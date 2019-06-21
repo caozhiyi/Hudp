@@ -1,0 +1,87 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="base">
+      <UniqueIdentifier>{8dc99840-b7fd-4838-9a6a-0392a9bc3c61}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common">
+      <UniqueIdentifier>{182df1a3-ddc6-423c-bba9-8e98025d374e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="base\Any.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="base\Buffer.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="base\config.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="base\Log.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="base\LoopBuffer.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="base\MemaryPool.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="base\PoolSharedPtr.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="base\Runnable.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="base\RunnableAloneTaskList.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="base\RunnableAloneTaskListWithPost.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="base\RunnableShareTaskList.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="base\Single.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="base\TaskQueue.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="base\TimeTool.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="common\Common.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="common\CBitStream.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="common\CommonType.h">
+      <Filter>common</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="base\Buffer.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
+    <ClCompile Include="base\config.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
+    <ClCompile Include="base\Log.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
+    <ClCompile Include="base\LoopBuffer.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
+    <ClCompile Include="base\MemaryPool.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
+    <ClCompile Include="base\TimeTool.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
+    <ClCompile Include="common\CBitStream.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

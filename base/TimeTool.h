@@ -22,7 +22,7 @@ public:
 	int GetHour();
 	int GetMin();
 	int GetSec();
-	int GetMsec();
+    time_t GetMsec();
 
 	//return xxxx xx xx-xx:xx:xx
 	std::string GetFormatTime();

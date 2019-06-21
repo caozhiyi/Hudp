@@ -60,7 +60,7 @@ int CTimeTool::GetSec() {
 	return _tm.tm_sec;
 }
 
-int CTimeTool::GetMsec() {
+time_t CTimeTool::GetMsec() {
 	return _time;
 }
 

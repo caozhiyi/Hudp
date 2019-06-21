@@ -8,7 +8,7 @@
 class CConfig
 {
 public:
-	bool SetFilePath(const std::string& path);
+	void SetFilePath(const std::string& path);
 	bool ReLoadFile();
 
 	bool LoadFile(const std::string& path);
