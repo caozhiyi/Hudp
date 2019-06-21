@@ -1,11 +1,11 @@
 #ifndef HEADER_CBITSTREAM
 #define HEADER_CBITSTREAM
 
-#include <mutex>
-#include <assert.h>
+#include <mutex>    // for mutex
+#include <string>   // for string
 #include "CommonType.h"
-static const bool __must_less_mtu  = false;
-static const uint16_t __max_length = (uint16_t)65536;
+static const bool     __must_less_mtu  = false;
+static const uint16_t __max_length     = (uint16_t)65536;
 namespace hudp {
     class CHudpBitStream {
     public:
@@ -21,10 +21,16 @@ namespace hudp {
         // only can write type that defined in common type
         template<typename T>
         bool Write(T& value);
-        bool Write(char* value, uint16_t len);
+        bool Write(const char* value, uint16_t len);
         bool Write(const std::string& value);
         bool Write(const CHudpBitStream& value);
-    
+
+        template<typename T>
+        bool Read(T& value);
+        bool Read(char* value, uint16_t len);
+        bool Read(std::string& value, uint16_t len);
+        bool Read(CHudpBitStream& value, uint16_t len);
+
     private:
         // check the left over buffer is enough?
         bool CheckBufferExpend(uint16_t len);
@@ -47,7 +53,19 @@ namespace hudp {
             return false;
         }
         // write value
-        memccpy(_cur_point, (void*)value, len);
+        memcpy(_cur_point, (void*)&value, len);
+        _cur_point += len;
+        _cur_length += len;
+        return true;
+    }
+
+    template<typename T>
+    bool CHudpBitStream::Read(T& value) {
+        uint16_t len = sizeof(value);
+        if (_cur_length + len > _length) {
+            return false;
+        }
+        memcpy((void*)&value, _cur_point, len);
         _cur_point += len;
         _cur_length += len;
         return true;

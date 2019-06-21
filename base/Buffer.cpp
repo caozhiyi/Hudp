@@ -4,6 +4,8 @@
 #include "LoopBuffer.h"
 #include "Log.h"
 
+using namespace base;
+
 CBuffer::CBuffer(std::shared_ptr<CMemoryPool>& pool) : 
 	_pool(pool), 
 	_buffer_num(0),

@@ -22,7 +22,7 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{0A8B6889-7D56-43C3-99F9-29C4340A022B}</ProjectGuid>
     <RootNamespace>Hudp</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -75,6 +75,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>$(SolutionDir)base;$(IncludePath)</IncludePath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>$(SolutionDir)base;H:\VS 2017\2017\VC\Tools\MSVC\14.16.27023\include;$(SolutionDir)common</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>$(SolutionDir)base;H:\VS 2017\2017\VC\Tools\MSVC\14.16.27023\include;$(SolutionDir)common</IncludePath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -124,7 +130,8 @@
   <ItemGroup>
     <ClInclude Include="base\Any.h" />
     <ClInclude Include="base\Buffer.h" />
-    <ClInclude Include="base\config.h" />
+    <ClInclude Include="base\BidiList.h" />
+    <ClInclude Include="base\Config.h" />
     <ClInclude Include="base\Log.h" />
     <ClInclude Include="base\LoopBuffer.h" />
     <ClInclude Include="base\MemaryPool.h" />
@@ -142,7 +149,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="base\Buffer.cpp" />
-    <ClCompile Include="base\config.cpp" />
+    <ClCompile Include="base\BidiList.cpp" />
+    <ClCompile Include="base\Config.cpp" />
     <ClCompile Include="base\Log.cpp" />
     <ClCompile Include="base\LoopBuffer.cpp" />
     <ClCompile Include="base\MemaryPool.cpp" />

@@ -15,9 +15,6 @@
     <ClInclude Include="base\Buffer.h">
       <Filter>base</Filter>
     </ClInclude>
-    <ClInclude Include="base\config.h">
-      <Filter>base</Filter>
-    </ClInclude>
     <ClInclude Include="base\Log.h">
       <Filter>base</Filter>
     </ClInclude>
@@ -42,9 +39,6 @@
     <ClInclude Include="base\RunnableShareTaskList.h">
       <Filter>base</Filter>
     </ClInclude>
-    <ClInclude Include="base\Single.h">
-      <Filter>base</Filter>
-    </ClInclude>
     <ClInclude Include="base\TaskQueue.h">
       <Filter>base</Filter>
     </ClInclude>
@@ -60,12 +54,18 @@
     <ClInclude Include="common\CommonType.h">
       <Filter>common</Filter>
     </ClInclude>
+    <ClInclude Include="base\BidiList.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="base\Config.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="base\Single.h">
+      <Filter>base</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="base\Buffer.cpp">
-      <Filter>base</Filter>
-    </ClCompile>
-    <ClCompile Include="base\config.cpp">
       <Filter>base</Filter>
     </ClCompile>
     <ClCompile Include="base\Log.cpp">
@@ -82,6 +82,12 @@
     </ClCompile>
     <ClCompile Include="common\CBitStream.cpp">
       <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="base\BidiList.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
+    <ClCompile Include="base\Config.cpp">
+      <Filter>base</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

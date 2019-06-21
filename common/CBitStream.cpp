@@ -59,7 +59,7 @@ void CHudpBitStream::CopyMemory(void* value, uint16_t len) {
     _cur_length += len;
 }
 
-bool CHudpBitStream::Write(char* value, uint16_t len) {
+bool CHudpBitStream::Write(const char* value, uint16_t len) {
     if (!CheckBufferExpend(len)) {
         return false;
     }
@@ -85,5 +85,36 @@ bool CHudpBitStream::Write(const CHudpBitStream& value) {
     }
     // write value
     CopyMemory((void*)value.GetDataPoint(), len);
+    return true;
+}
+
+bool CHudpBitStream::Read(char* value, uint16_t len) {
+    if (_cur_length + len > _length) {
+        return false;
+    }
+    memcpy((void*)value, _cur_point, len);
+    _cur_point += len;
+    _cur_length += len;
+    return true;
+}
+
+bool CHudpBitStream::Read(std::string& value, uint16_t len) {
+    if (_cur_length + len > _length) {
+        return false;
+    }
+    value = std::string(_cur_point, len);
+    _cur_point += len;
+    _cur_length += len;
+    return true;
+}
+
+bool CHudpBitStream::Read(CHudpBitStream& value, uint16_t len) {
+    if (_cur_length + len > _length) {
+        return false;
+    }
+    
+    value.Write(_cur_point, len);
+    _cur_point += len;
+    _cur_length += len;
     return true;
 }

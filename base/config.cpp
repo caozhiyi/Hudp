@@ -1,6 +1,8 @@
-#include "config.h"
+#include "Config.h"
 #include "Log.h"
 #include <fstream>
+
+using namespace base;
 
 void CConfig::SetFilePath(const std::string& path) {
 	_file = path;

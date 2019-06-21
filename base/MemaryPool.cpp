@@ -2,8 +2,7 @@
 #include "MemaryPool.h"
 #include "Log.h"
 
-#include <iostream>
-using namespace std;
+using namespace base;
 
 CMemoryPool::CMemoryPool() {
 	for (int i = 0; i < __number_of_free_lists; i++) {
