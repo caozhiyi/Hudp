@@ -1,5 +1,5 @@
-#ifndef HEADER_RUNNABLE
-#define HEADER_RUNNABLE
+#ifndef HEADER_BASE_RUNNABLE
+#define HEADER_BASE_RUNNABLE
 
 #include <thread>
 #include <atomic>

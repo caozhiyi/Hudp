@@ -1,5 +1,5 @@
-#ifndef HEADER_MMEMARY
-#define HEADER_MMEMARY
+#ifndef HEADER_BASE_MMEMARYPOOL
+#define HEADER_BASE_MMEMARYPOOL
 
 #include <new>
 #include <functional>

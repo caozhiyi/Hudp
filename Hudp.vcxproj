@@ -130,7 +130,6 @@
   <ItemGroup>
     <ClInclude Include="base\Any.h" />
     <ClInclude Include="base\Buffer.h" />
-    <ClInclude Include="base\BidiList.h" />
     <ClInclude Include="base\Config.h" />
     <ClInclude Include="base\Log.h" />
     <ClInclude Include="base\LoopBuffer.h" />
@@ -143,19 +142,33 @@
     <ClInclude Include="base\Single.h" />
     <ClInclude Include="base\TaskQueue.h" />
     <ClInclude Include="base\TimeTool.h" />
-    <ClInclude Include="common\CBitStream.h" />
+    <ClInclude Include="base\TSQueue.h" />
+    <ClInclude Include="common\BitStream.h" />
+    <ClInclude Include="common\BitStreamPool.h" />
     <ClInclude Include="common\Common.h" />
     <ClInclude Include="common\CommonType.h" />
+    <ClInclude Include="common\IncrementalId.h" />
+    <ClInclude Include="common\NetMsgPool.h" />
+    <ClInclude Include="common\Serializes.h" />
+    <ClInclude Include="common\PriorityQueue.h" />
+    <ClInclude Include="hudp\FilterInterface.h" />
+    <ClInclude Include="net\HudpSocket.h" />
+    <ClInclude Include="net\OsNet.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="base\Buffer.cpp" />
-    <ClCompile Include="base\BidiList.cpp" />
     <ClCompile Include="base\Config.cpp" />
     <ClCompile Include="base\Log.cpp" />
     <ClCompile Include="base\LoopBuffer.cpp" />
     <ClCompile Include="base\MemaryPool.cpp" />
     <ClCompile Include="base\TimeTool.cpp" />
-    <ClCompile Include="common\CBitStream.cpp" />
+    <ClCompile Include="common\BitStream.cpp" />
+    <ClCompile Include="common\BitStreamPool.cpp" />
+    <ClCompile Include="common\IncrementalId.cpp" />
+    <ClCompile Include="common\NetMsgPool.cpp" />
+    <ClCompile Include="common\PriorityQueue.cpp" />
+    <ClCompile Include="common\Serializes.cpp" />
+    <ClCompile Include="net\HudpSocket.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,5 +1,5 @@
-#ifndef HEADER_CTIME
-#define HEADER_CTIME
+#ifndef HEADER_BASE_TIMETOOL
+#define HEADER_BASE_TIMETOOL
 
 #include <mutex>
 namespace base {

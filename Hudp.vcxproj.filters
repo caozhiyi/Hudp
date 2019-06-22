@@ -7,6 +7,12 @@
     <Filter Include="common">
       <UniqueIdentifier>{182df1a3-ddc6-423c-bba9-8e98025d374e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="net">
+      <UniqueIdentifier>{6788f382-44a0-41d5-a2f2-df85cd6ca5c3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="hudp">
+      <UniqueIdentifier>{0db70ca4-8124-497b-a0e7-3b48908157ba}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="base\Any.h">
@@ -48,20 +54,44 @@
     <ClInclude Include="common\Common.h">
       <Filter>common</Filter>
     </ClInclude>
-    <ClInclude Include="common\CBitStream.h">
-      <Filter>common</Filter>
-    </ClInclude>
     <ClInclude Include="common\CommonType.h">
       <Filter>common</Filter>
-    </ClInclude>
-    <ClInclude Include="base\BidiList.h">
-      <Filter>base</Filter>
     </ClInclude>
     <ClInclude Include="base\Config.h">
       <Filter>base</Filter>
     </ClInclude>
     <ClInclude Include="base\Single.h">
       <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="net\HudpSocket.h">
+      <Filter>net</Filter>
+    </ClInclude>
+    <ClInclude Include="net\OsNet.h">
+      <Filter>net</Filter>
+    </ClInclude>
+    <ClInclude Include="common\PriorityQueue.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="base\TSQueue.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="common\BitStream.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="common\Serializes.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="common\IncrementalId.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="common\NetMsgPool.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="common\BitStreamPool.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="hudp\FilterInterface.h">
+      <Filter>hudp</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -80,14 +110,29 @@
     <ClCompile Include="base\TimeTool.cpp">
       <Filter>base</Filter>
     </ClCompile>
-    <ClCompile Include="common\CBitStream.cpp">
-      <Filter>common</Filter>
-    </ClCompile>
-    <ClCompile Include="base\BidiList.cpp">
-      <Filter>base</Filter>
-    </ClCompile>
     <ClCompile Include="base\Config.cpp">
       <Filter>base</Filter>
+    </ClCompile>
+    <ClCompile Include="net\HudpSocket.cpp">
+      <Filter>net</Filter>
+    </ClCompile>
+    <ClCompile Include="common\PriorityQueue.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="common\BitStream.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="common\Serializes.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="common\IncrementalId.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="common\NetMsgPool.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="common\BitStreamPool.cpp">
+      <Filter>common</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

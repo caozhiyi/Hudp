@@ -1,5 +1,5 @@
-#ifndef HEADER_CANY
-#define HEADER_CANY
+#ifndef HEADER_BASE_CANY
+#define HEADER_BASE_CANY
 
 #include <algorithm>
 #include <typeinfo>

@@ -1,5 +1,5 @@
-#ifndef HEADER_LOG
-#define HEADER_LOG
+#ifndef HEADER_BASE_LOG
+#define HEADER_BASE_LOG
 
 #include <fstream>
 #include <stdarg.h>

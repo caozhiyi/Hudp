@@ -1,5 +1,5 @@
-#ifndef HEADER_BUFFER
-#define HEADER_BUFFER
+#ifndef HEADER_BASE_BUFFER
+#define HEADER_BASE_BUFFER
 
 #include <memory>
 #include <vector>

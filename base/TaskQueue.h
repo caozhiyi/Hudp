@@ -1,5 +1,5 @@
-#ifndef HEADER_TASKQUEUE
-#define HEADER_TASKQUEUE
+#ifndef HEADER_BASE_TASKQUEUE
+#define HEADER_BASE_TASKQUEUE
 
 #include <list>
 #include <mutex>

@@ -1,5 +1,5 @@
-#ifndef HEADER_CPOOLSHAREDPTR
-#define HEADER_CPOOLSHAREDPTR
+#ifndef HEADER_BASE_CPOOLSHAREDPTR
+#define HEADER_BASE_CPOOLSHAREDPTR
 #include <atomic>
 #include <functional>
 #include <stddef.h>
