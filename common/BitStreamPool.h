@@ -4,13 +4,14 @@
 #include "CommonType.h"
 #include "BitStream.h"
 #include "TSQueue.h"
+#include "Single.h"
 
 namespace hudp {
     
     // pool size at initialization.
     static const uint16_t __init_pool_size = 200;
-    class CBitStreamPool {
-        
+    class CBitStreamPool : public base::CSingle<CBitStreamPool> {
+    public:    
         CBitStreamPool();
         ~CBitStreamPool();
 
@@ -21,7 +22,7 @@ namespace hudp {
 
         CHudpBitStream* GetBitStream();
 
-        void FreeBitStream(CHudpBitStream* msg);
+        void FreeBitStream(CHudpBitStream* bit_stream);
         
     private:
         base::CTSQueue<CHudpBitStream*>    _free_queue;

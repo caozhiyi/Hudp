@@ -38,5 +38,6 @@ NetMsg* CNetMsgPool::GetMsg() {
 }
 
 void CNetMsgPool::FreeMsg(NetMsg* msg) {
+    msg->Clear();
     _free_queue.Push(msg);
 }

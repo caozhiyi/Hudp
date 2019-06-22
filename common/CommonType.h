@@ -2,6 +2,11 @@
 #define HEADER_COMMON_COMMONTYPE
 
 namespace hudp {
+
+#define CHECK_RET(ret) do{if(!ret) return false;}while(0);
+
+
+
 #if defined(__GNUC__) || defined(__GCCXML__) || defined(__SNC__) || defined(__S3E__)
 #include <stdint.h>
 #elif !defined(_STDINT_H) && !defined(_SN_STDINT_H) && !defined(_SYS_STDINT_H_) && !defined(_STDINT) && !defined(_MACHTYPES_H_) && !defined(_STDINT_H_)

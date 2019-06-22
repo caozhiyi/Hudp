@@ -1,6 +1,7 @@
 #include <memory.h> // for memset memcpy
 #include "BitStream.h"
-#include "Common.h"
+#include "NetMsg.h"
+#include "CommonFlag.h"
 #include "Log.h"
 
 using namespace hudp;
@@ -31,7 +32,15 @@ const char* CHudpBitStream::GetDataPoint() const {
     return _data;
 }
 
+void CHudpBitStream::Clear() {
+    std::unique_lock<std::mutex> lock(_mutex);
+    memset(_data, 0, _length);
+    _cur_point = _data;
+    _cur_length = 0;
+}
+
 bool CHudpBitStream::CheckBufferExpend(uint16_t len) {
+    std::unique_lock<std::mutex> lock(_mutex);
     if (__max_length - _cur_length < len) {
         base::LOG_ERROR("write stream more than max length.");
         return false;
@@ -54,6 +63,7 @@ bool CHudpBitStream::CheckBufferExpend(uint16_t len) {
 }
 
 void CHudpBitStream::CopyMemory(void* value, uint16_t len) {
+    std::unique_lock<std::mutex> lock(_mutex);
     memcpy(_cur_point, (void*)value, len);
     _cur_point += len;
     _cur_length += len;
@@ -89,6 +99,7 @@ bool CHudpBitStream::Write(const CHudpBitStream& value) {
 }
 
 bool CHudpBitStream::Read(char* value, uint16_t len) {
+    std::unique_lock<std::mutex> lock(_mutex);
     if (_cur_length + len > _length) {
         return false;
     }
@@ -99,6 +110,7 @@ bool CHudpBitStream::Read(char* value, uint16_t len) {
 }
 
 bool CHudpBitStream::Read(std::string& value, uint16_t len) {
+    std::unique_lock<std::mutex> lock(_mutex);
     if (_cur_length + len > _length) {
         return false;
     }
@@ -109,6 +121,7 @@ bool CHudpBitStream::Read(std::string& value, uint16_t len) {
 }
 
 bool CHudpBitStream::Read(CHudpBitStream& value, uint16_t len) {
+    std::unique_lock<std::mutex> lock(_mutex);
     if (_cur_length + len > _length) {
         return false;
     }

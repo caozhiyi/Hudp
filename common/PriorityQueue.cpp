@@ -1,4 +1,5 @@
 #include "PriorityQueue.h"
+#include "CommonFlag.h"
 namespace hudp {
 
     CPriorityQueue::CPriorityQueue() : _pri_normal_count(__pri_surplus),
@@ -14,19 +15,19 @@ namespace hudp {
     }
 
     void CPriorityQueue::Push(NetMsg* msg) {
-        if (msg->_head._flag & PF_LOW_PRI) {
+        if (msg->_head._flag & HPF_LOW_PRI) {
             _queue_arr[__pri_low].Push(msg);
 
         }
-        else if (msg->_head._flag & PF_NROMAL_PRI) {
+        else if (msg->_head._flag & HPF_NROMAL_PRI) {
             _queue_arr[__pri_normal].Push(msg);
 
         }
-        else if (msg->_head._flag & PF_HIGH_PRI) {
+        else if (msg->_head._flag & HPF_HIGH_PRI) {
             _queue_arr[__pri_heig].Push(msg);
 
         }
-        else if (msg->_head._flag & PF_HIGHEST_PRI) {
+        else if (msg->_head._flag & HPF_HIGHEST_PRI) {
             _queue_arr[__pri_heighest].Push(msg);
 
         }

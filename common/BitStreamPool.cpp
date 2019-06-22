@@ -32,11 +32,15 @@ void CBitStreamPool::ReduceFree() {
 }
 
 CHudpBitStream* CBitStreamPool::GetBitStream() {
-    CHudpBitStream* msg = nullptr;
-    _free_queue.Pop(msg);
-    return msg;
+    CHudpBitStream* bit_stream = nullptr;
+    if (_free_queue.Size() == 0) {
+        ExpendFree();
+    }
+    _free_queue.Pop(bit_stream);
+    return bit_stream;
 }
 
-void CBitStreamPool::FreeBitStream(CHudpBitStream* msg) {
-    _free_queue.Push(msg);
+void CBitStreamPool::FreeBitStream(CHudpBitStream* bit_stream) {
+    bit_stream->Clear();
+    _free_queue.Push(bit_stream);
 }

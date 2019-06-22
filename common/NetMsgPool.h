@@ -2,15 +2,16 @@
 #define HEADER_COMMON_CNETMSGPOOL
 
 #include "CommonType.h"
-#include "Common.h"
+#include "NetMsg.h"
 #include "TSQueue.h"
+#include "Single.h"
 
 namespace hudp {
     
     // pool size at initialization.
     static const uint16_t __init_pool_size = 200;
-    class CNetMsgPool {
-        
+    class CNetMsgPool : public base::CSingle<CNetMsgPool> {
+    public:
         CNetMsgPool();
         ~CNetMsgPool();
 

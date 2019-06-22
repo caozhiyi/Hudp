@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -145,13 +145,17 @@
     <ClInclude Include="base\TSQueue.h" />
     <ClInclude Include="common\BitStream.h" />
     <ClInclude Include="common\BitStreamPool.h" />
-    <ClInclude Include="common\Common.h" />
+    <ClInclude Include="common\CommonFlag.h" />
     <ClInclude Include="common\CommonType.h" />
     <ClInclude Include="common\IncrementalId.h" />
+    <ClInclude Include="common\NetMsg.h" />
     <ClInclude Include="common\NetMsgPool.h" />
-    <ClInclude Include="common\Serializes.h" />
     <ClInclude Include="common\PriorityQueue.h" />
+    <ClInclude Include="common\Serializes.h" />
+    <ClInclude Include="common\Timer.h" />
     <ClInclude Include="hudp\FilterInterface.h" />
+    <ClInclude Include="hudp\FilterProcess.h" />
+    <ClInclude Include="hudp\SerializesFilter.h" />
     <ClInclude Include="net\HudpSocket.h" />
     <ClInclude Include="net\OsNet.h" />
   </ItemGroup>
@@ -168,6 +172,10 @@
     <ClCompile Include="common\NetMsgPool.cpp" />
     <ClCompile Include="common\PriorityQueue.cpp" />
     <ClCompile Include="common\Serializes.cpp" />
+    <ClCompile Include="common\Timer.cpp" />
+    <ClCompile Include="hudp\FilterInterface.cpp" />
+    <ClCompile Include="hudp\FilterProcess.cpp" />
+    <ClCompile Include="hudp\SerializesFilter.cpp" />
     <ClCompile Include="net\HudpSocket.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

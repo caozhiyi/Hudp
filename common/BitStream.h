@@ -7,7 +7,7 @@
 namespace hudp {
 
     static const bool     __must_less_mtu  = false;
-    static const uint16_t __max_length     = (uint16_t)65535;
+    static const uint16_t __max_length     = (uint16_t)0xFFFF;
 
     class CHudpBitStream {
     public:
@@ -19,6 +19,8 @@ namespace hudp {
         uint16_t GetCurrentLength() const;
 
         const char* GetDataPoint() const;
+
+        void Clear();
         
         // only can write type that defined in common type
         template<typename T>
@@ -42,7 +44,7 @@ namespace hudp {
         std::mutex  _mutex;
         char*       _data;       // date buffer
         char*       _cur_point;  // current read/write point
-        // max support 65536 length.
+        // max support 65535 length.
         uint16_t    _length;
         uint16_t    _cur_length;
     };

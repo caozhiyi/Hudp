@@ -7,7 +7,7 @@ namespace hudp {
 
     // after trans boundary, still think bigger in 0 ~ __max_compare_num
     static const uint16_t __max_compare_num = 100;  
-    static const uint16_t __max_id = (uint16_t)65535;
+    static const uint16_t __max_id = (uint16_t)0xFFFF;
 
     class CIncrementalId {
         CIncrementalId();

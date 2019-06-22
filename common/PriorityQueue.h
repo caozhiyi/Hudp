@@ -7,7 +7,7 @@
 #include <condition_variable>
 
 #include "CommonType.h"
-#include "Common.h"
+#include "NetMsg.h"
 #include "TSQueue.h"
 namespace hudp {
     

@@ -51,9 +51,6 @@
     <ClInclude Include="base\TimeTool.h">
       <Filter>base</Filter>
     </ClInclude>
-    <ClInclude Include="common\Common.h">
-      <Filter>common</Filter>
-    </ClInclude>
     <ClInclude Include="common\CommonType.h">
       <Filter>common</Filter>
     </ClInclude>
@@ -78,9 +75,6 @@
     <ClInclude Include="common\BitStream.h">
       <Filter>common</Filter>
     </ClInclude>
-    <ClInclude Include="common\Serializes.h">
-      <Filter>common</Filter>
-    </ClInclude>
     <ClInclude Include="common\IncrementalId.h">
       <Filter>common</Filter>
     </ClInclude>
@@ -92,6 +86,24 @@
     </ClInclude>
     <ClInclude Include="hudp\FilterInterface.h">
       <Filter>hudp</Filter>
+    </ClInclude>
+    <ClInclude Include="hudp\FilterProcess.h">
+      <Filter>hudp</Filter>
+    </ClInclude>
+    <ClInclude Include="hudp\SerializesFilter.h">
+      <Filter>hudp</Filter>
+    </ClInclude>
+    <ClInclude Include="common\CommonFlag.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="common\NetMsg.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="common\Serializes.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="common\Timer.h">
+      <Filter>common</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -132,6 +144,18 @@
       <Filter>common</Filter>
     </ClCompile>
     <ClCompile Include="common\BitStreamPool.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="hudp\FilterInterface.cpp">
+      <Filter>hudp</Filter>
+    </ClCompile>
+    <ClCompile Include="hudp\FilterProcess.cpp">
+      <Filter>hudp</Filter>
+    </ClCompile>
+    <ClCompile Include="hudp\SerializesFilter.cpp">
+      <Filter>hudp</Filter>
+    </ClCompile>
+    <ClCompile Include="common\Timer.cpp">
       <Filter>common</Filter>
     </ClCompile>
   </ItemGroup>
