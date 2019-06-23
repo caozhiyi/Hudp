@@ -105,6 +105,21 @@
     <ClInclude Include="common\Timer.h">
       <Filter>common</Filter>
     </ClInclude>
+    <ClInclude Include="common\SendWnd.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="common\TimerSolt.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="common\SendWndSolt.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="common\OrderList.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="common\OrderListSolt.h">
+      <Filter>common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="base\Buffer.cpp">
@@ -156,6 +171,12 @@
       <Filter>hudp</Filter>
     </ClCompile>
     <ClCompile Include="common\Timer.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="common\SendWnd.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="common\OrderList.cpp">
       <Filter>common</Filter>
     </ClCompile>
   </ItemGroup>

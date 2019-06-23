@@ -31,7 +31,7 @@ namespace base {
             return true;
         }
 
-        void Clear(bool notify = true) {
+        void Clear() {
             std::unique_lock<std::mutex> lock(_mutex);
             while (!_block_queue.empty()) {
                 _block_queue.pop();

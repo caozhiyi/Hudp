@@ -8,13 +8,13 @@ namespace hudp {
 
     class CSerializes {
     public:
-        static bool Serializes(NetMsg& msg, CHudpBitStream& stream);
-        static bool Serializes(const Head& head, CHudpBitStream& stream);
-        static bool Serializes(Head& head, const char* body, uint16_t len, CHudpBitStream& stream);
+        static bool Serializes(NetMsg& msg, CHudpBitStream& bit_stream);
+        static bool Serializes(const Head& head, CHudpBitStream& bit_stream);
+        static bool Serializes(Head& head, const char* body, uint16_t len, CHudpBitStream& bit_stream);
 
-        static bool Deseriali(CHudpBitStream& stream, NetMsg& msg);
-        static bool Deseriali(CHudpBitStream& stream, Head& head);
-        static bool Deseriali(CHudpBitStream& stream, Head& head, char* body, uint16_t& len);
+        static bool Deseriali(CHudpBitStream& bit_stream, NetMsg& msg);
+        static bool Deseriali(CHudpBitStream& bit_stream, Head& head);
+        static bool Deseriali(CHudpBitStream& bit_stream, Head& head, char* body, uint16_t& len);
     };
 }
 

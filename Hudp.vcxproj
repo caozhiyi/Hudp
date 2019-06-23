@@ -150,9 +150,14 @@
     <ClInclude Include="common\IncrementalId.h" />
     <ClInclude Include="common\NetMsg.h" />
     <ClInclude Include="common\NetMsgPool.h" />
+    <ClInclude Include="common\OrderList.h" />
+    <ClInclude Include="common\OrderListSolt.h" />
     <ClInclude Include="common\PriorityQueue.h" />
+    <ClInclude Include="common\SendWnd.h" />
+    <ClInclude Include="common\SendWndSolt.h" />
     <ClInclude Include="common\Serializes.h" />
     <ClInclude Include="common\Timer.h" />
+    <ClInclude Include="common\TimerSolt.h" />
     <ClInclude Include="hudp\FilterInterface.h" />
     <ClInclude Include="hudp\FilterProcess.h" />
     <ClInclude Include="hudp\SerializesFilter.h" />
@@ -170,7 +175,9 @@
     <ClCompile Include="common\BitStreamPool.cpp" />
     <ClCompile Include="common\IncrementalId.cpp" />
     <ClCompile Include="common\NetMsgPool.cpp" />
+    <ClCompile Include="common\OrderList.cpp" />
     <ClCompile Include="common\PriorityQueue.cpp" />
+    <ClCompile Include="common\SendWnd.cpp" />
     <ClCompile Include="common\Serializes.cpp" />
     <ClCompile Include="common\Timer.cpp" />
     <ClCompile Include="hudp\FilterInterface.cpp" />

@@ -1,13 +1,71 @@
 #include "Timer.h"
 #include "Log.h"
+#include "TimerSolt.h"
+
 using namespace hudp;
+
+static const uint16_t __notimer_sleep = 20;
+base::CTimeTool CTimer::_time_tool;
 
 inline bool is_between_in(const uint16_t& num, const uint16_t& prev, const uint16_t& next) {
     return num > prev && num <= next;
 }
 
-void CTimer::AddTimer(uint16_t ms, CTimerInterface* ti) {
-    
+CTimer::CTimer() {
+    memset(_timer_list, 0, sizeof(_timer_list));
+}
+
+CTimer::~CTimer() {
+
+}
+
+void CTimer::AddTimer(uint16_t ms, CTimerSolt* ti) {
+    _time_tool.Now();
+
+    ms = RoundedBackwards(ms);
+    uint64_t expiration_time = ms + _time_tool.GetMsec();
+    uint16_t index = GetIndex(ms);
+
+    std::unique_lock<std::mutex> lock(_mutex);
+    CTimerSolt* timer = _timer_list[index];
+    if (timer) {
+        ti->SetNext(timer);
+        timer = ti;
+    } else {
+        timer = ti;
+    }
+    _expiration_timer_map[expiration_time] = ms;
+    _notify.notify_one();
+}
+
+void CTimer::Run() {
+    uint16_t sleep_time = 0;
+    std::map<uint64_t, uint16_t>::iterator* iter = nullptr;
+    uint16_t index = 0;
+    while (!_stop) {
+        {
+            index = 0;
+            sleep_time = 0;
+            iter = nullptr;
+
+            std::unique_lock<std::mutex> lock(_mutex);
+            _notify.wait(_mutex, [this]() {return !this->_expiration_timer_map.empty(); });
+
+            iter = _expiration_timer_map.begin();
+            _time_tool.Now();
+            sleep_time = iter->first - _time_tool.GetMsec();
+        }
+        
+        base::CRunnable::Sleep(sleep_time);
+        
+        std::unique_lock<std::mutex> lock(_mutex);
+        index = GetIndex(iter->second);
+        auto ti = _timer_list[index];
+        while (ti) {
+            ti->OnTimer(ti->GetData());
+            ti = ti->GetNext();
+        }
+    }
 }
 
 uint16_t CTimer::RoundedBackwards(uint16_t ms) {
