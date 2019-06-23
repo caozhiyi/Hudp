@@ -5,7 +5,8 @@
 #include "CommonType.h"
 namespace hudp {
 
-    struct Head {
+    class Head {
+    public:
         uint16_t _flag;
         uint16_t _id;
         uint16_t _body_len;
@@ -13,7 +14,7 @@ namespace hudp {
         // ack
         uint16_t _ack_len;
         uint16_t _ack_start;
-        std:vector<uint16_t> _ack_vec;
+        std::vector<uint16_t> _ack_vec;
 
         Head() : _flag(0),
                  _id(0),
@@ -33,7 +34,8 @@ namespace hudp {
         }
     };
     
-    struct NetMsg {
+    class NetMsg {
+    public:
         std::string _ip_port;
         Head        _head;
         char*       _body;

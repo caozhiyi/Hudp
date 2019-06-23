@@ -22,7 +22,7 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{0A8B6889-7D56-43C3-99F9-29C4340A022B}</ProjectGuid>
     <RootNamespace>Hudp</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -70,16 +70,16 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(SolutionDir)base;$(IncludePath)</IncludePath>
+    <IncludePath>I:\Windows Kits\10\Include\10.0.17763.0\ucrt;$(SolutionDir)base;I:\VS2017\install\VC\Tools\MSVC\14.16.27023\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(SolutionDir)base;$(IncludePath)</IncludePath>
+    <IncludePath>I:\Windows Kits\10\Include\10.0.17763.0\ucrt;$(SolutionDir)base;I:\VS2017\install\VC\Tools\MSVC\14.16.27023\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SolutionDir)base;H:\VS 2017\2017\VC\Tools\MSVC\14.16.27023\include;$(SolutionDir)common</IncludePath>
+    <IncludePath>I:\Windows Kits\10\Include\10.0.17763.0\ucrt;$(SolutionDir)base;I:\VS2017\install\VC\Tools\MSVC\14.16.27023\include;H:\VS 2017\2017\VC\Tools\MSVC\14.16.27023\include;$(SolutionDir)common</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(SolutionDir)base;H:\VS 2017\2017\VC\Tools\MSVC\14.16.27023\include;$(SolutionDir)common</IncludePath>
+    <IncludePath>I:\Windows Kits\10\Include\10.0.17763.0\ucrt;$(SolutionDir)base;I:\VS2017\install\VC\Tools\MSVC\14.16.27023\include;H:\VS 2017\2017\VC\Tools\MSVC\14.16.27023\include;$(SolutionDir)common</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -96,6 +96,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -121,6 +122,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>

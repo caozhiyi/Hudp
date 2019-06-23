@@ -9,6 +9,10 @@
 
 namespace hudp {
 
+    class CFilterInterface;
+    static std::vector<CFilterInterface*> __filer_list;
+    static process_phase __cur_handle_phase;
+
     class CHudpBitStream;
     class CFilterInterface {
     public:
@@ -26,9 +30,6 @@ namespace hudp {
         friend class CFilterProcess;
 
         process_phase _handle_phase;
-
-        static std::vector<CFilterInterface*> __filer_list;
-        static process_phase __cur_handle_phase;
     };
 
     // protocol resolution

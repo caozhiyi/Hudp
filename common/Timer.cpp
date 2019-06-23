@@ -40,13 +40,12 @@ void CTimer::AddTimer(uint16_t ms, CTimerSolt* ti) {
 
 void CTimer::Run() {
     uint16_t sleep_time = 0;
-    std::map<uint64_t, uint16_t>::iterator* iter = nullptr;
+    std::map<uint64_t, uint16_t>::iterator iter;
     uint16_t index = 0;
     while (!_stop) {
         {
             index = 0;
             sleep_time = 0;
-            iter = nullptr;
 
             std::unique_lock<std::mutex> lock(_mutex);
             _notify.wait(_mutex, [this]() {return !this->_expiration_timer_map.empty(); });

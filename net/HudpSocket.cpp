@@ -6,7 +6,7 @@
 namespace base {
     class COsNetInterface {
         // create a udp socket
-        uint64_t Socket();
+        // uint64_t Socket();
 
         // 
         

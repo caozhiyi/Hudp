@@ -27,7 +27,7 @@ namespace hudp {
             }
             return nullptr;
         }
-        CTimerSolt* SetNext(CTimerSolt* ti) {
+        void SetNext(CTimerSolt* ti) {
             _next = ti;
         }
         

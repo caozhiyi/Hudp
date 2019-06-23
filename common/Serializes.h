@@ -1,6 +1,8 @@
 #ifndef HEADER_COMMON_SERIALIZES
 #define HEADER_COMMON_SERIALIZES
 
+#include "CommonType.h"
+
 namespace hudp {
     class CHudpBitStream;
     class NetMsg;

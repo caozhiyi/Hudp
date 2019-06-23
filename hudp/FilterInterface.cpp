@@ -3,8 +3,8 @@
 #include "Log.h"
 using namespace hudp;
 
-std::vector<CFilterInterface*> CFilterInterface::__filer_list;
-process_phase CFilterInterface::__cur_handle_phase = PP_PROTO_PARSE;
+//std::vector<CFilterInterface*> CFilterInterface::__filer_list;
+//process_phase CFilterInterface::__cur_handle_phase = PP_PROTO_PARSE;
 
 bool CFilterInterface::Attach() {
     if (__cur_handle_phase > _handle_phase) {

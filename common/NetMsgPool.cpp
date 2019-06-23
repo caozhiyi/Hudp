@@ -8,7 +8,7 @@ CNetMsgPool::CNetMsgPool() {
 CNetMsgPool::~CNetMsgPool() {
     size_t size = _free_queue.Size();
     NetMsg* msg;
-    for (int i = 0; i < __init_pool_size; i++) {
+    for (int i = 0; i < __netmsg_init_pool_size; i++) {
         _free_queue.Pop(msg);
         delete msg;
     }
@@ -16,7 +16,7 @@ CNetMsgPool::~CNetMsgPool() {
 
 void CNetMsgPool::ExpendFree() {
     NetMsg* msg;
-    for (int i = 0; i < __init_pool_size; i++) {
+    for (int i = 0; i < __netmsg_init_pool_size; i++) {
         msg = new NetMsg();
         _free_queue.Push(msg);
     }
@@ -25,7 +25,7 @@ void CNetMsgPool::ExpendFree() {
 void CNetMsgPool::ReduceFree() {
     size_t size = _free_queue.Size() / 2;
     NetMsg* msg;
-    for (int i = 0; i < __init_pool_size; i++) {
+    for (int i = 0; i < __netmsg_init_pool_size; i++) {
         _free_queue.Pop(msg);
         delete msg;
     }

@@ -9,7 +9,7 @@
 namespace hudp {
     
     // pool size at initialization.
-    static const uint16_t __init_pool_size = 200;
+    static const uint16_t __netmsg_init_pool_size = 200;
     class CNetMsgPool : public base::CSingle<CNetMsgPool> {
     public:
         CNetMsgPool();

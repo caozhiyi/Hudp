@@ -2,6 +2,8 @@
 #define HEADER_BASE_TSQUEUE
 
 #include <mutex>
+#include <queue>
+
 namespace base {
 
     // thread safe queue
@@ -18,7 +20,7 @@ namespace base {
 
         void Push(const T& element) {
             std::unique_lock<std::mutex> lock(_mutex);
-            _block_queue.push(element);
+            _queue.push(element);
         }
 
         bool Pop(T& value) {
@@ -33,8 +35,8 @@ namespace base {
 
         void Clear() {
             std::unique_lock<std::mutex> lock(_mutex);
-            while (!_block_queue.empty()) {
-                _block_queue.pop();
+            while (!_queue.empty()) {
+                _queue.pop();
             }
         }
 

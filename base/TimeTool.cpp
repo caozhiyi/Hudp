@@ -4,6 +4,8 @@
 
 #include "TimeTool.h"
 
+using namespace base;
+
 CTimeTool::CTimeTool() {
 	Now();
 }
