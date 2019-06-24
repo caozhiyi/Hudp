@@ -5,8 +5,7 @@
 namespace base {
 
     template<typename T>
-    class CSingle
-    {
+    class CSingle {
     private:
     	CSingle(const CSingle&);
     	CSingle& operator = (const CSingle&);

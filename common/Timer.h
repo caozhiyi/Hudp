@@ -4,7 +4,6 @@
 #include <condition_variable>
 #include <mutex>
 #include <map>
-#include "NetMsg.h"
 #include "Runnable.h"
 #include "TimeTool.h"
 
@@ -40,7 +39,7 @@ namespace hudp {
         
     private:
         // timer event list
-        CTimerSolt*             _timer_list[__timer_max_length];
+        CTimerSolt*                  _timer_list[__timer_max_length];
         // all expiration in list
         std::map<uint64_t, uint16_t> _expiration_timer_map;
         // get now time tool

@@ -11,8 +11,7 @@ namespace base {
     typedef std::function<void()> Task;
     
     template<typename T = Task>
-    class CRunnableShareTaskList : public CRunnable
-    {
+    class CRunnableShareTaskList : public CRunnable {
     public:
     	explicit CRunnableShareTaskList(int channel);
     	virtual ~CRunnableShareTaskList();

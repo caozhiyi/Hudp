@@ -64,6 +64,7 @@ void CTimer::Run() {
             ti->OnTimer(ti->GetData());
             ti = ti->GetNext();
         }
+        _timer_list[index] = nullptr;
     }
 }
 

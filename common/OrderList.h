@@ -32,8 +32,8 @@ namespace hudp {
     // receive list that reliable and orderly 
     class CReliableOrderlyList : public CRecvList {
     public:
-        CReliableOrderlyList();
-        virtual ~CReliableOrderlyList();
+        CReliableOrderlyList() {}
+        virtual ~CReliableOrderlyList() {}
         // add a item to order list
         virtual void Insert(uint16_t id, COrderListSolt* ol);
     private:
@@ -43,8 +43,8 @@ namespace hudp {
     //  receive list that only reliable
     class CReliableList : public CRecvList {
     public:
-        CReliableList();
-        virtual ~CReliableList();
+        CReliableList() {}
+        virtual ~CReliableList() {}
         // add a item to order list
         virtual void Insert(uint16_t id, COrderListSolt* ol);
     };
@@ -52,8 +52,8 @@ namespace hudp {
     // receive list that only orderly
     class COrderlyList : public CRecvList {
     public:
-        COrderlyList();
-        virtual ~COrderlyList();
+        COrderlyList() {}
+        virtual ~COrderlyList() {}
         // add a item to order list
         virtual void Insert(uint16_t id, COrderListSolt* ol);
     };

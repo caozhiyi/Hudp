@@ -3,9 +3,9 @@
 
 #include <mutex>
 namespace base {
+
     class CMemoryPool;
-    class CTimeTool
-    {
+    class CTimeTool {
     public:
         CTimeTool();
         ~CTimeTool();

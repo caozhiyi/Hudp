@@ -28,9 +28,14 @@ namespace hudp {
 
         void Push(NetMsg* msg);
 
+        // get a item from queue by priority
         NetMsg* Pop();
 
+        // get current number of item in queue
         uint64_t Size();
+
+        // clear all item
+        void Clear();
         
     private:
         base::CTSQueue<NetMsg*>     _queue_arr[__pri_queue_size];
