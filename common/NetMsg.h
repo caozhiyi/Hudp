@@ -20,9 +20,7 @@ namespace hudp {
                  _id(0),
                  _body_len(0),
                  _ack_len(0),
-                 _ack_start(0) {
-
-        }
+                 _ack_start(0) {}
 
         void Clear() {
             _flag = 0;
@@ -40,9 +38,9 @@ namespace hudp {
         Head        _head;
         char*       _body;
 
-        NetMsg() : _body(nullptr) {
+        NetMsg() : _body(nullptr) {}
 
-        }
+        virtual ~NetMsg() {}
 
         void Clear() {
             _ip_port.clear();
