@@ -39,7 +39,7 @@ void CTimer::AddTimer(uint16_t ms, CTimerSolt* ti) {
 }
 
 void CTimer::Run() {
-    uint16_t sleep_time = 0;
+    uint64_t sleep_time = 0;
     std::map<uint64_t, uint16_t>::iterator iter;
     uint16_t index = 0;
     while (!_stop) {

@@ -13,6 +13,12 @@
     <Filter Include="hudp">
       <UniqueIdentifier>{0db70ca4-8124-497b-a0e7-3b48908157ba}</UniqueIdentifier>
     </Filter>
+    <Filter Include="utest">
+      <UniqueIdentifier>{4f5a8bb9-c53b-47f4-adeb-1c116a962360}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="utest\common">
+      <UniqueIdentifier>{c98b720e-f274-480f-bece-d253fe2aa88e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="base\Any.h">
@@ -120,6 +126,15 @@
     <ClInclude Include="common\OrderListSolt.h">
       <Filter>common</Filter>
     </ClInclude>
+    <ClInclude Include="common\FunctionNetMsg.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="common\NetMsgFactory.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="utest\common\Ut_BitStream.cpp">
+      <Filter>utest\common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="base\Buffer.cpp">
@@ -177,6 +192,9 @@
       <Filter>common</Filter>
     </ClCompile>
     <ClCompile Include="common\OrderList.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="common\FunctionNetMsg.cpp">
       <Filter>common</Filter>
     </ClCompile>
   </ItemGroup>

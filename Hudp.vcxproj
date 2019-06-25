@@ -70,10 +70,10 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>I:\Windows Kits\10\Include\10.0.17763.0\ucrt;$(SolutionDir)base;I:\VS2017\install\VC\Tools\MSVC\14.16.27023\include;$(IncludePath)</IncludePath>
+    <IncludePath>I:\Windows Kits\10\Include\10.0.17763.0\ucrt;$(SolutionDir)base;I:\VS2017\install\VC\Tools\MSVC\14.16.27023\include;H:\VS 2017\2017\VC\Tools\MSVC\14.16.27023\include;$(SolutionDir)common</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>I:\Windows Kits\10\Include\10.0.17763.0\ucrt;$(SolutionDir)base;I:\VS2017\install\VC\Tools\MSVC\14.16.27023\include;$(IncludePath)</IncludePath>
+    <IncludePath>I:\Windows Kits\10\Include\10.0.17763.0\ucrt;$(SolutionDir)base;I:\VS2017\install\VC\Tools\MSVC\14.16.27023\include;H:\VS 2017\2017\VC\Tools\MSVC\14.16.27023\include;$(SolutionDir)common</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>I:\Windows Kits\10\Include\10.0.17763.0\ucrt;$(SolutionDir)base;I:\VS2017\install\VC\Tools\MSVC\14.16.27023\include;H:\VS 2017\2017\VC\Tools\MSVC\14.16.27023\include;$(SolutionDir)common</IncludePath>
@@ -87,8 +87,13 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -98,6 +103,9 @@
       <ConformanceMode>true</ConformanceMode>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -112,6 +120,7 @@
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -127,6 +136,7 @@
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <SubSystem>Windows</SubSystem>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -149,8 +159,10 @@
     <ClInclude Include="common\BitStreamPool.h" />
     <ClInclude Include="common\CommonFlag.h" />
     <ClInclude Include="common\CommonType.h" />
+    <ClInclude Include="common\FunctionNetMsg.h" />
     <ClInclude Include="common\IncrementalId.h" />
     <ClInclude Include="common\NetMsg.h" />
+    <ClInclude Include="common\NetMsgFactory.h" />
     <ClInclude Include="common\NetMsgPool.h" />
     <ClInclude Include="common\OrderList.h" />
     <ClInclude Include="common\OrderListSolt.h" />
@@ -165,6 +177,7 @@
     <ClInclude Include="hudp\SerializesFilter.h" />
     <ClInclude Include="net\HudpSocket.h" />
     <ClInclude Include="net\OsNet.h" />
+    <ClInclude Include="utest\common\Ut_BitStream.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="base\Buffer.cpp" />
@@ -175,6 +188,7 @@
     <ClCompile Include="base\TimeTool.cpp" />
     <ClCompile Include="common\BitStream.cpp" />
     <ClCompile Include="common\BitStreamPool.cpp" />
+    <ClCompile Include="common\FunctionNetMsg.cpp" />
     <ClCompile Include="common\IncrementalId.cpp" />
     <ClCompile Include="common\NetMsgPool.cpp" />
     <ClCompile Include="common\OrderList.cpp" />
