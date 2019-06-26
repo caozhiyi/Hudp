@@ -5,7 +5,7 @@
 
 namespace hudp {
 
-    class CHudpBitStream;
+    class CBitStream;
     class CFilterProcess {
     public:
         CFilterProcess() {}
@@ -13,7 +13,7 @@ namespace hudp {
         
         // process chain of responsibility
         bool SendProcess(char* data, uint16_t len, uint16_t flag, const std::string& _ip_port);
-        bool RecvProcess(CHudpBitStream* bit_stream, const std::string& _ip_port); 
+        bool RecvProcess(CBitStream* bit_stream, const std::string& _ip_port); 
     };
 }
 

@@ -6,11 +6,11 @@
 
 using namespace hudp;
 
-bool CSerializes::Serializes(NetMsg& msg, CHudpBitStream& bit_stream) {
+bool CSerializes::Serializes(NetMsg& msg, CBitStreamWriter& bit_stream) {
     return Serializes(msg._head, msg._body, msg._head._body_len, bit_stream);
 }
 
-bool CSerializes::Serializes(const Head& head, CHudpBitStream& bit_stream) {
+bool CSerializes::Serializes(const Head& head, CBitStreamWriter& bit_stream) {
     // must serializes head first
     if (bit_stream.GetCurrentLength() > 0) {
         base::LOG_ERROR("head is not first to be serializes");
@@ -38,7 +38,7 @@ bool CSerializes::Serializes(const Head& head, CHudpBitStream& bit_stream) {
     return true;
 }
 
-bool CSerializes::Serializes(Head& head, const char* body, uint16_t len, CHudpBitStream& bit_stream) {
+bool CSerializes::Serializes(Head& head, const char* body, uint16_t len, CBitStreamWriter& bit_stream) {
     if (len > 0) {
         head._body_len = len;
         head._flag |= HPF_WITH_BODY;
@@ -50,11 +50,11 @@ bool CSerializes::Serializes(Head& head, const char* body, uint16_t len, CHudpBi
     return bit_stream.Write(body, len);
 }
 
-bool CSerializes::Deseriali(CHudpBitStream& bit_stream, NetMsg& msg) {
+bool CSerializes::Deseriali(CBitStreamReader& bit_stream, NetMsg& msg) {
     return Deseriali(bit_stream, msg._head, msg._body, msg._head._body_len);
 }
 
-bool CSerializes::Deseriali(CHudpBitStream& bit_stream, Head& head) {
+bool CSerializes::Deseriali(CBitStreamReader& bit_stream, Head& head) {
     
     // fixed sequence by read/write
     bit_stream.Read(head._flag);
@@ -76,7 +76,7 @@ bool CSerializes::Deseriali(CHudpBitStream& bit_stream, Head& head) {
     }
 }
   
-bool CSerializes::Deseriali(CHudpBitStream& bit_stream, Head& head, char* body, uint16_t& len) {
+bool CSerializes::Deseriali(CBitStreamReader& bit_stream, Head& head, char* body, uint16_t& len) {
     if (!Deseriali(bit_stream, head)) {
         return false;
     }

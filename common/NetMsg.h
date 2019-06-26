@@ -32,11 +32,14 @@ namespace hudp {
         }
     };
     
+
+    class CBitStream;
     class NetMsg {
     public:
         std::string _ip_port;
         Head        _head;
         char*       _body;
+        CBitStream *_bit_stream;
 
         NetMsg() : _body(nullptr) {}
 

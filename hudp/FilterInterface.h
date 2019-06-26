@@ -13,7 +13,7 @@ namespace hudp {
     static std::vector<CFilterInterface*> __filer_list;
     static process_phase __cur_handle_phase;
 
-    class CHudpBitStream;
+    class CBitStream;
     class CFilterInterface {
     public:
         CFilterInterface(process_phase phase) : _handle_phase(phase) {}
@@ -38,8 +38,8 @@ namespace hudp {
         CProtocolFilterInterface() : CFilterInterface(PP_PROTO_PARSE) {}
         virtual ~CProtocolFilterInterface() {}
 
-        virtual bool OnSend(NetMsg* msg, CHudpBitStream* bit_stream, const std::string& _ip_port) = 0;
-        virtual bool OnRecv(CHudpBitStream* bit_stream, NetMsg* msg, const std::string& _ip_port) = 0;
+        virtual bool OnSend(NetMsg* msg, CBitStream* bit_stream, const std::string& _ip_port) = 0;
+        virtual bool OnRecv(CBitStream* bit_stream, NetMsg* msg, const std::string& _ip_port) = 0;
     };
 
     // head handle

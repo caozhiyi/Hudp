@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -20,7 +20,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{0A8B6889-7D56-43C3-99F9-29C4340A022B}</ProjectGuid>
+    <ProjectGuid>{DE0D19A0-D775-4B5F-B0E3-E2ED9046E41A}</ProjectGuid>
     <RootNamespace>Hudp</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
@@ -70,16 +70,10 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>I:\Windows Kits\10\Include\10.0.17763.0\ucrt;$(SolutionDir)base;I:\VS2017\install\VC\Tools\MSVC\14.16.27023\include;H:\VS 2017\2017\VC\Tools\MSVC\14.16.27023\include;$(SolutionDir)common</IncludePath>
+    <IncludePath>$(SolutionDir)common;$(SolutionDir)base;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>I:\Windows Kits\10\Include\10.0.17763.0\ucrt;$(SolutionDir)base;I:\VS2017\install\VC\Tools\MSVC\14.16.27023\include;H:\VS 2017\2017\VC\Tools\MSVC\14.16.27023\include;$(SolutionDir)common</IncludePath>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>I:\Windows Kits\10\Include\10.0.17763.0\ucrt;$(SolutionDir)base;I:\VS2017\install\VC\Tools\MSVC\14.16.27023\include;H:\VS 2017\2017\VC\Tools\MSVC\14.16.27023\include;$(SolutionDir)common</IncludePath>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>I:\Windows Kits\10\Include\10.0.17763.0\ucrt;$(SolutionDir)base;I:\VS2017\install\VC\Tools\MSVC\14.16.27023\include;H:\VS 2017\2017\VC\Tools\MSVC\14.16.27023\include;$(SolutionDir)common</IncludePath>
+    <IncludePath>$(SolutionDir)common;$(SolutionDir)base;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -87,13 +81,8 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <Link>
-      <SubSystem>Console</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -101,11 +90,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <Link>
-      <SubSystem>Windows</SubSystem>
-    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -120,7 +105,6 @@
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -131,18 +115,39 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <SubSystem>Windows</SubSystem>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="base\Buffer.cpp" />
+    <ClCompile Include="base\config.cpp" />
+    <ClCompile Include="base\Log.cpp" />
+    <ClCompile Include="base\LoopBuffer.cpp" />
+    <ClCompile Include="base\MemaryPool.cpp" />
+    <ClCompile Include="base\TimeTool.cpp" />
+    <ClCompile Include="common\BitStream.cpp" />
+    <ClCompile Include="common\BitStreamPool.cpp" />
+    <ClCompile Include="common\FunctionNetMsg.cpp" />
+    <ClCompile Include="common\IncrementalId.cpp" />
+    <ClCompile Include="common\NetMsgPool.cpp" />
+    <ClCompile Include="common\OrderList.cpp" />
+    <ClCompile Include="common\PriorityQueue.cpp" />
+    <ClCompile Include="common\SendWnd.cpp" />
+    <ClCompile Include="common\Serializes.cpp" />
+    <ClCompile Include="common\Timer.cpp" />
+    <ClCompile Include="hudp\FilterInterface.cpp" />
+    <ClCompile Include="hudp\FilterProcess.cpp" />
+    <ClCompile Include="hudp\SerializesFilter.cpp" />
+    <ClCompile Include="net\HudpSocket.cpp" />
+    <ClCompile Include="utest\common\Ut_BitStream.cpp" />
+  </ItemGroup>
+  <ItemGroup>
     <ClInclude Include="base\Any.h" />
     <ClInclude Include="base\Buffer.h" />
-    <ClInclude Include="base\Config.h" />
+    <ClInclude Include="base\config.h" />
     <ClInclude Include="base\Log.h" />
     <ClInclude Include="base\LoopBuffer.h" />
     <ClInclude Include="base\MemaryPool.h" />
@@ -177,29 +182,7 @@
     <ClInclude Include="hudp\SerializesFilter.h" />
     <ClInclude Include="net\HudpSocket.h" />
     <ClInclude Include="net\OsNet.h" />
-    <ClInclude Include="utest\common\Ut_BitStream.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="base\Buffer.cpp" />
-    <ClCompile Include="base\Config.cpp" />
-    <ClCompile Include="base\Log.cpp" />
-    <ClCompile Include="base\LoopBuffer.cpp" />
-    <ClCompile Include="base\MemaryPool.cpp" />
-    <ClCompile Include="base\TimeTool.cpp" />
-    <ClCompile Include="common\BitStream.cpp" />
-    <ClCompile Include="common\BitStreamPool.cpp" />
-    <ClCompile Include="common\FunctionNetMsg.cpp" />
-    <ClCompile Include="common\IncrementalId.cpp" />
-    <ClCompile Include="common\NetMsgPool.cpp" />
-    <ClCompile Include="common\OrderList.cpp" />
-    <ClCompile Include="common\PriorityQueue.cpp" />
-    <ClCompile Include="common\SendWnd.cpp" />
-    <ClCompile Include="common\Serializes.cpp" />
-    <ClCompile Include="common\Timer.cpp" />
-    <ClCompile Include="hudp\FilterInterface.cpp" />
-    <ClCompile Include="hudp\FilterProcess.cpp" />
-    <ClCompile Include="hudp\SerializesFilter.cpp" />
-    <ClCompile Include="net\HudpSocket.cpp" />
+    <ClInclude Include="utest\Test.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

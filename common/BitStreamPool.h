@@ -20,12 +20,12 @@ namespace hudp {
         // reduce half of free queue every time 
         void ReduceFree();
 
-        CHudpBitStream* GetBitStream();
+        CBitStream* GetBitStream();
 
-        void FreeBitStream(CHudpBitStream* bit_stream);
+        void FreeBitStream(CBitStream* bit_stream);
         
     private:
-        base::CTSQueue<CHudpBitStream*>    _free_queue;
+        base::CTSQueue<CBitStream*>    _free_queue;
     };
 }
 #endif

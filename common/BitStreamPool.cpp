@@ -7,7 +7,7 @@ CBitStreamPool::CBitStreamPool() {
 
 CBitStreamPool::~CBitStreamPool() {
     size_t size = _free_queue.Size();
-    CHudpBitStream* bit_stream;
+    CBitStream* bit_stream;
     for (int i = 0; i < size; i++) {
         _free_queue.Pop(bit_stream);
         delete bit_stream;
@@ -15,24 +15,24 @@ CBitStreamPool::~CBitStreamPool() {
 }
 
 void CBitStreamPool::ExpendFree() {
-    CHudpBitStream* bit_stream;
+    CBitStream* bit_stream;
     for (int i = 0; i < __init_pool_size; i++) {
-        bit_stream = new CHudpBitStream();
+        bit_stream = new CBitStream();
         _free_queue.Push(bit_stream);
     }
 }
 
 void CBitStreamPool::ReduceFree() {
     size_t size = _free_queue.Size() / 2;
-    CHudpBitStream* bit_stream;
+    CBitStream* bit_stream;
     for (int i = 0; i < size; i++) {
         _free_queue.Pop(bit_stream);
         delete bit_stream;
     }
 }
 
-CHudpBitStream* CBitStreamPool::GetBitStream() {
-    CHudpBitStream* bit_stream = nullptr;
+CBitStream* CBitStreamPool::GetBitStream() {
+    CBitStream* bit_stream = nullptr;
     if (_free_queue.Size() == 0) {
         ExpendFree();
     }
@@ -40,7 +40,7 @@ CHudpBitStream* CBitStreamPool::GetBitStream() {
     return bit_stream;
 }
 
-void CBitStreamPool::FreeBitStream(CHudpBitStream* bit_stream) {
+void CBitStreamPool::FreeBitStream(CBitStream* bit_stream) {
     bit_stream->Clear();
     _free_queue.Push(bit_stream);
 }

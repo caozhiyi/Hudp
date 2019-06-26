@@ -6,40 +6,52 @@
 
 using namespace hudp;
 
-CHudpBitStream::CHudpBitStream() : _data(nullptr),
+CBitStream::CBitStream() : _data(nullptr),
                                    _cur_point(nullptr),
                                    _length(__mtu),
                                    _cur_length(0) {
     _data = new char[__mtu];
     memset(_data, 0, __mtu);
+    _cur_point = _data;
 }
 
-CHudpBitStream::~CHudpBitStream() {
+CBitStream::~CBitStream() {
     if (_data) {
         delete _data;
     }
 }
 
-uint16_t CHudpBitStream::GetTotalLength() const {
+uint16_t CBitStream::GetTotalLength() const {
     return _length;
 }
 
-uint16_t CHudpBitStream::GetCurrentLength() const {
+uint16_t CBitStream::GetCurrentLength() const {
     return _cur_length;
 }
 
-const char* CHudpBitStream::GetDataPoint() const {
+bool CBitStream::Init(const char* value, uint16_t len) {
+    if (!CheckBufferExpend(len)) {
+        return false;
+    }
+    // write value
+    std::unique_lock<std::mutex> lock(_mutex);
+    memcpy(_data, (void*)value, len);
+    _cur_length = len;
+    return true;
+}
+
+const char* CBitStream::GetDataPoint() const {
     return _data;
 }
 
-void CHudpBitStream::Clear() {
+void CBitStream::Clear() {
     std::unique_lock<std::mutex> lock(_mutex);
     memset(_data, 0, _length);
     _cur_point = _data;
     _cur_length = 0;
 }
 
-bool CHudpBitStream::CheckBufferExpend(uint16_t len) {
+bool CBitStream::CheckBufferExpend(uint16_t len) {
     std::unique_lock<std::mutex> lock(_mutex);
     if (__max_length - _cur_length < len) {
         base::LOG_ERROR("write stream more than max length.");
@@ -62,14 +74,14 @@ bool CHudpBitStream::CheckBufferExpend(uint16_t len) {
     return true;
 }
 
-void CHudpBitStream::CopyMemory(void* value, uint16_t len) {
+void CBitStream::CopyMemory(void* value, uint16_t len) {
     std::unique_lock<std::mutex> lock(_mutex);
     memcpy(_cur_point, (void*)value, len);
     _cur_point += len;
     _cur_length += len;
 }
 
-bool CHudpBitStream::Write(const char* value, uint16_t len) {
+bool CBitStreamWriter::Write(const char* value, uint16_t len) {
     if (!CheckBufferExpend(len)) {
         return false;
     }
@@ -78,7 +90,7 @@ bool CHudpBitStream::Write(const char* value, uint16_t len) {
     return true;
 }
 
-bool CHudpBitStream::Write(const std::string& value) {
+bool CBitStreamWriter::Write(const std::string& value) {
     uint16_t len = (uint16_t)value.length();
     if (!CheckBufferExpend(len)) {
         return false;
@@ -88,7 +100,7 @@ bool CHudpBitStream::Write(const std::string& value) {
     return true;
 }
 
-bool CHudpBitStream::Write(const CHudpBitStream& value) {
+bool CBitStreamWriter::Write(const CBitStreamWriter& value) {
     uint16_t len = value.GetCurrentLength();
     if (!CheckBufferExpend(len)) {
         return false;
@@ -98,36 +110,33 @@ bool CHudpBitStream::Write(const CHudpBitStream& value) {
     return true;
 }
 
-bool CHudpBitStream::Read(char* value, uint16_t len) {
+bool CBitStreamReader::Read(char* value, uint16_t len) {
     std::unique_lock<std::mutex> lock(_mutex);
-    if (_cur_length + len > _length) {
+    if (_cur_point - _data + len > _cur_length) {
         return false;
     }
     memcpy((void*)value, _cur_point, len);
     _cur_point += len;
-    _cur_length += len;
     return true;
 }
 
-bool CHudpBitStream::Read(std::string& value, uint16_t len) {
+bool CBitStreamReader::Read(std::string& value, uint16_t len) {
     std::unique_lock<std::mutex> lock(_mutex);
-    if (_cur_length + len > _length) {
+    if (_cur_point - _data + len > _cur_length) {
         return false;
     }
     value = std::string(_cur_point, len);
     _cur_point += len;
-    _cur_length += len;
     return true;
 }
 
-bool CHudpBitStream::Read(CHudpBitStream& value, uint16_t len) {
+bool CBitStreamReader::Read(CBitStreamReader& value, uint16_t len) {
     std::unique_lock<std::mutex> lock(_mutex);
-    if (_cur_length + len > _length) {
+    if (_cur_point - _data + len > _cur_length) {
         return false;
     }
     
-    value.Write(_cur_point, len);
+    value.Init(_cur_point, len);
     _cur_point += len;
-    _cur_length += len;
     return true;
 }
