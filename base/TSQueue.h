@@ -28,7 +28,7 @@ namespace base {
             if (_queue.empty()) {
                 return false;
             }
-            T ret = std::move(_queue.front());
+            value = std::move(_queue.front());
             _queue.pop();
             return true;
         }

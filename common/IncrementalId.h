@@ -10,6 +10,7 @@ namespace hudp {
     static const uint16_t __max_id = (uint16_t)0xFFFF;
 
     class CIncrementalId {
+    public:
         CIncrementalId();
         ~CIncrementalId();
         

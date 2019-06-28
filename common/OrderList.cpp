@@ -1,7 +1,7 @@
 #include "OrderList.h"
 using namespace hudp;
 
-CRecvList::CRecvList() : _expect_id(0) {
+CRecvList::CRecvList() : _expect_id(1) {
     memset(_order_list, 0, sizeof(_order_list));
 }
 

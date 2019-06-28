@@ -143,6 +143,9 @@
     <ClCompile Include="hudp\SerializesFilter.cpp" />
     <ClCompile Include="net\HudpSocket.cpp" />
     <ClCompile Include="utest\common\Ut_BitStream.cpp" />
+    <ClCompile Include="utest\common\Ut_IncrementalId.cpp" />
+    <ClCompile Include="utest\common\Ut_OrderList.cpp" />
+    <ClCompile Include="utest\common\Ut_PriorityQueue.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="base\Any.h" />

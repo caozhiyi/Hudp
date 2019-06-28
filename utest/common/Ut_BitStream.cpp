@@ -90,7 +90,3 @@ void UtestBitStream() {
     std::cout << "cur   point  : " << bit_stream_3.GetDataPoint() << std::endl;
 
 }
-
-int main() {
-    UtestBitStream();
-}

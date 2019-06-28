@@ -1,5 +1,6 @@
 #include "PriorityQueue.h"
 #include "CommonFlag.h"
+#include "Log.h"
 using namespace hudp;
 
 CPriorityQueue::CPriorityQueue() : _pri_normal_count(__pri_surplus),
@@ -66,9 +67,11 @@ NetMsg* CPriorityQueue::Pop() {
     _pri_heig_count = __pri_surplus;
     _pri_heighest_count = __pri_surplus;
 
-    if (_queue_arr[__pri_normal].Pop(msg)) {
+    if (_queue_arr[__pri_low].Pop(msg)) {
         return msg;
     }
+
+    base::LOG_ERROR("can't get message from _queue_arr. shouldn't be here.");
     return nullptr;
 }
 

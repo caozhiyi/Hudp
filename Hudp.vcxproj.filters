@@ -84,6 +84,15 @@
     <ClCompile Include="hudp\SerializesFilter.cpp">
       <Filter>hudp</Filter>
     </ClCompile>
+    <ClCompile Include="utest\common\Ut_IncrementalId.cpp">
+      <Filter>utest\common</Filter>
+    </ClCompile>
+    <ClCompile Include="utest\common\Ut_OrderList.cpp">
+      <Filter>utest\common</Filter>
+    </ClCompile>
+    <ClCompile Include="utest\common\Ut_PriorityQueue.cpp">
+      <Filter>utest\common</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="base\Any.h">
