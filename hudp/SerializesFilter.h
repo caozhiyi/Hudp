@@ -12,8 +12,8 @@ namespace hudp {
         CSerializesFilter() {}
         virtual ~CSerializesFilter() {}
 
-        virtual bool OnSend(NetMsg* msg, CBitStream* bit_stream, const std::string& _ip_port);
-        virtual bool OnRecv(CBitStream* bit_stream, NetMsg* msg, const std::string& _ip_port);
+        virtual bool OnSend(NetMsg* msg);
+        virtual bool OnRecv(NetMsg* msg);
     };
 
 }

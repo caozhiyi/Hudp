@@ -17,7 +17,7 @@ NetMsg HighMsg;
 NetMsg HighestMsg;
 
 std::unordered_map<uint16_t, std::string> __map;
-bool __run = true;
+static bool __run = true;
 
 void Init() {
     LowMsg._head._flag     |= HPF_LOW_PRI;

@@ -55,7 +55,6 @@ bool CSerializes::Deseriali(CBitStreamReader& bit_stream, NetMsg& msg) {
 }
 
 bool CSerializes::Deseriali(CBitStreamReader& bit_stream, Head& head) {
-    
     // fixed sequence by read/write
     bit_stream.Read(head._flag);
     if (head._flag & HPF_WITH_ID) {
@@ -74,6 +73,7 @@ bool CSerializes::Deseriali(CBitStreamReader& bit_stream, Head& head) {
     if (head._flag & HPF_WITH_BODY) {
         CHECK_RET(bit_stream.Read(head._body_len));
     }
+    return true;
 }
   
 bool CSerializes::Deseriali(CBitStreamReader& bit_stream, Head& head, char* body, uint16_t& len) {

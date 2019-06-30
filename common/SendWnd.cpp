@@ -20,18 +20,29 @@ void CSendWnd::PushBack(uint16_t id, CSendWndSolt* data) {
     {
         std::unique_lock<std::mutex> lock(_mutex);
         _id_map[id] = data;
+        data->_next = nullptr;
+        data->_done_ack = false;
+
         if (_end) {
             _end->_next = data;
             _end = data;
+        }
 
-        } else {
+        if (_cur == nullptr) {
+            _cur = _end;
+        }
+
+        if (_start == nullptr) {
+            _start = data;
             _end = data;
+            _cur = data;
         }
 
         if (_cur_send_size < _send_wnd_size) {
             _send_queue.Push(data);
             _cur_send_size++;
-            _cur = _end;
+            _cur = _end->_next;
+
         }
     }
     
@@ -49,20 +60,14 @@ void CSendWnd::AcceptAck(uint16_t id) {
         iter->second->_done_ack = true;
         // call back done ack
         if (iter->second == _start) {
-            while (_start->_done_ack && _start) {
+            while (_start && _start->_done_ack) {
                 // move start point
                 _ack_queue.Push(_start);
                 _start = _start->_next;
                 _cur_send_size--;
 
                 // send next bag
-                if (_cur_send_size < _send_wnd_size && (_cur->_next || _cur)) {
-                    _send_queue.Push(_cur);
-                    _cur_send_size++;
-                    if (_cur->_next) {
-                        _cur = _cur->_next;
-                    }
-                }
+                SendNext();
             }
         }
         _id_map.erase(iter);
@@ -71,8 +76,8 @@ void CSendWnd::AcceptAck(uint16_t id) {
 }
 
 void CSendWnd::AcceptAck(uint16_t start_id, uint16_t len) {
-    for (uint16_t i = start_id; i < len; i++) {
-        AcceptAck(i);
+    for (uint16_t index = start_id, i = 0; i < len; index++, i++) {
+        AcceptAck(index);
     }
 }
 
@@ -81,8 +86,14 @@ void CSendWnd::ChangeSendWndSize(uint16_t size) {
         return;
     }
 
-    std::unique_lock<std::mutex> lock(_mutex);
-    _send_wnd_size = size;
+    {
+        std::unique_lock<std::mutex> lock(_mutex);
+        _send_wnd_size = size;
+
+        SendNext();
+    }
+
+    SendAndAck();
 }
 
 CSendWndSolt* CSendWnd::GetIndexData(uint16_t id) {
@@ -121,4 +132,15 @@ void CSendWnd::SendAndAck() {
         item->AckDone();   
     }
     _ack_queue.Clear();
+}
+
+void CSendWnd::SendNext() {
+    // send next bag
+    if (_cur_send_size < _send_wnd_size && _cur) {
+        if (!_cur->_done_ack) {
+            _send_queue.Push(_cur);
+            _cur_send_size++;
+        }
+        _cur = _cur->_next;
+    }
 }

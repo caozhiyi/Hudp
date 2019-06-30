@@ -36,10 +36,13 @@ namespace hudp {
     class CBitStream;
     class NetMsg {
     public:
+        // only head and body will be serialized
+        Head        _head;        // head msg. set by hudp
+        char*       _body;        // body msg. set by user
+
+        // other 
         std::string _ip_port;
-        Head        _head;
-        char*       _body;
-        CBitStream *_bit_stream;
+        CBitStream* _bit_stream;  // serialize stream
 
         NetMsg() : _body(nullptr) {}
 

@@ -38,8 +38,8 @@ namespace hudp {
         CProtocolFilterInterface() : CFilterInterface(PP_PROTO_PARSE) {}
         virtual ~CProtocolFilterInterface() {}
 
-        virtual bool OnSend(NetMsg* msg, CBitStream* bit_stream, const std::string& _ip_port) = 0;
-        virtual bool OnRecv(CBitStream* bit_stream, NetMsg* msg, const std::string& _ip_port) = 0;
+        virtual bool OnSend(NetMsg* msg) = 0;
+        virtual bool OnRecv(NetMsg* msg) = 0;
     };
 
     // head handle
@@ -48,8 +48,8 @@ namespace hudp {
         CHeadFilterInterface() : CFilterInterface(PP_HEAD_HANDLE) {}
         virtual ~CHeadFilterInterface() {}
 
-        virtual bool OnSend(Head* msg) = 0;
-        virtual bool OnRecv(Head* msg) = 0;
+        virtual bool OnSend(NetMsg* msg) = 0;
+        virtual bool OnRecv(NetMsg* msg) = 0;
     };
 
     // body handle
@@ -58,8 +58,8 @@ namespace hudp {
         CBodyFilterInterface() : CFilterInterface(PP_BODY_HANDLE) {}
         virtual ~CBodyFilterInterface() {}
 
-        virtual bool OnSend(char* msg, uint16_t len) = 0;
-        virtual bool OnRecv(char* msg, uint16_t& len) = 0;
+        virtual bool OnSend(NetMsg* msg) = 0;
+        virtual bool OnRecv(NetMsg* msg) = 0;
     };
     
     // upper program handle
@@ -68,8 +68,8 @@ namespace hudp {
         CUpperFilterInterface() : CFilterInterface(PP_UPPER_HANDLE) {}
         virtual ~CUpperFilterInterface() {}
 
-        virtual bool OnSend(char* data, uint16_t len, uint16_t flag, const std::string& _ip_port, NetMsg* msg) = 0;
-        virtual bool OnRecv(char* data, uint16_t& len, uint16_t& flag, const std::string& _ip_port, NetMsg* msg) = 0;
+        virtual bool OnSend(NetMsg* msg) = 0;
+        virtual bool OnRecv(NetMsg* msg) = 0;
     };
 }
 

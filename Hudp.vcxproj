@@ -70,7 +70,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(SolutionDir)common;$(SolutionDir)base;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)common;$(SolutionDir)net;$(SolutionDir)base;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>$(SolutionDir)common;$(SolutionDir)base;$(IncludePath)</IncludePath>
@@ -81,7 +81,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -130,6 +130,7 @@
     <ClCompile Include="base\TimeTool.cpp" />
     <ClCompile Include="common\BitStream.cpp" />
     <ClCompile Include="common\BitStreamPool.cpp" />
+    <ClCompile Include="common\CommonFunc.cpp" />
     <ClCompile Include="common\FunctionNetMsg.cpp" />
     <ClCompile Include="common\IncrementalId.cpp" />
     <ClCompile Include="common\NetMsgPool.cpp" />
@@ -141,11 +142,16 @@
     <ClCompile Include="hudp\FilterInterface.cpp" />
     <ClCompile Include="hudp\FilterProcess.cpp" />
     <ClCompile Include="hudp\SerializesFilter.cpp" />
-    <ClCompile Include="net\HudpSocket.cpp" />
+    <ClCompile Include="net\Socket.cpp" />
+    <ClCompile Include="net\win\OsNet.cpp" />
     <ClCompile Include="utest\common\Ut_BitStream.cpp" />
     <ClCompile Include="utest\common\Ut_IncrementalId.cpp" />
     <ClCompile Include="utest\common\Ut_OrderList.cpp" />
     <ClCompile Include="utest\common\Ut_PriorityQueue.cpp" />
+    <ClCompile Include="utest\common\Ut_SendWnd.cpp" />
+    <ClCompile Include="utest\common\Ut_Serializes.cpp" />
+    <ClCompile Include="utest\common\Ut_Timer.cpp" />
+    <ClCompile Include="utest\net\Ut_OsNet.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="base\Any.h" />
@@ -180,10 +186,11 @@
     <ClInclude Include="common\Serializes.h" />
     <ClInclude Include="common\Timer.h" />
     <ClInclude Include="common\TimerSolt.h" />
+    <ClInclude Include="common\CommonFunc.h" />
     <ClInclude Include="hudp\FilterInterface.h" />
     <ClInclude Include="hudp\FilterProcess.h" />
     <ClInclude Include="hudp\SerializesFilter.h" />
-    <ClInclude Include="net\HudpSocket.h" />
+    <ClInclude Include="net\Socket.h" />
     <ClInclude Include="net\OsNet.h" />
     <ClInclude Include="utest\Test.h" />
   </ItemGroup>

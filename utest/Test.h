@@ -7,5 +7,6 @@
 #define Expect_Value(a, b) do{if(a != b) abort();}while(0)
 #define Expect_True(v)     do{if(!v) abort();}while(0)
 #define Expect_False(v)    do{if(v) abort();}while(0)
+#define Expect_Bigger(a, b)    do{if(a < b) abort();}while(0)
 
 #endif

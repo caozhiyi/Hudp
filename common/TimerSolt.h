@@ -8,13 +8,13 @@ namespace hudp {
     // timer event interface
     class CTimerSolt {
     public:
-        CTimerSolt() : _data(nullptr), _next(nullptr) {}
+        CTimerSolt() : _next(nullptr) {}
         virtual ~CTimerSolt() {}
 
         //*********************
         // the timer call back
         //*********************
-        virtual void OnTimer(void* pt) = 0;
+        virtual void OnTimer() = 0;
         
         // attach to timer
         void Attach(CTimer* timer, uint16_t ms) {
@@ -30,16 +30,8 @@ namespace hudp {
         void SetNext(CTimerSolt* ti) {
             _next = ti;
         }
-        
-        void* GetData() {
-            return _data;
-        };
-        void SetData(void* data) {
-            _data = data;
-        };
-
+       
     private:
-        void* _data;
         CTimerSolt *_next;
     };
 }

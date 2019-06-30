@@ -10,8 +10,9 @@ namespace hudp {
     
 
     private:
-        char     _ip[__ip_length];
-        uint8_t  _short;
+        char            _ip[__ip_length];
+        uint8_t         _short;
+        unsigned int	_sock;
     };
 }
 

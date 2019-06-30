@@ -32,6 +32,8 @@ namespace hudp {
     private:
         // call callback func
         void SendAndAck();
+        // send next
+        void SendNext();
 
     private:
         CSendWndSolt* _start;// point to the list start

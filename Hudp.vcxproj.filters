@@ -19,6 +19,12 @@
     <Filter Include="hudp">
       <UniqueIdentifier>{68f00413-447f-4992-8144-1bbcdffb5e4a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="net\win">
+      <UniqueIdentifier>{04c326ee-1170-43be-88a3-160c4b179d88}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="utest\net">
+      <UniqueIdentifier>{0cfe3810-f125-47d7-94cf-b7f8dd760336}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="utest\common\Ut_BitStream.cpp">
@@ -72,9 +78,6 @@
     <ClCompile Include="common\Timer.cpp">
       <Filter>common</Filter>
     </ClCompile>
-    <ClCompile Include="net\HudpSocket.cpp">
-      <Filter>net</Filter>
-    </ClCompile>
     <ClCompile Include="hudp\FilterInterface.cpp">
       <Filter>hudp</Filter>
     </ClCompile>
@@ -91,6 +94,27 @@
       <Filter>utest\common</Filter>
     </ClCompile>
     <ClCompile Include="utest\common\Ut_PriorityQueue.cpp">
+      <Filter>utest\common</Filter>
+    </ClCompile>
+    <ClCompile Include="utest\common\Ut_SendWnd.cpp">
+      <Filter>utest\common</Filter>
+    </ClCompile>
+    <ClCompile Include="utest\common\Ut_Serializes.cpp">
+      <Filter>utest\common</Filter>
+    </ClCompile>
+    <ClCompile Include="net\win\OsNet.cpp">
+      <Filter>net\win</Filter>
+    </ClCompile>
+    <ClCompile Include="net\Socket.cpp">
+      <Filter>net</Filter>
+    </ClCompile>
+    <ClCompile Include="utest\net\Ut_OsNet.cpp">
+      <Filter>utest\net</Filter>
+    </ClCompile>
+    <ClCompile Include="common\CommonFunc.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="utest\common\Ut_Timer.cpp">
       <Filter>utest\common</Filter>
     </ClCompile>
   </ItemGroup>
@@ -191,9 +215,6 @@
     <ClInclude Include="common\TimerSolt.h">
       <Filter>common</Filter>
     </ClInclude>
-    <ClInclude Include="net\HudpSocket.h">
-      <Filter>net</Filter>
-    </ClInclude>
     <ClInclude Include="net\OsNet.h">
       <Filter>net</Filter>
     </ClInclude>
@@ -208,6 +229,12 @@
     </ClInclude>
     <ClInclude Include="utest\Test.h">
       <Filter>utest</Filter>
+    </ClInclude>
+    <ClInclude Include="net\Socket.h">
+      <Filter>net</Filter>
+    </ClInclude>
+    <ClInclude Include="common\CommonFunc.h">
+      <Filter>common</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

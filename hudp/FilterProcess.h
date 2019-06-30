@@ -5,15 +5,15 @@
 
 namespace hudp {
 
-    class CBitStream;
+    class NetMsg;
     class CFilterProcess {
     public:
         CFilterProcess() {}
         virtual ~CFilterProcess() {}
         
         // process chain of responsibility
-        bool SendProcess(char* data, uint16_t len, uint16_t flag, const std::string& _ip_port);
-        bool RecvProcess(CBitStream* bit_stream, const std::string& _ip_port); 
+        void SendProcess(NetMsg* msg);
+        void RecvProcess(NetMsg* msg);
     };
 }
 
