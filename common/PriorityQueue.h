@@ -21,7 +21,7 @@ namespace hudp {
     static const uint16_t __pri_heig       = 1;
     static const uint16_t __pri_heighest   = 0;
     
-    class CPriorityQueue{
+    class CPriorityQueue {
     public:   
         CPriorityQueue();
         ~CPriorityQueue();

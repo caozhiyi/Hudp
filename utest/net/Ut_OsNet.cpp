@@ -32,3 +32,27 @@ void UtestOsNet() {
     Expect_True(COsNet::Close(socket1));
     Expect_True(COsNet::Close(socket2));
 }
+
+#include <memory>
+template <class T, void(*deleter)(T*)> class CSmartPtr : public std::unique_ptr<T, void(*)(T*)> {
+public:
+    CSmartPtr() : std::unique_ptr<T, void(*)(T*)>(nullptr, deleter) {}
+    CSmartPtr(T* object) : std::unique_ptr<T, void(*)(T*)>(object, deleter) {}
+};
+
+void Destroy(int* arr) {
+    std::cout << "delete" << std::endl;
+    delete[] arr;
+}
+
+int main() {
+
+    {
+        int* arr = new int[1000];
+        arr[0] = 10000;
+        CSmartPtr<int, Destroy> p(arr);
+    }
+
+    int a= 0;
+    a++;
+}

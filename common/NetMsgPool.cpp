@@ -1,43 +1,145 @@
 #include "NetMsgPool.h"
+#include "FunctionNetMsg.h"
 using namespace hudp;
 
+// if bigger than it, will reduce half of queue size
+static const uint16_t __reduce_limit_size = 10;
+
 CNetMsgPool::CNetMsgPool() {
-    ExpendFree();
+    //ExpendFree();
 }
 
 CNetMsgPool::~CNetMsgPool() {
-    size_t size = _free_queue.Size();
-    NetMsg* msg;
-    for (int i = 0; i < __netmsg_init_pool_size; i++) {
-        _free_queue.Pop(msg);
-        delete msg;
+    size_t size = _free_net_msg_queue.Size();
+    NetMsg* net_msg;
+    for (int i = 0; i < size; i++) {
+        _free_net_msg_queue.Pop(net_msg);
+        delete net_msg;
+    }
+    size = _free_order_queue.Size();
+    CSenderOrderlyNetMsg* order_msg;
+    for (int i = 0; i < size; i++) {
+        _free_order_queue.Pop(order_msg);
+        delete order_msg;
+    }
+    size = _free_reliale_order_queue.Size();
+    CSenderRelialeOrderlyNetMsg* reliale_msg;
+    for (int i = 0; i < size; i++) {
+        _free_reliale_order_queue.Pop(reliale_msg);
+        delete reliale_msg;
+    }
+    size = _free_revceiver_queue.Size();
+    CReceiverNetMsg* recv_msg;
+    for (int i = 0; i < size; i++) {
+        _free_revceiver_queue.Pop(recv_msg);
+        delete recv_msg;
     }
 }
 
-void CNetMsgPool::ExpendFree() {
-    NetMsg* msg;
-    for (int i = 0; i < __netmsg_init_pool_size; i++) {
-        msg = new NetMsg();
-        _free_queue.Push(msg);
-    }
-}
+//void CNetMsgPool::ExpendFree() {
+//    NetMsg* msg;
+//    for (int i = 0; i < __netmsg_init_pool_size; i++) {
+//        msg = new NetMsg();
+//        _free_queue.Push(msg);
+//    }
+//}
 
 void CNetMsgPool::ReduceFree() {
-    size_t size = _free_queue.Size() / 2;
-    NetMsg* msg;
-    for (int i = 0; i < __netmsg_init_pool_size; i++) {
-        _free_queue.Pop(msg);
-        delete msg;
+    size_t size = _free_net_msg_queue.Size();
+    if (size > __reduce_limit_size) {
+        size = size / 2;
+        NetMsg* net_msg;
+        for (int i = 0; i < size; i++) {
+            _free_net_msg_queue.Pop(net_msg);
+            delete net_msg;
+        }
+    }
+
+    size = _free_order_queue.Size();
+    if (size > __reduce_limit_size) {
+        size = size / 2;
+        CSenderOrderlyNetMsg* order_msg;
+        for (int i = 0; i < size; i++) {
+            _free_order_queue.Pop(order_msg);
+            delete order_msg;
+        }
+    }
+
+    size = _free_reliale_order_queue.Size();
+    if (size > __reduce_limit_size) {
+        size = size / 2;
+        CSenderRelialeOrderlyNetMsg* reliale_msg;
+        for (int i = 0; i < size; i++) {
+            _free_reliale_order_queue.Pop(reliale_msg);
+            delete reliale_msg;
+        }
+    }
+
+    size = _free_revceiver_queue.Size();
+    if (size > __reduce_limit_size) {
+        size = size / 2;
+        CReceiverNetMsg* recv_msg;
+        for (int i = 0; i < size; i++) {
+            _free_revceiver_queue.Pop(recv_msg);
+            delete recv_msg;
+        }
     }
 }
 
-NetMsg* CNetMsgPool::GetMsg() {
-    NetMsg* msg = nullptr;
-    _free_queue.Pop(msg);
-    return msg;
+NetMsg* CNetMsgPool::GetMsg(hudp_tran_flag mt, bool is_recv) {
+    if (is_recv) {
+        CReceiverNetMsg* recv_msg;
+        _free_revceiver_queue.Pop(recv_msg);
+        return (NetMsg*)recv_msg;
+    }
+
+    if (mt & HTF_ORDERLY) {
+        CSenderOrderlyNetMsg* order_msg;
+        _free_order_queue.Pop(order_msg);
+        return (NetMsg*)order_msg;
+
+    } else if (mt & HTF_RELIABLE) {
+        CSenderRelialeOrderlyNetMsg* reliale_msg;
+        _free_reliale_order_queue.Pop(reliale_msg);
+        return (NetMsg*)reliale_msg;
+
+    } else if (mt & HTF_RELIABLE_ORDERLY) {
+        CSenderRelialeOrderlyNetMsg* reliale_msg;
+        _free_reliale_order_queue.Pop(reliale_msg);
+        return (NetMsg*)reliale_msg;
+
+    } else if (mt & HTF_NORMAL) {
+        NetMsg* net_msg;
+        _free_net_msg_queue.Pop(net_msg);
+        return net_msg;
+    }
+    return nullptr;
 }
 
-void CNetMsgPool::FreeMsg(NetMsg* msg) {
-    msg->Clear();
-    _free_queue.Push(msg);
+void CNetMsgPool::FreeMsg(NetMsg* msg, bool is_recv) {
+    if (is_recv) {
+        msg->Clear();
+        _free_revceiver_queue.Push((CReceiverNetMsg*)msg);
+    }
+
+    if (msg->_head._flag & HTF_ORDERLY) {
+        msg->Clear();
+        _free_order_queue.Push((CSenderOrderlyNetMsg*)msg);
+        return;
+
+    } else if (msg->_head._flag & HTF_RELIABLE) {
+        msg->Clear();
+        _free_reliale_order_queue.Push((CSenderRelialeOrderlyNetMsg*)msg);
+        return;
+
+    } else if (msg->_head._flag & HTF_RELIABLE_ORDERLY) {
+        msg->Clear();
+        _free_reliale_order_queue.Push((CSenderRelialeOrderlyNetMsg*)msg);
+        return;
+
+    } else if (msg->_head._flag & HTF_NORMAL) {
+        msg->Clear();
+        _free_net_msg_queue.Push(msg);
+        return;
+    }
 }

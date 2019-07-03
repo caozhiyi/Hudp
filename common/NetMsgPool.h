@@ -1,15 +1,20 @@
 #ifndef HEADER_COMMON_CNETMSGPOOL
 #define HEADER_COMMON_CNETMSGPOOL
 
+#include "CommonFlag.h"
 #include "CommonType.h"
 #include "NetMsg.h"
 #include "TSQueue.h"
 #include "Single.h"
 
 namespace hudp {
-    
+
+    class CSenderOrderlyNetMsg; 
+    class CSenderRelialeOrderlyNetMsg;
+    class CReceiverNetMsg;
+
     // pool size at initialization.
-    static const uint16_t __netmsg_init_pool_size = 200;
+    //static const uint16_t __netmsg_init_pool_size = 200;
     class CNetMsgPool : public base::CSingle<CNetMsgPool> {
     public:
         CNetMsgPool();
@@ -20,12 +25,15 @@ namespace hudp {
         // reduce half of free queue every time 
         void ReduceFree();
 
-        NetMsg* GetMsg();
+        NetMsg* GetMsg(hudp_tran_flag mt, bool is_recv = false);
 
-        void FreeMsg(NetMsg* msg);
+        void FreeMsg(NetMsg* msg, bool is_recv = false);
         
     private:
-        base::CTSQueue<NetMsg*>     _free_queue;
+        base::CTSQueue<NetMsg*>                         _free_net_msg_queue;
+        base::CTSQueue<CSenderOrderlyNetMsg*>           _free_order_queue;
+        base::CTSQueue<CSenderRelialeOrderlyNetMsg*>    _free_reliale_order_queue;
+        base::CTSQueue<CReceiverNetMsg*>                _free_revceiver_queue;
     };
 }
 #endif

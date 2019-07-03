@@ -9,6 +9,9 @@
 
 namespace hudp {
     
+    class CNetMsgPool;
+    class CBitStreamPool;
+
     // send window
     class CSendWnd {
     public:
@@ -28,6 +31,9 @@ namespace hudp {
 
         // set resend 
         void SetIndexResend(uint16_t id);
+
+        // move item to pool
+        void Clear(CNetMsgPool* msg_pool, CBitStreamPool* bit_pool);
 
     private:
         // call callback func
