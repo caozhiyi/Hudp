@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 #include "CommonType.h"
+#include "CommonFlag.h"
 namespace hudp {
 
     class Head {
@@ -41,8 +42,9 @@ namespace hudp {
         char*       _body;        // body msg. set by user
 
         // other 
-        std::string _ip_port;
-        CBitStream* _bit_stream;  // serialize stream
+        std::string   _ip_port;
+        CBitStream*   _bit_stream;  // serialize stream
+        process_phase _phase;       // phase in process
 
         NetMsg() : _body(nullptr) {}
 
@@ -52,6 +54,9 @@ namespace hudp {
             _ip_port.clear();
             _head.Clear();
             _body = nullptr;
+        }
+        void NextPhase() {
+            _phase<<1;
         }
     };
 }

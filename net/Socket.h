@@ -1,5 +1,5 @@
-#ifndef HEADER_OSNET_INTERFACE
-#define HEADER_OSNET_INTERFACE
+#ifndef HEADER_NET_SOCKET
+#define HEADER_NET_SOCKET
 
 #include "CommonType.h"
 
@@ -22,11 +22,15 @@ namespace hudp {
 
     class CSocket {
     public:
-        CSocket();
+        CSocket(const std::string& ip, uint16_t port, uint64_t sock);
         ~CSocket();
 
-        void SendMsg(NetMsg* msg);
-        void RecvMsg(NetMsg* msg);
+        void SendMsgToPriQueue(NetMsg* msg);
+        void SendMsgToSendWnd(NetMsg* msg);
+        void SendMsgToNet(NetMsg* msg);
+
+        void RecvMsgUpper(NetMsg* msg);
+        void RecvMsgToOrderList(NetMsg* msg);
 
     private:
         char            _ip[__ip_length];

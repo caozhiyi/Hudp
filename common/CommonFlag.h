@@ -9,13 +9,13 @@ namespace hudp {
     // processing phase
     enum process_phase {
         // protocol resolution 
-        PP_PROTO_PARSE      = 1,
+        PP_PROTO_PARSE      = 0x0001,
         // head handle
-        PP_HEAD_HANDLE      = 2,
+        PP_HEAD_HANDLE      = 0x0002,
         // body handle
-        PP_BODY_HANDLE      = 3,
+        PP_BODY_HANDLE      = 0x0004,
         // upper program handle
-        PP_UPPER_HANDLE     = 4
+        PP_UPPER_HANDLE     = 0x0008
     };
 
     // Transmission reliability control

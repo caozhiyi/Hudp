@@ -10,9 +10,6 @@
 namespace hudp {
 
     class CFilterInterface;
-    static std::vector<CFilterInterface*> __filer_list;
-    static process_phase __cur_handle_phase;
-
     class CBitStream;
     class CFilterInterface {
     public:
@@ -27,8 +24,6 @@ namespace hudp {
         const process_phase& GetPhase();
 
     private:
-        friend class CFilterProcess;
-
         process_phase _handle_phase;
     };
 
