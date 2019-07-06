@@ -54,13 +54,7 @@
     <ClCompile Include="common\BitStreamPool.cpp">
       <Filter>common</Filter>
     </ClCompile>
-    <ClCompile Include="common\FunctionNetMsg.cpp">
-      <Filter>common</Filter>
-    </ClCompile>
     <ClCompile Include="common\IncrementalId.cpp">
-      <Filter>common</Filter>
-    </ClCompile>
-    <ClCompile Include="common\NetMsgPool.cpp">
       <Filter>common</Filter>
     </ClCompile>
     <ClCompile Include="common\OrderList.cpp">
@@ -116,6 +110,33 @@
     </ClCompile>
     <ClCompile Include="utest\common\Ut_Timer.cpp">
       <Filter>utest\common</Filter>
+    </ClCompile>
+    <ClCompile Include="net\SocketManager.cpp">
+      <Filter>net</Filter>
+    </ClCompile>
+    <ClCompile Include="hudp\Hudp.cpp">
+      <Filter>hudp</Filter>
+    </ClCompile>
+    <ClCompile Include="hudp\RelialeOrderlyFilter.cpp">
+      <Filter>hudp</Filter>
+    </ClCompile>
+    <ClCompile Include="hudp\ProcessThread.cpp">
+      <Filter>hudp</Filter>
+    </ClCompile>
+    <ClCompile Include="hudp\RecvThread.cpp">
+      <Filter>hudp</Filter>
+    </ClCompile>
+    <ClCompile Include="hudp\SendThread.cpp">
+      <Filter>hudp</Filter>
+    </ClCompile>
+    <ClCompile Include="hudp\UpperThread.cpp">
+      <Filter>hudp</Filter>
+    </ClCompile>
+    <ClCompile Include="hudp\FunctionNetMsg.cpp">
+      <Filter>hudp</Filter>
+    </ClCompile>
+    <ClCompile Include="hudp\NetMsgPool.cpp">
+      <Filter>hudp</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -176,19 +197,10 @@
     <ClInclude Include="common\CommonType.h">
       <Filter>common</Filter>
     </ClInclude>
-    <ClInclude Include="common\FunctionNetMsg.h">
-      <Filter>common</Filter>
-    </ClInclude>
     <ClInclude Include="common\IncrementalId.h">
       <Filter>common</Filter>
     </ClInclude>
     <ClInclude Include="common\NetMsg.h">
-      <Filter>common</Filter>
-    </ClInclude>
-    <ClInclude Include="common\NetMsgFactory.h">
-      <Filter>common</Filter>
-    </ClInclude>
-    <ClInclude Include="common\NetMsgPool.h">
       <Filter>common</Filter>
     </ClInclude>
     <ClInclude Include="common\OrderList.h">
@@ -235,6 +247,33 @@
     </ClInclude>
     <ClInclude Include="common\CommonFunc.h">
       <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="net\SocketManager.h">
+      <Filter>net</Filter>
+    </ClInclude>
+    <ClInclude Include="hudp\Hudp.h">
+      <Filter>hudp</Filter>
+    </ClInclude>
+    <ClInclude Include="hudp\RelialeOrderlyFilter.h">
+      <Filter>hudp</Filter>
+    </ClInclude>
+    <ClInclude Include="hudp\ProcessThread.h">
+      <Filter>hudp</Filter>
+    </ClInclude>
+    <ClInclude Include="hudp\RecvThread.h">
+      <Filter>hudp</Filter>
+    </ClInclude>
+    <ClInclude Include="hudp\SendThread.h">
+      <Filter>hudp</Filter>
+    </ClInclude>
+    <ClInclude Include="hudp\UpperThread.h">
+      <Filter>hudp</Filter>
+    </ClInclude>
+    <ClInclude Include="hudp\FunctionNetMsg.h">
+      <Filter>hudp</Filter>
+    </ClInclude>
+    <ClInclude Include="hudp\NetMsgPool.h">
+      <Filter>hudp</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

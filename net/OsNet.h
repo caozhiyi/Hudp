@@ -17,6 +17,8 @@ namespace hudp {
 
         // send a msg to client
         static int SendTo(uint64_t socket, const char * buf, int len, const std::string& ip, uint16_t port);
+        static int SendTo(uint64_t socket, const char * buf, int len, const std::string& ip_port);
+        static int SendTo(uint64_t socket, const char * buf, int len);
 
         // receiver msg from socket
         static int RecvFrom(uint64_t sockfd, char *buf, size_t len, std::string& ip, uint16_t& port);

@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include <functional>
 #include "CommonType.h"
 namespace hudp {
 
@@ -60,6 +61,9 @@ namespace hudp {
         HPF_NEED_ACK        = 0x0100,
         // 
     };
+
+    typedef std::string HudpHandle;
+    typedef std::function<void(const HudpHandle& handlle, const char* msg, uint16_t len)> recv_back;
 
     const uint16_t __mtu = 400;
 

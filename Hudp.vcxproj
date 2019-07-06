@@ -70,7 +70,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(SolutionDir)common;$(SolutionDir)net;$(SolutionDir)base;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)common;$(SolutionDir)net;$(SolutionDir)base;$(SolutionDir)hudp;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>$(SolutionDir)common;$(SolutionDir)base;$(IncludePath)</IncludePath>
@@ -131,9 +131,7 @@
     <ClCompile Include="common\BitStream.cpp" />
     <ClCompile Include="common\BitStreamPool.cpp" />
     <ClCompile Include="common\CommonFunc.cpp" />
-    <ClCompile Include="common\FunctionNetMsg.cpp" />
     <ClCompile Include="common\IncrementalId.cpp" />
-    <ClCompile Include="common\NetMsgPool.cpp" />
     <ClCompile Include="common\OrderList.cpp" />
     <ClCompile Include="common\PriorityQueue.cpp" />
     <ClCompile Include="common\SendWnd.cpp" />
@@ -141,8 +139,17 @@
     <ClCompile Include="common\Timer.cpp" />
     <ClCompile Include="hudp\FilterInterface.cpp" />
     <ClCompile Include="hudp\FilterProcess.cpp" />
+    <ClCompile Include="hudp\FunctionNetMsg.cpp" />
+    <ClCompile Include="hudp\Hudp.cpp" />
+    <ClCompile Include="hudp\NetMsgPool.cpp" />
+    <ClCompile Include="hudp\ProcessThread.cpp" />
+    <ClCompile Include="hudp\RecvThread.cpp" />
+    <ClCompile Include="hudp\RelialeOrderlyFilter.cpp" />
+    <ClCompile Include="hudp\SendThread.cpp" />
     <ClCompile Include="hudp\SerializesFilter.cpp" />
+    <ClCompile Include="hudp\UpperThread.cpp" />
     <ClCompile Include="net\Socket.cpp" />
+    <ClCompile Include="net\SocketManager.cpp" />
     <ClCompile Include="net\win\OsNet.cpp" />
     <ClCompile Include="utest\common\Ut_BitStream.cpp" />
     <ClCompile Include="utest\common\Ut_IncrementalId.cpp" />
@@ -173,11 +180,8 @@
     <ClInclude Include="common\BitStreamPool.h" />
     <ClInclude Include="common\CommonFlag.h" />
     <ClInclude Include="common\CommonType.h" />
-    <ClInclude Include="common\FunctionNetMsg.h" />
     <ClInclude Include="common\IncrementalId.h" />
     <ClInclude Include="common\NetMsg.h" />
-    <ClInclude Include="common\NetMsgFactory.h" />
-    <ClInclude Include="common\NetMsgPool.h" />
     <ClInclude Include="common\OrderList.h" />
     <ClInclude Include="common\OrderListSolt.h" />
     <ClInclude Include="common\PriorityQueue.h" />
@@ -189,9 +193,18 @@
     <ClInclude Include="common\CommonFunc.h" />
     <ClInclude Include="hudp\FilterInterface.h" />
     <ClInclude Include="hudp\FilterProcess.h" />
+    <ClInclude Include="hudp\FunctionNetMsg.h" />
+    <ClInclude Include="hudp\Hudp.h" />
+    <ClInclude Include="hudp\NetMsgPool.h" />
+    <ClInclude Include="hudp\ProcessThread.h" />
+    <ClInclude Include="hudp\RecvThread.h" />
+    <ClInclude Include="hudp\RelialeOrderlyFilter.h" />
+    <ClInclude Include="hudp\SendThread.h" />
     <ClInclude Include="hudp\SerializesFilter.h" />
+    <ClInclude Include="hudp\UpperThread.h" />
     <ClInclude Include="net\Socket.h" />
     <ClInclude Include="net\OsNet.h" />
+    <ClInclude Include="net\SocketManager.h" />
     <ClInclude Include="utest\Test.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -4,13 +4,14 @@
 #include <mutex>    // for mutex
 #include <string>   // for string
 #include "CommonType.h"
+#include "Single.h"
 namespace hudp {
 
     static const bool     __must_less_mtu  = false;
     static const uint16_t __max_length     = (uint16_t)0xFFFF;
 
     // only can read or write once
-    class CBitStream {
+    class CBitStream : public base::CSingle<CBitStream> {
     public:
         CBitStream();
         virtual ~CBitStream();

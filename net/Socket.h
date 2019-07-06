@@ -5,7 +5,6 @@
 
 namespace hudp {
 
-    static const uint8_t __ip_length = 32;
     static const uint8_t __wnd_size  = 3;
 
     enum WndIndex {
@@ -22,7 +21,7 @@ namespace hudp {
 
     class CSocket {
     public:
-        CSocket(const std::string& ip, uint16_t port, uint64_t sock);
+        CSocket();
         ~CSocket();
 
         void SendMsgToPriQueue(NetMsg* msg);
@@ -33,10 +32,11 @@ namespace hudp {
         void RecvMsgToOrderList(NetMsg* msg);
 
     private:
-        char            _ip[__ip_length];
-        uint16_t        _short;
-        uint64_t    	_socket;
+        // Instantiating corresponding classes
+        void CreateSendWnd(WndIndex index);
+        void CreateRecvList(WndIndex index);
 
+    private:
         CIncrementalId* _inc_id[__wnd_size];
         CSendWnd*       _send_wnd[__wnd_size];
         CRecvList*      _recv_list[__wnd_size];

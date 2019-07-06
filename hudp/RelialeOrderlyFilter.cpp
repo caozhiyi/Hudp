@@ -1,4 +1,4 @@
-#include "SerializesFilter.h"
+#include "RelialeOrderlyFilter.h"
 #include "Log.h"
 #include "BitStreamPool.h"
 #include "NetMsgPool.h"
@@ -7,13 +7,13 @@
 
 using namespace hudp;
 
-bool CSerializesFilter::OnSend(NetMsg* msg) {
+bool CRelialeOrderlyFilter::OnSend(NetMsg* msg) {
     
 
     return true;
 }
 
-bool CSerializesFilter::OnRecv(NetMsg* msg) {
+bool CRelialeOrderlyFilter::OnRecv(NetMsg* msg) {
     
 
     return true;

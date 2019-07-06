@@ -2,6 +2,7 @@
 #define HEADER_COMMON_NETMSG
 #include <vector>
 #include <string>
+#include <memory>
 #include "CommonType.h"
 #include "CommonFlag.h"
 namespace hudp {
@@ -33,30 +34,37 @@ namespace hudp {
         }
     };
     
+    // this size better less than mtu
+    static const uint16_t __body_size = __mtu;
 
     class CBitStream;
+    class CSocket;
     class NetMsg {
     public:
         // only head and body will be serialized
         Head        _head;        // head msg. set by hudp
-        char*       _body;        // body msg. set by user
+        char        _body[__body_size];        // body msg. set by user
 
         // other 
         std::string   _ip_port;
         CBitStream*   _bit_stream;  // serialize stream
         process_phase _phase;       // phase in process
+        std::weak_ptr<CSocket> _socket;
 
-        NetMsg() : _body(nullptr) {}
+        NetMsg() {
+            memset(_body, 0, __body_size);
+        }
 
         virtual ~NetMsg() {}
 
         void Clear() {
             _ip_port.clear();
             _head.Clear();
-            _body = nullptr;
+            memset(_body, 0, __body_size);
+            _socket.reset();
         }
         void NextPhase() {
-            _phase<<1;
+            _phase = static_cast<process_phase>(_phase<<1);
         }
     };
 }

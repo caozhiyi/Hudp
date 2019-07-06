@@ -54,6 +54,19 @@ int COsNet::SendTo(uint64_t socket, const char * buf, int len, const std::string
     return ret;
 }
 
+int COsNet::SendTo(uint64_t socket, const char * buf, int len, const std::string& ip_port) {
+    auto ret = SplitIpPort(ip_port);
+    return SendTo(socket, buf, len, ret.second, ret.first);
+}
+
+int COsNet::SendTo(uint64_t socket, const char * buf, int len) {
+    int ret = send(socket, buf, len, 0);
+    if (ret <= 0) {
+        base::LOG_ERROR("send to failed. errno : %d", WSAGetLastError());
+    }
+    return ret;
+}
+
 int COsNet::RecvFrom(uint64_t sockfd, char *buf, size_t len, std::string& ip, uint16_t& port) {
     SOCKADDR_IN addr_cli;
     int fromlen = sizeof(SOCKADDR);

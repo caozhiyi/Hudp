@@ -46,7 +46,7 @@ namespace hudp {
         CSendWndSolt* _end;  // point to the list end
         
         CSendWndSolt* _cur;  // current send point
-
+        
         std::mutex    _mutex;
         uint16_t      _send_wnd_size;
         uint16_t      _cur_send_size;

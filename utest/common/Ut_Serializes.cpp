@@ -13,7 +13,7 @@ void UtestCSerializes() {
     NetMsg msg4;
     char buf[] = "it is a test body";
     uint16_t len = strlen(buf);
-    msg1._body = buf;
+    memcpy(msg1._body, buf, len);
     msg1._head._flag |= HPF_LOW_PRI;
     msg1._head._flag |= HPF_WITH_ID;
     msg1._head._id = 1201;
