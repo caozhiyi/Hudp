@@ -60,6 +60,6 @@ void CHudp::SendMsgToRecvProcessThread(NetMsg* msg) {
     _recv_process_thread.Push(msg);
 }
 
-void CHudp::SendMsgToSendProcessThread(NetMsg* msg) {
-    _send_process_thread.Push(msg);
+NetMsg* CHudp::GetMsgFromPriQueue() {
+   return _socket_manager.GetMsg();
 }

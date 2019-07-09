@@ -13,10 +13,23 @@ CSocketManager::~CSocketManager() {
     _socket_map.clear();
 }
 
+NetMsg* CSocketManager::GetMsg() {
+    std::unique_lock<std::mutex> lock(_mutex);
+    _notify.wait(_mutex, [this]() {return this->_have_msg_socket.size() != 0; });
+
+    auto iter = _have_msg_socket.begin();
+    auto msg = _socket_map[*iter]->GetMsgFromPriQueue();
+    _have_msg_socket.erase(iter);
+    return msg;
+}
+
 void CSocketManager::SendMsg(const HudpHandle& handle, NetMsg* msg) {
+    std::unique_lock<std::mutex> lock(_mutex);
     auto ptr = GetSocket(handle);
     msg->_socket = ptr;
     ptr->SendMsgToPriQueue(msg);
+    _have_msg_socket.push_back(handle);
+    _notify.notify_one();
 }
 
 void CSocketManager::Destory(const HudpHandle& handle) {
@@ -35,7 +48,7 @@ std::shared_ptr<CSocket> CSocketManager::GetSocket(const HudpHandle& handle) {
         return iter->second;
     }
     
-//     std::shared_ptr<CSocket> socket = std::make_shared<CSocket>(new CSocket());
-//     _socket_map[handle] = socket;
-//     return socket;
+    std::shared_ptr<CSocket> socket = std::make_shared<CSocket>(new CSocket());
+    _socket_map[handle] = socket;
+    return socket;
 }

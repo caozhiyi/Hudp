@@ -26,6 +26,13 @@ namespace base {
     	void Push(const T& t) {
     		_task_list.Push(t);
     	}
+
+        void PushFront(const T&& t) {
+            _task_list.PushFront(t);
+        }
+        void PushFront(const T& t) {
+            _task_list.PushFront(t);
+        }
     
     	//TO DO
     	virtual void Run() = 0;

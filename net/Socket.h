@@ -24,6 +24,8 @@ namespace hudp {
         CSocket();
         ~CSocket();
 
+        NetMsg* GetMsgFromPriQueue();
+
         void SendMsgToPriQueue(NetMsg* msg);
         void SendMsgToSendWnd(NetMsg* msg);
         void SendMsgToNet(NetMsg* msg);

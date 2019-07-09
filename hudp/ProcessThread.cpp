@@ -1,5 +1,6 @@
 #include "ProcessThread.h"
 #include "FilterProcess.h"
+#include "Hudp.h"
 using namespace hudp;
 
 CRecvProcessThread::CRecvProcessThread() {
@@ -33,7 +34,7 @@ CSendProcessThread::~CSendProcessThread() {
 
 void CSendProcessThread::Run() {
     while (!_stop) {
-        auto pt = _Pop();
+        auto pt = CHudp::Instance().GetMsgFromPriQueue();
         if (pt) {
             CFilterProcess::Instance().SendProcess((NetMsg*)pt);
         }

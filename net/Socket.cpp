@@ -36,6 +36,13 @@ CSocket::~CSocket() {
     delete _pri_queue;
 }
 
+NetMsg* CSocket::GetMsgFromPriQueue() {
+    if (_pri_queue->Size()) {
+        return _pri_queue->Pop();
+    }
+    return nullptr;
+}
+
 void CSocket::SendMsgToPriQueue(NetMsg* msg) {
     _pri_queue->Push(msg);
 }

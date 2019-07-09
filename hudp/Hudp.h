@@ -33,9 +33,9 @@ namespace hudp {
         void SendMsgToUpper(NetMsg* msg);
         // send msg to recv process thread
         void SendMsgToRecvProcessThread(NetMsg* msg);
-        // send msg to send process thread
-        void SendMsgToSendProcessThread(NetMsg* msg);
 
+        // get msg from socket queue
+        NetMsg* GetMsgFromPriQueue();
     private:
         CRecvProcessThread      _recv_process_thread;
         CSendProcessThread      _send_process_thread;
