@@ -15,12 +15,12 @@ void CFilterProcess::SendProcess(NetMsg* msg) {
             dynamic_cast<CBodyFilterInterface*>(_filer_list[i])->OnSend(msg);
         }
 
-        if (_filer_list[i]->GetPhase() == PP_HEAD_HANDLE && msg->_phase & PP_HEAD_HANDLE) {
-            dynamic_cast<CHeadFilterInterface*>(_filer_list[i])->OnSend(msg);
-        }
-
         if (_filer_list[i]->GetPhase() == PP_PROTO_PARSE && msg->_phase & PP_PROTO_PARSE ) {
             dynamic_cast<CProtocolFilterInterface*>(_filer_list[i])->OnSend(msg);
+        }
+
+        if (_filer_list[i]->GetPhase() == PP_HEAD_HANDLE && msg->_phase & PP_HEAD_HANDLE) {
+            dynamic_cast<CHeadFilterInterface*>(_filer_list[i])->OnSend(msg);
         }
     }
 }

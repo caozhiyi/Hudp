@@ -45,7 +45,7 @@ void CHudp::SendTo(const HudpHandle& handlle, uint16_t flag, const char* msg, ui
 }
 
 void CHudp::Destroy(const HudpHandle& handlle) {
-    _socket_manager.Destory(handlle);
+    _socket_manager.Destroy(handlle);
 }
 
 void CHudp::SendMsgToNet(NetMsg* msg) {

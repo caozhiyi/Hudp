@@ -75,8 +75,7 @@ void CSocket::SendMsgToSendWnd(NetMsg* msg) {
             msg->_head._id = _inc_id[WI_RELIABLE_ORDERLY]->GetNextId();
             _send_wnd[WI_RELIABLE_ORDERLY]->PushBack(msg->_head._id, dynamic_cast<CSenderRelialeOrderlyNetMsg*>(msg));
 
-        }
-        else {
+        } else {
             CreateSendWnd(WI_RELIABLE_ORDERLY);
             msg->_head._id = _inc_id[WI_RELIABLE_ORDERLY]->GetNextId();
             _send_wnd[WI_RELIABLE_ORDERLY]->PushBack(msg->_head._id, dynamic_cast<CSenderRelialeOrderlyNetMsg*>(msg));

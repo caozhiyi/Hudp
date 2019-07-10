@@ -10,7 +10,7 @@ namespace hudp {
 
         // net library init 
         static bool Init();
-        static void Destory();
+        static void Destroy();
 
         // bind a socket to ip port
         static bool Bind(uint64_t socket, const std::string& ip, uint16_t port);

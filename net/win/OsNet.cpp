@@ -20,7 +20,7 @@ bool COsNet::Init() {
     return true;
 }
 
-void COsNet::Destory() {
+void COsNet::Destroy() {
     WSACleanup();
 }
 
