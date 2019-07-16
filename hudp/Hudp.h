@@ -42,8 +42,6 @@ namespace hudp {
         CRecvThread             _recv_thread;
         CSendThread             _send_thread;
         CUpperThread            _upper_thread;
-
-        CSocketManager          _socket_manager;
     };
 
 }

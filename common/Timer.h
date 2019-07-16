@@ -4,8 +4,10 @@
 #include <condition_variable>
 #include <mutex>
 #include <map>
+
 #include "Runnable.h"
 #include "TimeTool.h"
+#include "Single.h"
 
 namespace hudp {
 
@@ -16,12 +18,12 @@ namespace hudp {
     // the timer only support timing of up to five seconds.
     // in 1~100ms, every 1 microsecond can set a timer event.
     // in 100~300ms, every 2 microsecond can set a timer event.
-    // in 300~600ms, every 3 microsecond can set a timer event.
-    // in 600~1000ms, every 4 microsecond can set a timer event.
-    // in 1000~5000ms, every 40 microsecond can set a timer event.
+    // in 300~600ms, every 4 microsecond can set a timer event.
+    // in 600~1000ms, every 8 microsecond can set a timer event.
+    // in 1000~5000ms, every 32 microsecond can set a timer event.
     // the more backward the rougher, each input is rounded backwards
     // like 101ms will be set to 102ms, and 602ms will be set to 604ms.
-    class CTimer : public base::CRunnable {
+    class CTimer : public base::CRunnable, public base::CSingle<CTimer> {
     public:
         CTimer();
         ~CTimer();

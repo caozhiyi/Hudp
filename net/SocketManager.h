@@ -9,12 +9,13 @@
 
 #include "CommonType.h"
 #include "CommonFlag.h"
+#include "Single.h"
 
 namespace hudp {
 
     class CSocket;
     class NetMsg;
-    class CSocketManager {
+    class CSocketManager : public base::CSingle<CSocketManager> {
     public:
         CSocketManager();
         ~CSocketManager();
@@ -23,13 +24,14 @@ namespace hudp {
         // all socket take msg out in turn.
         NetMsg* GetMsg();
         
-        // send a msg to priority queue.
+        // get a socket for send msg.
         // if there isn't a socket, just create it.
-        void SendMsg(const HudpHandle& handle, NetMsg* msg);
+        void GetSendSocket(const HudpHandle& handle, std::shared_ptr<CSocket>& socket);
 
         // recv a msg to upper or order list.
+        // if msg need a socket then return true and socket, else return false.
         // if there isn't a socket, just create it.
-        void RecvMsg(const HudpHandle& handle, NetMsg* msg);
+        bool GetRecvSocket(const HudpHandle& handle, uint16_t flag, std::shared_ptr<CSocket>& socket);
 
         // destroy resource of socket and send destroy msg to remote.
         void Destroy(const HudpHandle& handle);

@@ -1,6 +1,7 @@
 #ifndef HEADER_NET_SOCKET
 #define HEADER_NET_SOCKET
 
+#include <atomic>
 #include "CommonType.h"
 
 namespace hudp {
@@ -18,6 +19,7 @@ namespace hudp {
     class CPriorityQueue;
     class CIncrementalId;
     class NetMsg;
+    class CSenderRelialeOrderlyNetMsg;
 
     class CSocket {
     public:
@@ -33,6 +35,10 @@ namespace hudp {
         void RecvMsgUpper(NetMsg* msg);
         void RecvMsgToOrderList(NetMsg* msg);
 
+        
+        void SetTimerOutTime(uint16_t timer_out);
+        void AddToTimer(CSenderRelialeOrderlyNetMsg* msg);
+
     private:
         // Instantiating corresponding classes
         void CreateSendWnd(WndIndex index);
@@ -43,6 +49,7 @@ namespace hudp {
         CSendWnd*       _send_wnd[__wnd_size];
         CRecvList*      _recv_list[__wnd_size];
         CPriorityQueue* _pri_queue;
+        std::atomic<uint16_t> _timer_out_time;
     };
 }
 

@@ -4,6 +4,7 @@
 #include "BitStreamPool.h"
 #include "NetMsgPool.h"
 #include "NetMsg.h"
+#include "Socket.h"
 
 using namespace hudp;
 
@@ -41,11 +42,17 @@ void CHudp::SendTo(const HudpHandle& handlle, uint16_t flag, const char* msg, ui
     net_msg->_head._body_len = len;
     memcpy(net_msg->_body, msg, len);
     
-    _socket_manager.SendMsg(handlle, net_msg);
+    //get a socket. 
+    std::shared_ptr<CSocket> socket;
+    CSocketManager::Instance().GetSendSocket(handlle, socket);
+    net_msg->_socket = socket;
+
+    // send msg to pri queue.
+    socket->SendMsgToPriQueue(net_msg);
 }
 
 void CHudp::Destroy(const HudpHandle& handlle) {
-    _socket_manager.Destroy(handlle);
+    CSocketManager::Instance().Destroy(handlle);
 }
 
 void CHudp::SendMsgToNet(NetMsg* msg) {
@@ -61,5 +68,5 @@ void CHudp::SendMsgToRecvProcessThread(NetMsg* msg) {
 }
 
 NetMsg* CHudp::GetMsgFromPriQueue() {
-   return _socket_manager.GetMsg();
+   return CSocketManager::Instance().GetMsg();
 }

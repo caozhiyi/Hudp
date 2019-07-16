@@ -8,6 +8,7 @@
 #include "NetMsg.h"
 #include "FunctionNetMsg.h"
 #include "Hudp.h"
+#include "Timer.h"
 
 using namespace hudp;
 
@@ -63,22 +64,26 @@ void CSocket::SendMsgToSendWnd(NetMsg* msg) {
         if (_send_wnd[WI_RELIABLE]) {
             msg->_head._id = _inc_id[WI_RELIABLE]->GetNextId();
             _send_wnd[WI_RELIABLE]->PushBack(msg->_head._id, dynamic_cast<CSenderRelialeOrderlyNetMsg*>(msg));
+            AddToTimer(dynamic_cast<CSenderRelialeOrderlyNetMsg*>(msg));
 
         } else {
             CreateSendWnd(WI_RELIABLE);
             msg->_head._id = _inc_id[WI_RELIABLE]->GetNextId();
             _send_wnd[WI_RELIABLE]->PushBack(msg->_head._id, dynamic_cast<CSenderRelialeOrderlyNetMsg*>(msg));
+            AddToTimer(dynamic_cast<CSenderRelialeOrderlyNetMsg*>(msg));
         }
 
     } else if (msg->_head._flag & HTF_RELIABLE_ORDERLY) {
         if (_send_wnd[WI_RELIABLE_ORDERLY]) {
             msg->_head._id = _inc_id[WI_RELIABLE_ORDERLY]->GetNextId();
             _send_wnd[WI_RELIABLE_ORDERLY]->PushBack(msg->_head._id, dynamic_cast<CSenderRelialeOrderlyNetMsg*>(msg));
-
+            AddToTimer(dynamic_cast<CSenderRelialeOrderlyNetMsg*>(msg));
+        
         } else {
             CreateSendWnd(WI_RELIABLE_ORDERLY);
             msg->_head._id = _inc_id[WI_RELIABLE_ORDERLY]->GetNextId();
             _send_wnd[WI_RELIABLE_ORDERLY]->PushBack(msg->_head._id, dynamic_cast<CSenderRelialeOrderlyNetMsg*>(msg));
+            AddToTimer(dynamic_cast<CSenderRelialeOrderlyNetMsg*>(msg));
         }
 
     // normal udp msg. send to net
@@ -127,6 +132,14 @@ void CSocket::RecvMsgToOrderList(NetMsg* msg) {
     } else {
         RecvMsgUpper(msg);
     }
+}
+
+void CSocket::SetTimerOutTime(uint16_t timer_out) {
+    _timer_out_time = timer_out;
+}
+
+void CSocket::AddToTimer(CSenderRelialeOrderlyNetMsg* msg) {
+    CTimer::Instance().AddTimer(_timer_out_time, msg);
 }
 
 void CSocket::CreateSendWnd(WndIndex index) {

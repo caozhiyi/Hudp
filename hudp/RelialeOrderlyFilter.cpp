@@ -5,6 +5,7 @@
 #include "Serializes.h"
 #include "CommonType.h"
 #include "Socket.h"
+#include "SocketManager.h"
 
 using namespace hudp;
 
@@ -27,19 +28,14 @@ bool CRelialeOrderlyFilter::OnSend(NetMsg* msg) {
 }
 
 bool CRelialeOrderlyFilter::OnRecv(NetMsg* msg) {
-    auto share_pt = msg->_socket.lock();
-    if (!share_pt) {
-        base::LOG_ERROR("socket of msg is empty.");
-        return false;
-    }
-
-    // normal udp send to net direct
-    if (msg->_head._flag & HTF_NORMAL) {
-        share_pt->RecvMsgUpper(msg);
-
+    //get a socket for msg
+    std::shared_ptr<CSocket> socket;
+    if (CSocketManager::Instance().GetRecvSocket(msg->_ip_port, msg->_head._flag, socket)) {
+        socket->RecvMsgToOrderList(msg);
+    
     } else {
-        share_pt->RecvMsgToOrderList(msg);
+        socket->RecvMsgUpper(msg);
     }
-
+    
     return true;
 }

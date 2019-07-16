@@ -24,26 +24,21 @@ NetMsg* CSocketManager::GetMsg() {
     return msg;
 }
 
-void CSocketManager::SendMsg(const HudpHandle& handle, NetMsg* msg) {
+void CSocketManager::GetSendSocket(const HudpHandle& handle, std::shared_ptr<CSocket>& socket) {
     std::unique_lock<std::mutex> lock(_mutex);
-    auto ptr = GetSocket(handle);
-    msg->_socket = ptr;
-    ptr->SendMsgToPriQueue(msg);
-    _have_msg_socket.push_back(handle);
-    _notify.notify_one();
+    socket = GetSocket(handle);
 }
 
-void CSocketManager::RecvMsg(const HudpHandle& handle, NetMsg* msg) {
+bool CSocketManager::GetRecvSocket(const HudpHandle& handle, uint16_t flag, std::shared_ptr<CSocket>& socket) {
     // if a normal udp, send to upper direct.
-    if (msg->_head._flag & HTF_NORMAL) {
-        CHudp::Instance().SendMsgToUpper(msg);
+    if (flag & HTF_NORMAL) {
+        return false;
     }
-    
+
     // add to order list.
     std::unique_lock<std::mutex> lock(_mutex);
-    auto ptr = GetSocket(handle);
-    msg->_socket = ptr;
-    ptr->RecvMsgToOrderList(msg);
+    socket = GetSocket(handle);
+    return true;
 }
 
 void CSocketManager::Destroy(const HudpHandle& handle) {
@@ -62,7 +57,7 @@ std::shared_ptr<CSocket> CSocketManager::GetSocket(const HudpHandle& handle) {
         return iter->second;
     }
     
-    std::shared_ptr<CSocket> socket = std::make_shared<CSocket>(new CSocket());
+    std::shared_ptr<CSocket> socket = std::make_shared<CSocket>();
     _socket_map[handle] = socket;
     return socket;
 }

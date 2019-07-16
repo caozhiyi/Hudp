@@ -8,7 +8,7 @@ CBitStreamPool::CBitStreamPool() {
 CBitStreamPool::~CBitStreamPool() {
     size_t size = _free_queue.Size();
     CBitStream* bit_stream;
-    for (int i = 0; i < size; i++) {
+    for (size_t i = 0; i < size; i++) {
         _free_queue.Pop(bit_stream);
         delete bit_stream;
     }
@@ -16,7 +16,7 @@ CBitStreamPool::~CBitStreamPool() {
 
 void CBitStreamPool::ExpendFree() {
     CBitStream* bit_stream;
-    for (int i = 0; i < __init_pool_size; i++) {
+    for (size_t i = 0; i < __init_pool_size; i++) {
         bit_stream = new CBitStream();
         _free_queue.Push(bit_stream);
     }
@@ -25,7 +25,7 @@ void CBitStreamPool::ExpendFree() {
 void CBitStreamPool::ReduceFree() {
     size_t size = _free_queue.Size() / 2;
     CBitStream* bit_stream;
-    for (int i = 0; i < size; i++) {
+    for (size_t i = 0; i < size; i++) {
         _free_queue.Pop(bit_stream);
         delete bit_stream;
     }
