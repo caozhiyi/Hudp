@@ -29,4 +29,7 @@ void CSenderRelialeOrderlyNetMsg::OnTimer() {
 
 void CReceiverNetMsg::ToRecv() {
     CHudp::Instance().SendMsgToUpper(this);
+
+    // send ack msg to remote
+    
 }
