@@ -59,7 +59,8 @@ namespace hudp {
 
         // receiver need send back a ack.
         HPF_NEED_ACK        = 0x0100,
-        // 
+        // is orderly
+        HPF_IS_ORDERLY      = 0x0200,
     };
 
     typedef std::string HudpHandle;

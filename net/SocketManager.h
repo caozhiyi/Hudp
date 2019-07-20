@@ -22,6 +22,7 @@ namespace hudp {
     
         // get a msg from priority queue.
         // all socket take msg out in turn.
+        // if it's empty, it's blocked.
         NetMsg* GetMsg();
         
         // get a socket for send msg.
