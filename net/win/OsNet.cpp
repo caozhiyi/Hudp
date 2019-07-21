@@ -74,6 +74,7 @@ int COsNet::RecvFrom(uint64_t sockfd, char *buf, size_t len, std::string& ip, ui
     
     if (ret <= 0) {
         base::LOG_ERROR("recv from failed. errno : %d", WSAGetLastError());
+        int err = WSAGetLastError();
     }
 
     ip = inet_ntoa(addr_cli.sin_addr);
@@ -81,9 +82,16 @@ int COsNet::RecvFrom(uint64_t sockfd, char *buf, size_t len, std::string& ip, ui
 
     return ret;
 }
+#include <Mstcpip.h>
 
 uint64_t COsNet::UdpSocket() {
     auto ret = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+
+    // ignore recvfrom 10054 error
+    bool bNewBehavior = FALSE;
+    DWORD dwBytesReturned = 0;
+    WSAIoctl(ret, _WSAIOW(IOC_VENDOR, 12), &bNewBehavior, sizeof(bNewBehavior), NULL, 0, &dwBytesReturned, NULL, NULL);
+
     if (ret == INVALID_SOCKET) {
         base::LOG_ERROR("get udp socket failed. errno : %d", GetLastError());
         return 0;
