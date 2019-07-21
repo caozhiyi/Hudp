@@ -25,6 +25,9 @@
     <Filter Include="utest\net">
       <UniqueIdentifier>{0cfe3810-f125-47d7-94cf-b7f8dd760336}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{b1ad3157-80a9-49e7-924b-58235a58a3fe}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="utest\common\Ut_BitStream.cpp">
@@ -114,9 +117,6 @@
     <ClCompile Include="net\SocketManager.cpp">
       <Filter>net</Filter>
     </ClCompile>
-    <ClCompile Include="hudp\Hudp.cpp">
-      <Filter>hudp</Filter>
-    </ClCompile>
     <ClCompile Include="hudp\RelialeOrderlyFilter.cpp">
       <Filter>hudp</Filter>
     </ClCompile>
@@ -136,6 +136,18 @@
       <Filter>hudp</Filter>
     </ClCompile>
     <ClCompile Include="hudp\NetMsgPool.cpp">
+      <Filter>hudp</Filter>
+    </ClCompile>
+    <ClCompile Include="common\PendAck.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="utest\common\Ut_PendAck.cpp">
+      <Filter>utest\common</Filter>
+    </ClCompile>
+    <ClCompile Include="hudp\HudpImpl.cpp">
+      <Filter>hudp</Filter>
+    </ClCompile>
+    <ClCompile Include="hudp\Hudp.cpp">
       <Filter>hudp</Filter>
     </ClCompile>
   </ItemGroup>
@@ -251,9 +263,6 @@
     <ClInclude Include="net\SocketManager.h">
       <Filter>net</Filter>
     </ClInclude>
-    <ClInclude Include="hudp\Hudp.h">
-      <Filter>hudp</Filter>
-    </ClInclude>
     <ClInclude Include="hudp\RelialeOrderlyFilter.h">
       <Filter>hudp</Filter>
     </ClInclude>
@@ -274,6 +283,18 @@
     </ClInclude>
     <ClInclude Include="hudp\NetMsgPool.h">
       <Filter>hudp</Filter>
+    </ClInclude>
+    <ClInclude Include="common\PendAck.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Hudp.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="hudp\HudpImpl.h">
+      <Filter>hudp</Filter>
+    </ClInclude>
+    <ClInclude Include="include\HudpFlag.h">
+      <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

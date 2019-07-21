@@ -44,15 +44,3 @@ void Destroy(int* arr) {
     std::cout << "delete" << std::endl;
     delete[] arr;
 }
-
-int main() {
-
-    {
-        int* arr = new int[1000];
-        arr[0] = 10000;
-        CSmartPtr<int, Destroy> p(arr);
-    }
-
-    int a= 0;
-    a++;
-}

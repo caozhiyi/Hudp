@@ -17,6 +17,10 @@ namespace hudp {
 
         // get the bag ack.
         virtual void AckDone();
+
+        void NextPhase() {
+            _phase--;
+        }
     };
 
     // ordered and reliable messages at the sender 
@@ -32,6 +36,10 @@ namespace hudp {
 
         // time out call back
         virtual void OnTimer();
+
+        void NextPhase() {
+            _phase--;
+        }
     };
 
     // messages at the receiver 
@@ -40,6 +48,10 @@ namespace hudp {
     public:
         // notify superior acceptance 
         virtual void ToRecv();
+
+        void NextPhase() {
+            _phase++;
+        }
     };
 }
 #endif

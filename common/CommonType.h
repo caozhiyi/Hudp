@@ -4,7 +4,7 @@
 namespace hudp {
 
 #define CHECK_RET(ret) do{if(!ret) return false;}while(0);
-
+#define MAX_ID_NUM 65535
 
 
 #if defined(__GNUC__) || defined(__GCCXML__) || defined(__SNC__) || defined(__S3E__)

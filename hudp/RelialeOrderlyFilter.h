@@ -7,9 +7,9 @@ namespace hudp {
 
     class CBitStream;
     // protocol resolution
-    class CRelialeOrderlyFilter : public CHeadFilterInterface {
+    class CRelialeOrderlyFilter : public CFilterInterface {
     public:
-        CRelialeOrderlyFilter() {}
+        CRelialeOrderlyFilter() : CFilterInterface(PP_HEAD_HANDLE) {}
         virtual ~CRelialeOrderlyFilter() {}
 
         virtual bool OnSend(NetMsg* msg);

@@ -22,6 +22,7 @@ namespace hudp {
         // receive a ack
         void AcceptAck(uint16_t id);
         void AcceptAck(uint16_t start_id, uint16_t len);
+        void AcceptAck(std::vector<uint16_t>& vec_id);
 
         // change send window size
         void ChangeSendWndSize(uint16_t size);

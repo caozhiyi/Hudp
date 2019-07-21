@@ -86,6 +86,20 @@ void CNetMsgPool::ReduceFree() {
     }
 }
 
+NetMsg* CNetMsgPool::GetAckMsg() {
+    NetMsg* net_msg;
+    if (!_free_net_msg_queue.Pop(net_msg)) {
+        net_msg = new NetMsg();
+    }
+
+    if (net_msg) {
+        net_msg->_phase = PP_PROTO_PARSE;
+        net_msg->_head._flag |= HPF_HIGH_PRI;
+        return net_msg;
+    }
+    return nullptr;
+}
+
 NetMsg* CNetMsgPool::GetSendMsg(uint32_t flag) {
     if (flag & HTF_ORDERLY) {
         CSenderOrderlyNetMsg* order_msg;
@@ -131,23 +145,17 @@ void CNetMsgPool::FreeMsg(NetMsg* msg, bool is_recv) {
         msg->Clear();
         _free_revceiver_queue.Push((CReceiverNetMsg*)msg);
     }
+    if (msg->_head._flag & HPF_NEED_ACK) {
+        msg->Clear();
+        _free_reliale_order_queue.Push((CSenderRelialeOrderlyNetMsg*)msg);
+        return;
 
-    if (msg->_head._flag & HTF_ORDERLY) {
+    } else if (msg->_head._flag & HPF_IS_ORDERLY) {
         msg->Clear();
         _free_order_queue.Push((CSenderOrderlyNetMsg*)msg);
         return;
 
-    } else if (msg->_head._flag & HTF_RELIABLE) {
-        msg->Clear();
-        _free_reliale_order_queue.Push((CSenderRelialeOrderlyNetMsg*)msg);
-        return;
-
-    } else if (msg->_head._flag & HTF_RELIABLE_ORDERLY) {
-        msg->Clear();
-        _free_reliale_order_queue.Push((CSenderRelialeOrderlyNetMsg*)msg);
-        return;
-
-    } else if (msg->_head._flag & HTF_NORMAL) {
+    } else if (msg->_head._flag) {
         msg->Clear();
         _free_net_msg_queue.Push(msg);
         return;

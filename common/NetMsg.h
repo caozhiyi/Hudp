@@ -49,23 +49,28 @@ namespace hudp {
         // other 
         std::string   _ip_port;
         CBitStream*   _bit_stream;  // serialize stream
-        process_phase _phase;       // phase in process
+        uint8_t       _phase;       // phase in process
         std::weak_ptr<CSocket> _socket;
 
-        NetMsg() {
+        bool          _change; // head may be changes,should serialize again
+
+        NetMsg() : _change(false) {
             memset(_body, 0, __body_size);
         }
 
         virtual ~NetMsg() {}
 
         void Clear() {
+            _change = false;
             _ip_port.clear();
             _head.Clear();
             memset(_body, 0, __body_size);
             _socket.reset();
         }
-        void NextPhase() {
-            _phase = static_cast<process_phase>(_phase<<1);
+
+        void SetId(const uint16_t& id) {
+            _head._id = id;
+            _head._flag |= HPF_WITH_ID;
         }
     };
 }

@@ -24,7 +24,10 @@ namespace hudp {
         // all socket take msg out in turn.
         // if it's empty, it's blocked.
         NetMsg* GetMsg();
-        
+
+        // notify msg arrive 
+        void NotifyMsg(const HudpHandle& handle);
+
         // get a socket for send msg.
         // if there isn't a socket, just create it.
         void GetSendSocket(const HudpHandle& handle, std::shared_ptr<CSocket>& socket);

@@ -18,6 +18,7 @@ CSendThread::~CSendThread() {
 
 void CSendThread::Start(uint64_t socket) {
     _send_socket = socket;
+    CRunnable::Start();
 }
 
 void CSendThread::Run() {
@@ -31,7 +32,8 @@ void CSendThread::Run() {
         if (msg) {
             COsNet::SendTo(_send_socket, msg->_bit_stream->GetDataPoint(), msg->_bit_stream->GetCurrentLength(), msg->_ip_port);
 
-            if ((msg->_head._flag & HTF_ORDERLY) || (msg->_head._flag & HTF_NORMAL)) {
+            // if msg don't need ack, destroy here
+            if (!(msg->_head._flag & HPF_NEED_ACK)) {
                 CBitStreamPool::Instance().FreeBitStream(msg->_bit_stream);
                 CNetMsgPool::Instance().FreeMsg(msg);
             }

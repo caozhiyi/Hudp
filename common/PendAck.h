@@ -32,7 +32,7 @@ namespace hudp {
         // start id of consecutive ack
         uint16_t    _ack_start;
         // expect start id
-        u_int16_t   _expect_start_id;
+        uint16_t   _expect_start_id;
         // all ack id cache
         std::set<uint16_t> _ack_set;
     };

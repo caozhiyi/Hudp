@@ -66,15 +66,20 @@ void CTimer::Run() {
         
         base::CRunnable::Sleep(sleep_time);
         
-        std::unique_lock<std::mutex> lock(_mutex);
-        index = GetIndex(iter->second);
-        auto ti = _timer_list[index];
+        CTimerSolt* ti = nullptr;
+        {
+            std::unique_lock<std::mutex> lock(_mutex);
+            index = GetIndex(iter->second);
+
+            ti = _timer_list[index];
+
+            _expiration_timer_map.erase(iter);
+            _timer_list[index] = nullptr;
+        }
         while (ti) {
             ti->OnTimer();
             ti = ti->GetNext();
         }
-        _expiration_timer_map.erase(iter);
-        _timer_list[index] = nullptr;
     }
 }
 

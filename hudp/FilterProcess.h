@@ -14,6 +14,9 @@ namespace hudp {
         CFilterProcess() {}
         virtual ~CFilterProcess() {}
         
+        // init filter
+        void Init();
+
         // process chain of responsibility
         void SendProcess(NetMsg* msg);
         void RecvProcess(NetMsg* msg);
@@ -24,12 +27,7 @@ namespace hudp {
         bool Remove(CFilterInterface* filter);
 
     private:
-        // get start index from vector 
-        size_t GetIndex(process_phase cur_handle_phase);
-
-    private:
         std::vector<CFilterInterface*> _filer_list;
-        process_phase _cur_handle_phase;
     };
 }
 

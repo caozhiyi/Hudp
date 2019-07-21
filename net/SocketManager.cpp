@@ -2,7 +2,7 @@
 #include "SocketManager.h"
 #include "NetMsg.h"
 #include "Socket.h"
-#include "Hudp.h"
+#include "HudpImpl.h"
 
 using namespace hudp;
 
@@ -24,6 +24,12 @@ NetMsg* CSocketManager::GetMsg() {
     return msg;
 }
 
+void CSocketManager::NotifyMsg(const HudpHandle& handle) {
+    std::unique_lock<std::mutex> lock(_mutex);
+    _have_msg_socket.push_back(handle);
+    _notify.notify_one();
+}
+
 void CSocketManager::GetSendSocket(const HudpHandle& handle, std::shared_ptr<CSocket>& socket) {
     std::unique_lock<std::mutex> lock(_mutex);
     socket = GetSocket(handle);
@@ -31,7 +37,8 @@ void CSocketManager::GetSendSocket(const HudpHandle& handle, std::shared_ptr<CSo
 
 bool CSocketManager::GetRecvSocket(const HudpHandle& handle, uint16_t flag, std::shared_ptr<CSocket>& socket) {
     // if a normal udp, send to upper direct.
-    if (flag & HTF_NORMAL) {
+    if (!(flag & HPF_NEED_ACK && flag & HPF_IS_ORDERLY) && 
+        !((flag & HPF_WITH_ACK_ARRAY | flag & HPF_WITH_ACK_RANGE))) {
         return false;
     }
 
@@ -57,7 +64,7 @@ std::shared_ptr<CSocket> CSocketManager::GetSocket(const HudpHandle& handle) {
         return iter->second;
     }
     
-    std::shared_ptr<CSocket> socket = std::make_shared<CSocket>();
+    std::shared_ptr<CSocket> socket = std::make_shared<CSocket>(handle);
     _socket_map[handle] = socket;
     return socket;
 }

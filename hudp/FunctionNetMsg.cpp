@@ -1,12 +1,18 @@
 #include "FunctionNetMsg.h"
-#include "Hudp.h"
+#include "HudpImpl.h"
 #include "BitStreamPool.h"
 #include "NetMsgPool.h"
+#include "FilterProcess.h"
+#include "Log.h"
+#include "Socket.h"
 
 using namespace hudp;
 
 void CSenderOrderlyNetMsg::ToSend() {
-    CHudp::Instance().SendMsgToNet(this);
+    if (_phase == PP_HEAD_HANDLE) {
+        NextPhase();
+    }
+    CFilterProcess::Instance().SendProcess(this);
 }
 
 void CSenderOrderlyNetMsg::AckDone() {
@@ -15,7 +21,10 @@ void CSenderOrderlyNetMsg::AckDone() {
 }
 
 void CSenderRelialeOrderlyNetMsg::ToSend() {
-    CHudp::Instance().SendMsgToNet(this);
+    if (_phase == PP_HEAD_HANDLE) {
+        NextPhase();
+    }
+    CFilterProcess::Instance().SendProcess(this);
 }
 
 void CSenderRelialeOrderlyNetMsg::AckDone() {
@@ -24,12 +33,28 @@ void CSenderRelialeOrderlyNetMsg::AckDone() {
 }
 
 void CSenderRelialeOrderlyNetMsg::OnTimer() {
-    CHudp::Instance().SendMsgToNet(this);
+    if (_phase == PP_HEAD_HANDLE) {
+        NextPhase();
+    }
+    
+    // add to timer again
+    auto socket = _socket.lock();
+    if (socket) {
+        // send to process again
+        CFilterProcess::Instance().SendProcess(this);
+        socket->AddToTimer(this);
+    }
 }
 
 void CReceiverNetMsg::ToRecv() {
-    CHudp::Instance().SendMsgToUpper(this);
+    CHudpImpl::Instance().SendMsgToUpper(this);
 
     // send ack msg to remote
-    
+    auto socket = _socket.lock();
+    if (!socket) {
+        base::LOG_ERROR("a recv net msg can't find socket");
+        return;
+    }
+
+    socket->AddAck(this);
 }

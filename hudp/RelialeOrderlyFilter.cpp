@@ -6,6 +6,8 @@
 #include "CommonType.h"
 #include "Socket.h"
 #include "SocketManager.h"
+#include "HudpImpl.h"
+#include "FunctionNetMsg.h"
 
 using namespace hudp;
 
@@ -17,8 +19,9 @@ bool CRelialeOrderlyFilter::OnSend(NetMsg* msg) {
     }
 
     // normal udp send to net direct
-    if (msg->_head._flag & HTF_NORMAL) {
-        share_pt->SendMsgToNet(msg);
+    if (!(msg->_head._flag & HPF_NEED_ACK && msg->_head._flag & HPF_IS_ORDERLY)) {
+        // set msg to next phase 
+        static_cast<CSenderOrderlyNetMsg*>(msg)->NextPhase();
 
     } else {
         share_pt->SendMsgToSendWnd(msg);
@@ -28,14 +31,30 @@ bool CRelialeOrderlyFilter::OnSend(NetMsg* msg) {
 }
 
 bool CRelialeOrderlyFilter::OnRecv(NetMsg* msg) {
-    //get a socket for msg
+
     std::shared_ptr<CSocket> socket;
-    if (CSocketManager::Instance().GetRecvSocket(msg->_ip_port, msg->_head._flag, socket)) {
-        socket->RecvMsgToOrderList(msg);
+    CSocketManager::Instance().GetRecvSocket(msg->_ip_port, msg->_head._flag, socket);
     
-    } else {
-        socket->RecvMsgUpper(msg);
+    // with ack
+    if ((msg->_head._flag & HPF_WITH_ACK_ARRAY | msg->_head._flag & HPF_WITH_ACK_RANGE) && socket) {
+        socket->RecvAck(msg);
     }
-    
+
+    if (!(msg->_head._flag & HPF_NEED_ACK && msg->_head._flag & HPF_IS_ORDERLY) && msg->_head._body_len != 0) {
+        // set msg to next phase 
+        // static_cast<CReceiverNetMsg*>(msg)->NextPhase();
+
+        // now don't have other phase, send to upper
+        CHudpImpl::Instance().SendMsgToUpper(msg);
+
+    } else if (socket && msg->_head._body_len != 0){
+        msg->_socket = socket;
+        socket->RecvMsgToOrderList(msg);
+
+    } else {
+        base::LOG_ERROR("get a recv socket error.");
+        return false;
+    }
+
     return true;
 }

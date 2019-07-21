@@ -2,57 +2,49 @@
 #include "FilterProcess.h"
 #include "FilterInterface.h"
 #include "Log.h"
+#include "NetMsg.h"
+
+#include "RelialeOrderlyFilter.h"
+#include "SerializesFilter.h"
 
 using namespace hudp;
 
+void CFilterProcess::Init() {
+    // create all filter.
+    CSerializesFilter* serializes_filter = new CSerializesFilter();
+    CRelialeOrderlyFilter* reliale_orderly_filter = new CRelialeOrderlyFilter();
+}
+
 void CFilterProcess::SendProcess(NetMsg* msg) {
-    for (size_t i = GetIndex(msg->_phase); i < _filer_list.size(); i++) {
-        if (_filer_list[i]->GetPhase() == PP_UPPER_HANDLE && msg->_phase & PP_UPPER_HANDLE) {
-            dynamic_cast<CUpperFilterInterface*>(_filer_list[i])->OnSend(msg);
-        }
-        
-        if (_filer_list[i]->GetPhase() == PP_BODY_HANDLE && msg->_phase & PP_BODY_HANDLE) {
-            dynamic_cast<CBodyFilterInterface*>(_filer_list[i])->OnSend(msg);
-        }
+    for (uint8_t i = msg->_phase; i > (uint8_t)0; i--) {
+        if (i == msg->_phase) {
+            _filer_list[(int)(i - 1)]->OnSend(msg);
 
-        if (_filer_list[i]->GetPhase() == PP_PROTO_PARSE && msg->_phase & PP_PROTO_PARSE ) {
-            dynamic_cast<CProtocolFilterInterface*>(_filer_list[i])->OnSend(msg);
-        }
-
-        if (_filer_list[i]->GetPhase() == PP_HEAD_HANDLE && msg->_phase & PP_HEAD_HANDLE) {
-            dynamic_cast<CHeadFilterInterface*>(_filer_list[i])->OnSend(msg);
+        } else {
+            break;
         }
     }
 }
 
 void CFilterProcess::RecvProcess(NetMsg* msg) {
-    size_t i = _filer_list.size() - GetIndex(msg->_phase);
-    for (; i >= 0; i--) {
-        if (_filer_list[i]->GetPhase() == PP_PROTO_PARSE && msg->_phase & PP_PROTO_PARSE) {
-            dynamic_cast<CProtocolFilterInterface*>(_filer_list[i])->OnRecv(msg);
-        }
+    for (uint8_t i = msg->_phase; i <= (uint8_t)_filer_list.size(); i++) {
+        if (i == msg->_phase) {
+            _filer_list[(int)(i - 1)]->OnRecv(msg);
 
-        if (_filer_list[i]->GetPhase() == PP_HEAD_HANDLE && msg->_phase & PP_HEAD_HANDLE) {
-            dynamic_cast<CHeadFilterInterface*>(_filer_list[i])->OnRecv(msg);
-        }
-
-        if (_filer_list[i]->GetPhase() == PP_BODY_HANDLE && msg->_phase & PP_BODY_HANDLE) {
-            dynamic_cast<CBodyFilterInterface*>(_filer_list[i])->OnRecv(msg);
-        }
-
-        if (_filer_list[i]->GetPhase() == PP_UPPER_HANDLE && msg->_phase & PP_UPPER_HANDLE) {
-            dynamic_cast<CUpperFilterInterface*>(_filer_list[i])->OnRecv(msg);
+        } else {
+            break;
         }
     }
 }
 
 bool CFilterProcess::Add(CFilterInterface* filter) {
-    if (_cur_handle_phase > filter->GetPhase()) {
-        base::LOG_ERROR("current filer is too low to attch.");
+    auto iter = std::find(_filer_list.begin(), _filer_list.end(), filter);
+    if (iter != _filer_list.end()) {
+        base::LOG_ERROR("current filer is already to attach.");
         return false;
     }
+    
     _filer_list.push_back(filter);
-    _cur_handle_phase = filter->GetPhase();
     return true;
 }
 
@@ -64,8 +56,4 @@ bool CFilterProcess::Remove(CFilterInterface* filter) {
     }
     base::LOG_ERROR("can't find the filer in list.");
     return false;
-}
-
-size_t CFilterProcess::GetIndex(process_phase cur_handle_phase) {
-    return 1;
 }

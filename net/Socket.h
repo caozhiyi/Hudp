@@ -4,6 +4,7 @@
 #include <atomic>
 #include "CommonType.h"
 #include "TimerSolt.h"
+#include "HudpFlag.h"
 
 namespace hudp {
 
@@ -25,7 +26,7 @@ namespace hudp {
 
     class CSocket : public CTimerSolt {
     public:
-        CSocket();
+        CSocket(const HudpHandle& handle);
         ~CSocket();
 
         // get msg from pri queue. 
@@ -37,9 +38,14 @@ namespace hudp {
         void SendMsgToSendWnd(NetMsg* msg);
         void SendMsgToNet(NetMsg* msg);
 
+        // accept ack to send wnd
+        void RecvAck(NetMsg* msg);
         // recv msg to module of socket.
         void RecvMsgUpper(NetMsg* msg);
         void RecvMsgToOrderList(NetMsg* msg);
+
+        // add a ack msg to remote 
+        void AddAck(NetMsg* msg);
 
         // timer call back
         void OnTimer();
@@ -62,6 +68,8 @@ namespace hudp {
         CPendAck*       _pend_ack[__wnd_size];
         CPriorityQueue* _pri_queue;
         std::atomic<uint16_t> _timer_out_time; //default 50ms
+        std::atomic<bool>     _is_in_timer;
+        HudpHandle      _handle;
     };
 }
 

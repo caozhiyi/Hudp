@@ -81,6 +81,12 @@ void CSendWnd::AcceptAck(uint16_t start_id, uint16_t len) {
     }
 }
 
+void CSendWnd::AcceptAck(std::vector<uint16_t>& vec_id) {
+    for (auto iter = vec_id.begin(); iter != vec_id.end(); ++iter) {
+        AcceptAck(*iter);
+    }
+}
+
 void CSendWnd::ChangeSendWndSize(uint16_t size) {
     if (_send_wnd_size == size) {
         return;
