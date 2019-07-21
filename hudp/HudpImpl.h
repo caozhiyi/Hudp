@@ -1,5 +1,5 @@
-#ifndef HEADER_NET_HUDP
-#define HEADER_NET_HUDP
+#ifndef HEADER_NET_HUDPIMPL
+#define HEADER_NET_HUDPIMPL
 
 #include <functional>
 #include "Single.h"
@@ -14,10 +14,16 @@
 namespace hudp {
 
     class NetMsg;
-    class CHudp : public base::CSingle<CHudp> {
+    class CHudpImpl : public base::CSingle<CHudpImpl> {
     public:
+        CHudpImpl();
+        ~CHudpImpl();
+        // init library
+        void Init(bool log = false);
         // start thread and recv
         bool Start(uint16_t port, const recv_back& func);
+
+        void Join();
 
         // send msg
         void SendTo(const HudpHandle& handlle, uint16_t flag, const std::string& msg);
@@ -33,9 +39,12 @@ namespace hudp {
         void SendMsgToUpper(NetMsg* msg);
         // send msg to recv process thread
         void SendMsgToRecvProcessThread(NetMsg* msg);
+        // send msg to send process thread
+        void SendMsgToSendProcessThread(NetMsg* msg);
 
-        // get msg from socket queue
-        NetMsg* GetMsgFromPriQueue();
+        // make public flag to private flag of hudp
+        void TranslateFlag(NetMsg* msg);
+
     private:
         CRecvProcessThread      _recv_process_thread;
         CSendProcessThread      _send_process_thread;
