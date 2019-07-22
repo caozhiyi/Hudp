@@ -142,17 +142,17 @@ NetMsg* CNetMsgPool::GetRecvMsg() {
 
 void CNetMsgPool::FreeMsg(NetMsg* msg, bool is_recv) {
     if (is_recv) {
-        msg->Clear();
-        _free_revceiver_queue.Push((CReceiverNetMsg*)msg);
+        dynamic_cast<CReceiverNetMsg*>(msg)->Clear();
+        _free_revceiver_queue.Push(dynamic_cast<CReceiverNetMsg*>(msg));
     }
     if (msg->_head._flag & HPF_NEED_ACK) {
-        msg->Clear();
-        _free_reliale_order_queue.Push((CSenderRelialeOrderlyNetMsg*)msg);
+        dynamic_cast<CSenderRelialeOrderlyNetMsg*>(msg)->Clear();
+        _free_reliale_order_queue.Push(dynamic_cast<CSenderRelialeOrderlyNetMsg*>(msg));
         return;
 
     } else if (msg->_head._flag & HPF_IS_ORDERLY) {
-        msg->Clear();
-        _free_order_queue.Push((CSenderOrderlyNetMsg*)msg);
+        dynamic_cast<CSenderOrderlyNetMsg*>(msg)->Clear();
+        _free_order_queue.Push(dynamic_cast<CSenderOrderlyNetMsg*>(msg));
         return;
 
     } else if (msg->_head._flag) {

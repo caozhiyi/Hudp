@@ -19,6 +19,11 @@ void CSendWnd::PushBack(uint16_t id, CSendWndSolt* data) {
 
     {
         std::unique_lock<std::mutex> lock(_mutex);
+        // repeat msg
+        if (_id_map.find(id) != _id_map.end()) {
+            return;
+        }
+        
         _id_map[id] = data;
         data->_next = nullptr;
         data->_done_ack = false;

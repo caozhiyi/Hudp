@@ -20,6 +20,11 @@ void CSenderOrderlyNetMsg::AckDone() {
     CNetMsgPool::Instance().FreeMsg(this);
 }
 
+void CSenderOrderlyNetMsg::Clear() {
+    NetMsg::Clear();
+    CSendWndSolt::Clear();
+}
+
 void CSenderRelialeOrderlyNetMsg::ToSend() {
     if (_phase == PP_HEAD_HANDLE) {
         NextPhase();
@@ -46,6 +51,12 @@ void CSenderRelialeOrderlyNetMsg::OnTimer() {
     }
 }
 
+void CSenderRelialeOrderlyNetMsg::Clear() {
+    NetMsg::Clear();
+    CSendWndSolt::Clear();
+    CTimerSolt::Clear();
+}
+
 void CReceiverNetMsg::ToRecv() {
     CHudpImpl::Instance().SendMsgToUpper(this);
 
@@ -58,3 +69,7 @@ void CReceiverNetMsg::ToRecv() {
 
     socket->AddAck(this);
 }
+
+ void CReceiverNetMsg::Clear() {
+     NetMsg::Clear();
+ }

@@ -18,6 +18,8 @@ namespace hudp {
         // get the bag ack.
         virtual void AckDone();
 
+        void Clear();
+
         void NextPhase() {
             _phase--;
         }
@@ -37,6 +39,8 @@ namespace hudp {
         // time out call back
         virtual void OnTimer();
 
+        void Clear();
+
         void NextPhase() {
             _phase--;
         }
@@ -49,9 +53,12 @@ namespace hudp {
         // notify superior acceptance 
         virtual void ToRecv();
 
+        void Clear();
+
         void NextPhase() {
             _phase++;
         }
+
     };
 }
 #endif

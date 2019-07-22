@@ -31,6 +31,10 @@ namespace hudp {
             _next = ti;
         }
        
+        void Clear() {
+            _next = nullptr;
+        }
+
     private:
         CTimerSolt *_next;
     };

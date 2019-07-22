@@ -21,6 +21,11 @@ namespace hudp {
         //*********************
         virtual void AckDone() = 0;
 
+        void Clear() {
+            _next = nullptr;
+            _done_ack = false;
+        }
+
     private:
         friend class CSendWnd;
         CSendWndSolt* _next;
