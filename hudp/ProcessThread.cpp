@@ -1,6 +1,7 @@
 #include "ProcessThread.h"
 #include "FilterProcess.h"
 #include "HudpImpl.h"
+#include "Log.h"
 using namespace hudp;
 
 CRecvProcessThread::CRecvProcessThread() {
@@ -18,6 +19,8 @@ void CRecvProcessThread::Run() {
         auto pt = _Pop();
         if (pt) {
             CFilterProcess::Instance().RecvProcess((NetMsg*)pt);
+        } else {
+            base::LOG_WARN("recv process thread get a null msg.");
         }
     }
 }
@@ -37,6 +40,9 @@ void CSendProcessThread::Run() {
         auto pt = CSocketManager::Instance().GetMsg();
         if (pt) {
             CFilterProcess::Instance().SendProcess((NetMsg*)pt);
+
+        } else {
+            base::LOG_WARN("send process thread get a null msg.");
         }
     }
 }

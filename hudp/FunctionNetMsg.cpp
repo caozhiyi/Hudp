@@ -9,10 +9,13 @@
 using namespace hudp;
 
 void CSenderOrderlyNetMsg::ToSend() {
+    // first into process filter. in process loop
     if (_phase == PP_HEAD_HANDLE) {
         NextPhase();
+
+    } else {
+        CFilterProcess::Instance().SendProcess(this);
     }
-    CFilterProcess::Instance().SendProcess(this);
 }
 
 void CSenderOrderlyNetMsg::AckDone() {
@@ -26,10 +29,14 @@ void CSenderOrderlyNetMsg::Clear() {
 }
 
 void CSenderRelialeOrderlyNetMsg::ToSend() {
+    // first into process filter. in process loop
     if (_phase == PP_HEAD_HANDLE) {
         NextPhase();
+
+    } else {
+        CFilterProcess::Instance().SendProcess(this);
     }
-    CFilterProcess::Instance().SendProcess(this);
+    
 }
 
 void CSenderRelialeOrderlyNetMsg::AckDone() {
@@ -40,14 +47,15 @@ void CSenderRelialeOrderlyNetMsg::AckDone() {
 void CSenderRelialeOrderlyNetMsg::OnTimer() {
     if (_phase == PP_HEAD_HANDLE) {
         NextPhase();
-    }
-    
-    // add to timer again
-    auto socket = _socket.lock();
-    if (socket) {
-        // send to process again
-        CFilterProcess::Instance().SendProcess(this);
-        socket->AddToTimer(this);
+
+    } else {
+        // add to timer again
+        auto socket = _socket.lock();
+        if (socket) {
+            // send to process again
+            CFilterProcess::Instance().SendProcess(this);
+            socket->AddToTimer(this);
+        }
     }
 }
 

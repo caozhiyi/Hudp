@@ -74,7 +74,6 @@ int COsNet::RecvFrom(uint64_t sockfd, char *buf, size_t len, std::string& ip, ui
     
     if (ret <= 0) {
         base::LOG_ERROR("recv from failed. errno : %d", WSAGetLastError());
-        int err = WSAGetLastError();
     }
 
     ip = inet_ntoa(addr_cli.sin_addr);

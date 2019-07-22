@@ -61,11 +61,11 @@ void CTimer::Run() {
 
             } else {
                 sleep_time = 0;
-            }    
+            }
         }
-        
+
         base::CRunnable::Sleep(sleep_time);
-        
+
         CTimerSolt* ti = nullptr;
         {
             std::unique_lock<std::mutex> lock(_mutex);

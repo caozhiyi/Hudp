@@ -66,6 +66,7 @@ namespace hudp {
             _head.Clear();
             memset(_body, 0, __body_size);
             _socket.reset();
+            _bit_stream = nullptr;
         }
 
         void SetId(const uint16_t& id) {

@@ -2,6 +2,7 @@
 #include "BitStreamPool.h"
 #include "NetMsgPool.h"
 #include "OsNet.h"
+#include "Log.h"
 using namespace hudp;
 
 CUpperThread::CUpperThread() {
@@ -25,7 +26,10 @@ void CUpperThread::Run() {
         if (pt) {
             _call_back(pt->_ip_port, pt->_body, pt->_head._body_len);
             CBitStreamPool::Instance().FreeBitStream(pt->_bit_stream);
-            CNetMsgPool::Instance().FreeMsg(pt);
+            CNetMsgPool::Instance().FreeMsg(pt, true);
+
+        } else {
+            base::LOG_WARN("upper thread get a null msg.");
         }
     }
 }

@@ -29,7 +29,8 @@ void CSendThread::Run() {
 
     while (!_stop) {
         auto msg = static_cast<NetMsg*>(_Pop());
-        if (msg) {
+        // msg not free to pool
+        if (msg && !msg->_ip_port.empty()) {
             COsNet::SendTo(_send_socket, msg->_bit_stream->GetDataPoint(), msg->_bit_stream->GetCurrentLength(), msg->_ip_port);
 
             // if msg don't need ack, destroy here
@@ -37,6 +38,9 @@ void CSendThread::Run() {
                 CBitStreamPool::Instance().FreeBitStream(msg->_bit_stream);
                 CNetMsgPool::Instance().FreeMsg(msg);
             }
+
+        } else {
+            base::LOG_WARN("send thread get a null msg.");
         }
     }
 }

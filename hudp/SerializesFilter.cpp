@@ -17,11 +17,16 @@ bool CSerializesFilter::OnSend(NetMsg* msg) {
             if (CSerializes::Serializes(*msg, *temp_bit_stream)) {
                 msg->_bit_stream = temp_bit_stream;
                 CHudpImpl::Instance().SendMsgToNet(msg);
+                return true;
             
             } else {
                 base::LOG_ERROR("serializes msg to stream failed. id : %d, handle : %s", msg->_head._id, msg->_ip_port.c_str());
                 return false;
             }
+
+        } else {
+            CHudpImpl::Instance().SendMsgToNet(msg);
+            return true;
         }
     }
     CBitStreamWriter* temp_bit_stream = static_cast<CBitStreamWriter*>(CBitStreamPool::Instance().GetBitStream());

@@ -69,6 +69,31 @@ NetMsg* CPriorityQueue::Pop() {
 
     if (_queue_arr[__pri_low].Pop(msg)) {
         return msg;
+
+    // if don't have pri low
+    } else {
+
+        if (_pri_heighest_count > 0) {
+            if (_queue_arr[__pri_heighest].Pop(msg)) {
+                _pri_heighest_count--;
+                return msg;
+            }
+        }
+        if (_pri_heig_count > 0) {
+            if (_queue_arr[__pri_heig].Pop(msg)) {
+                _pri_heig_count--;
+                _pri_heighest_count = __pri_surplus;
+                return msg;
+            }
+        }
+        if (_pri_normal_count > 0) {
+            if (_queue_arr[__pri_normal].Pop(msg)) {
+                _pri_normal_count--;
+                _pri_heig_count = __pri_surplus;
+                _pri_heighest_count = __pri_surplus;
+                return msg;
+            }
+        }
     }
 
     base::LOG_ERROR("can't get message from _queue_arr. shouldn't be here.");
