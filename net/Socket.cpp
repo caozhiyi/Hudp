@@ -13,6 +13,7 @@
 #include "NetMsgPool.h"
 #include "BitStreamPool.h"
 #include "SocketManager.h"
+#include "Log.h"
 
 using namespace hudp;
 
@@ -52,6 +53,7 @@ NetMsg* CSocket::GetMsgFromPriQueue() {
     if (_pri_queue->Size()) {
         return _pri_queue->Pop();
     }
+    base::LOG_WARN("socket return a null msg.");
     return nullptr;
 }
 
