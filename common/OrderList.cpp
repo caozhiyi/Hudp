@@ -36,9 +36,11 @@ void CReliableOrderlyList::Insert(uint16_t id, COrderListSolt* ol) {
         } else {
             // a repeat bag
             if (_order_list[index]) {
-                return;
+                _recv_list.Push(ol);
+            } else {
+                _order_list[index] = ol;
             }
-            _order_list[index] = ol;
+            
         }
     }
     

@@ -4,7 +4,7 @@ namespace hudp {
     std::pair<uint16_t, std::string> SplitIpPort(const std::string& ip_port) {
         std::pair<uint16_t, std::string> ret;
         ret.first = 0;
-        uint16_t pos = ip_port.find(":");
+        int pos = ip_port.find(":");
         if (pos == std::string::npos) {
             return ret;
         }

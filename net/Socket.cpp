@@ -26,7 +26,7 @@ CSocket::CSocket(const HudpHandle& handle) : _handle(handle), _pri_queue(new CPr
     memset(_recv_list, 0, sizeof(_recv_list));
     memset(_pend_ack, 0, sizeof(_pend_ack));
     // init out timer
-    _timer_out_time = 50;
+    _timer_out_time = 500;
     _is_in_timer = false;
 }
 
