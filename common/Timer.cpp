@@ -33,11 +33,11 @@ void CTimer::AddTimer(uint16_t ms, CTimerSolt* ti) {
     std::unique_lock<std::mutex> lock(_mutex);
     CTimerSolt** timer = &(_timer_list[index]);
 
-    ti->SetNext(nullptr);
     if (*timer) {
         ti->SetNext(*timer);
         *timer = ti;
     } else {
+        ti->SetNext(nullptr);
         *timer = ti;
     }
     _expiration_timer_map[expiration_time] = ms;

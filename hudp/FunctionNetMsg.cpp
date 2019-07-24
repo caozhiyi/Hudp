@@ -55,6 +55,10 @@ void CSenderRelialeOrderlyNetMsg::OnTimer() {
             // send to process again
             CFilterProcess::Instance().SendProcess(this);
             socket->AddToTimer(this);
+            base::LOG_DEBUG("resend msg to net. id : %d", _head._id);
+
+        } else {
+            base::LOG_INFO("resend msg is destroyed");
         }
     }
 }
