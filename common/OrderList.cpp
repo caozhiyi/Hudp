@@ -13,7 +13,7 @@ uint16_t CRecvList::HashFunc(uint16_t id) {
     return id & (__order_list_size - 1);
 }
 
-void CReliableOrderlyList::Insert(uint16_t id, COrderListSolt* ol) {
+uint16_t CReliableOrderlyList::Insert(uint16_t id, COrderListSolt* ol) {
     uint16_t index = HashFunc(id);
     
     {
@@ -36,9 +36,11 @@ void CReliableOrderlyList::Insert(uint16_t id, COrderListSolt* ol) {
         } else {
             // a repeat bag
             if (_order_list[index]) {
-                return;
+                return 1;
+            } else {
+                _order_list[index] = ol;
             }
-            _order_list[index] = ol;
+            
         }
     }
     
@@ -50,18 +52,22 @@ void CReliableOrderlyList::Insert(uint16_t id, COrderListSolt* ol) {
         }
         _recv_list.Clear();
     }
+    return 0;
 }
    
-void CReliableList::Insert(uint16_t id, COrderListSolt* ol) {
+uint16_t CReliableList::Insert(uint16_t id, COrderListSolt* ol) {
+    // msg repeat TO DO
     ol->ToRecv();
+    return 0;
 }
     
-void COrderlyList::Insert(uint16_t id, COrderListSolt* ol) {
+uint16_t COrderlyList::Insert(uint16_t id, COrderListSolt* ol) {
     
     if (id < _expect_id) {
-        return;
+        return 0;
     }
 
     _expect_id = id;
     ol->ToRecv();
+    return 0;
 }

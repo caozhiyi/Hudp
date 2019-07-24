@@ -17,7 +17,7 @@ namespace hudp {
         virtual ~CRecvList();
 
         // add a item to order list
-        virtual void Insert(uint16_t id, COrderListSolt* ol) = 0;
+        virtual uint16_t Insert(uint16_t id, COrderListSolt* ol) = 0;
 
         // make id little than order list size
         uint16_t HashFunc(uint16_t id);
@@ -35,7 +35,9 @@ namespace hudp {
         CReliableOrderlyList() {}
         virtual ~CReliableOrderlyList() {}
         // add a item to order list
-        virtual void Insert(uint16_t id, COrderListSolt* ol);
+        // return 0 if success
+        // return 1 if msg is repeat
+        virtual uint16_t Insert(uint16_t id, COrderListSolt* ol);
     private:
         std::mutex _mutex;
     };
@@ -46,7 +48,9 @@ namespace hudp {
         CReliableList() {}
         virtual ~CReliableList() {}
         // add a item to order list
-        virtual void Insert(uint16_t id, COrderListSolt* ol);
+        // return 0 if success
+        // return 1 if msg is repeat
+        virtual uint16_t Insert(uint16_t id, COrderListSolt* ol);
     };
 
     // receive list that only orderly
@@ -55,7 +59,8 @@ namespace hudp {
         COrderlyList() {}
         virtual ~COrderlyList() {}
         // add a item to order list
-        virtual void Insert(uint16_t id, COrderListSolt* ol);
+        // always return 0
+        virtual uint16_t Insert(uint16_t id, COrderListSolt* ol);
     };
 }
 #endif

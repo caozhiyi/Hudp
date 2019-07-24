@@ -48,6 +48,13 @@ void CSendWnd::PushBack(uint16_t id, CSendWndSolt* data) {
             _cur_send_size++;
             _cur = _end->_next;
 
+            // all msg are sended
+            if (_cur == nullptr) {
+                _start = nullptr;
+                _cur = nullptr;
+                _end = nullptr;
+            }
+
         }
     }
     
@@ -157,5 +164,11 @@ void CSendWnd::SendNext() {
             _cur_send_size++;
         }
         _cur = _cur->_next;
+    
+    // all msg are sended
+    } else if (_cur == nullptr) {
+        _start = nullptr;
+        _cur = nullptr;
+        _end = nullptr;
     }
 }

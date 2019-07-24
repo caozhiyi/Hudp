@@ -52,16 +52,17 @@ namespace hudp {
         uint8_t       _phase;       // phase in process
         std::weak_ptr<CSocket> _socket;
 
-        bool          _change; // head may be changes,should serialize again
+        bool          _flag;   // head may be changes,should serialize again. set true
+                               // in recv msg. if send to upper set true
 
-        NetMsg() : _change(false) {
+        NetMsg() : _flag(false) {
             memset(_body, 0, __body_size);
         }
 
         virtual ~NetMsg() {}
 
         void Clear() {
-            _change = false;
+            _flag = false;
             _ip_port.clear();
             _head.Clear();
             memset(_body, 0, __body_size);

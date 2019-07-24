@@ -26,7 +26,7 @@ CSocket::CSocket(const HudpHandle& handle) : _handle(handle), _pri_queue(new CPr
     memset(_recv_list, 0, sizeof(_recv_list));
     memset(_pend_ack, 0, sizeof(_pend_ack));
     // init out timer
-    _timer_out_time = 50;
+    _timer_out_time = 4000;
     _is_in_timer = false;
 }
 
@@ -141,58 +141,65 @@ void CSocket::RecvMsgUpper(NetMsg* msg) {
 
 void CSocket::RecvMsgToOrderList(NetMsg* msg) {
     bool done = false;
+    uint16_t ret = 0;
     // reliable and orderly
     if (msg->_head._flag & HPF_IS_ORDERLY && msg->_head._flag & HPF_NEED_ACK) {
         if (_recv_list[WI_RELIABLE_ORDERLY]) {
-            _recv_list[WI_RELIABLE_ORDERLY]->Insert(msg->_head._id, dynamic_cast<CReceiverNetMsg*>(msg));
+            ret = _recv_list[WI_RELIABLE_ORDERLY]->Insert(msg->_head._id, dynamic_cast<CReceiverNetMsg*>(msg));
 
         } else {
             CreateRecvList(WI_RELIABLE_ORDERLY);
-            _recv_list[WI_RELIABLE_ORDERLY]->Insert(msg->_head._id, dynamic_cast<CReceiverNetMsg*>(msg));
+            ret = _recv_list[WI_RELIABLE_ORDERLY]->Insert(msg->_head._id, dynamic_cast<CReceiverNetMsg*>(msg));
         }
         done = true;
 
     // only orderly
     } else if (msg->_head._flag & HPF_IS_ORDERLY) {
         if (_recv_list[WI_ORDERLY]) {
-            _recv_list[WI_ORDERLY]->Insert(msg->_head._id, dynamic_cast<CReceiverNetMsg*>(msg));
+            ret = _recv_list[WI_ORDERLY]->Insert(msg->_head._id, dynamic_cast<CReceiverNetMsg*>(msg));
 
         } else {
             CreateRecvList(WI_ORDERLY);
-            _recv_list[WI_ORDERLY]->Insert(msg->_head._id, dynamic_cast<CReceiverNetMsg*>(msg));
+            ret = _recv_list[WI_ORDERLY]->Insert(msg->_head._id, dynamic_cast<CReceiverNetMsg*>(msg));
         }
         done = true;
 
     // only reliable
     } else if (msg->_head._flag & HPF_NEED_ACK) {
         if (_recv_list[WI_RELIABLE]) {
-            _recv_list[WI_RELIABLE]->Insert(msg->_head._id, dynamic_cast<CReceiverNetMsg*>(msg));
+            ret = _recv_list[WI_RELIABLE]->Insert(msg->_head._id, dynamic_cast<CReceiverNetMsg*>(msg));
 
         } else {
             CreateRecvList(WI_RELIABLE);
-            _recv_list[WI_RELIABLE]->Insert(msg->_head._id, dynamic_cast<CReceiverNetMsg*>(msg));
+            ret = _recv_list[WI_RELIABLE]->Insert(msg->_head._id, dynamic_cast<CReceiverNetMsg*>(msg));
         }
         done = true;
+    }
+
+    // get a repeat msg
+    if (ret == 1) {
+        RecvAck(msg);
+        return;
     }
 
     // with ack
     if (msg->_head._flag & HPF_WITH_ACK_RANGE) {
         _send_wnd[WI_RELIABLE_ORDERLY]->AcceptAck(msg->_head._ack_start, msg->_head._ack_len);
         // the msg only with ack. release here
-        if (!done) {
+        if (!done && msg->_head._body_len == 0) {
            CNetMsgPool::Instance().FreeMsg(msg, true);
+           done = true;
         }
         
-        done = true;
     } else if (msg->_head._flag & HPF_WITH_ACK_ARRAY) {
         for (auto iter = msg->_head._ack_vec.begin(); iter != msg->_head._ack_vec.end(); ++iter) {
             _send_wnd[WI_RELIABLE_ORDERLY]->AcceptAck(*iter);
         }
         // the msg only with ack. release here
-        if (!done) {
+        if (!done && msg->_head._body_len == 0) {
            CNetMsgPool::Instance().FreeMsg(msg, true);
+           done = true;
         }
-        done = true;
     }
 
     // normal udp. 

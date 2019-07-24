@@ -11,7 +11,7 @@ using namespace hudp;
 
 bool CSerializesFilter::OnSend(NetMsg* msg) {
     if (msg->_bit_stream) {
-        if (msg->_change) {
+        if (msg->_flag) {
             msg->_bit_stream->Clear();
             CBitStreamWriter* temp_bit_stream = static_cast<CBitStreamWriter*>(msg->_bit_stream);
             if (CSerializes::Serializes(*msg, *temp_bit_stream)) {
