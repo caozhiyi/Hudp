@@ -35,6 +35,10 @@ void CSenderRelialeOrderlyNetMsg::ToSend() {
 
     } else {
         CFilterProcess::Instance().SendProcess(this);
+        auto socket = _socket.lock();
+        if (socket) {
+            socket->AddToTimer(this);
+        }
     }
     
 }

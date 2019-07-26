@@ -67,13 +67,11 @@ void CSocket::SendMsgToSendWnd(NetMsg* msg) {
         if (_send_wnd[WI_RELIABLE_ORDERLY]) {
             msg->SetId(_inc_id[WI_RELIABLE_ORDERLY]->GetNextId());
             _send_wnd[WI_RELIABLE_ORDERLY]->PushBack(msg->_head._id, dynamic_cast<CSenderRelialeOrderlyNetMsg*>(msg));
-            AddToTimer(dynamic_cast<CSenderRelialeOrderlyNetMsg*>(msg));
 
         } else {
             CreateSendWnd(WI_RELIABLE_ORDERLY);
             msg->SetId(_inc_id[WI_RELIABLE_ORDERLY]->GetNextId());
             _send_wnd[WI_RELIABLE_ORDERLY]->PushBack(msg->_head._id, dynamic_cast<CSenderRelialeOrderlyNetMsg*>(msg));
-            AddToTimer(dynamic_cast<CSenderRelialeOrderlyNetMsg*>(msg));
         }
 
     } else if (msg->_head._flag & HPF_IS_ORDERLY) {
@@ -91,13 +89,11 @@ void CSocket::SendMsgToSendWnd(NetMsg* msg) {
         if (_send_wnd[WI_RELIABLE]) {
             msg->SetId(_inc_id[WI_RELIABLE]->GetNextId());
             _send_wnd[WI_RELIABLE]->PushBack(msg->_head._id, dynamic_cast<CSenderRelialeOrderlyNetMsg*>(msg));
-            AddToTimer(dynamic_cast<CSenderRelialeOrderlyNetMsg*>(msg));
 
         } else {
             CreateSendWnd(WI_RELIABLE);
             msg->SetId(_inc_id[WI_RELIABLE]->GetNextId());
             _send_wnd[WI_RELIABLE]->PushBack(msg->_head._id, dynamic_cast<CSenderRelialeOrderlyNetMsg*>(msg));
-            AddToTimer(dynamic_cast<CSenderRelialeOrderlyNetMsg*>(msg));
         }
 
     // normal udp msg. send to net
