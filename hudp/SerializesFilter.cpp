@@ -6,17 +6,21 @@
 #include "CommonType.h"
 #include "HudpImpl.h"
 #include "FunctionNetMsg.h"
+#include "Socket.h"
 
 using namespace hudp;
 
 bool CSerializesFilter::OnSend(NetMsg* msg) {
+    if (msg->_socket.expired()) {
+        return true;
+    }
     if (msg->_bit_stream) {
         if (msg->_flag) {
             msg->_bit_stream->Clear();
             CBitStreamWriter* temp_bit_stream = static_cast<CBitStreamWriter*>(msg->_bit_stream);
             if (CSerializes::Serializes(*msg, *temp_bit_stream)) {
                 msg->_bit_stream = temp_bit_stream;
-                CHudpImpl::Instance().SendMsgToNet(msg);
+                msg->_socket.lock()->SendMsgToNet(msg);
                 return true;
             
             } else {
@@ -25,7 +29,7 @@ bool CSerializesFilter::OnSend(NetMsg* msg) {
             }
 
         } else {
-            CHudpImpl::Instance().SendMsgToNet(msg);
+            msg->_socket.lock()->SendMsgToNet(msg);
             return true;
         }
     }
@@ -33,7 +37,7 @@ bool CSerializesFilter::OnSend(NetMsg* msg) {
 
     if (CSerializes::Serializes(*msg, *temp_bit_stream)) {
         msg->_bit_stream = temp_bit_stream;
-        CHudpImpl::Instance().SendMsgToNet(msg);
+        msg->_socket.lock()->SendMsgToNet(msg);
 
     } else {
         base::LOG_ERROR("serializes msg to stream failed. id : %d, handle : %s", msg->_head._id, msg->_ip_port.c_str());

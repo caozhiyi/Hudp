@@ -2,6 +2,7 @@
 #define HEADER_NET_SOCKET
 
 #include <atomic>
+#include <vector>
 #include "CommonType.h"
 #include "TimerSolt.h"
 #include "HudpFlag.h"
@@ -46,6 +47,8 @@ namespace hudp {
 
         // add a ack msg to remote 
         void AddAck(NetMsg* msg);
+        // attach ack info to msg
+        void AttachPendAck(NetMsg* msg);
 
         // timer call back
         void OnTimer();

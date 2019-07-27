@@ -15,22 +15,22 @@ namespace hudp {
         uint16_t _body_len;
 
         // ack
-        uint16_t _ack_len;
-        uint16_t _ack_start;
+        uint16_t _ack_reliable_len;
+        uint16_t _ack_reliable_orderly_len;
         std::vector<uint16_t> _ack_vec;
 
         Head() : _flag(0),
                  _id(0),
                  _body_len(0),
-                 _ack_len(0),
-                 _ack_start(0) {}
+                 _ack_reliable_len(0),
+                 _ack_reliable_orderly_len(0) {}
 
         void Clear() {
             _flag = 0;
             _id = 0;
             _body_len = 0;
-            _ack_len = 0;
-            _ack_start = 0;
+            _ack_reliable_len = 0;
+            _ack_reliable_orderly_len = 0;
             _ack_vec.clear();
         }
     };
@@ -55,7 +55,10 @@ namespace hudp {
         bool          _flag;   // head may be changes,should serialize again. set true
                                // in recv msg. if send to upper set true
 
-        NetMsg() : _flag(false) {
+        bool          _use;    // check msg is used
+
+        NetMsg() : _flag(false),
+                   _use(true) {
             memset(_body, 0, __body_size);
         }
 
@@ -68,6 +71,17 @@ namespace hudp {
             memset(_body, 0, __body_size);
             _socket.reset();
             _bit_stream = nullptr;
+            _use = false;
+        }
+
+        void ClearAck() {
+            _head._ack_reliable_len = 0;
+            _head._ack_reliable_orderly_len = 0;
+            _head._ack_vec.clear();
+            _head._flag &= ~HPF_WITH_RELIABLE_ACK;
+            _head._flag &= ~HPF_WITH_RELIABLE_ORDERLY_ACK;
+            _head._flag &= ~HPF_RELIABLE_ACK_RANGE;
+            _head._flag &= ~HPF_RELIABLE_ORDERLY_ACK_RANGE;
         }
 
         void SetId(const uint16_t& id) {

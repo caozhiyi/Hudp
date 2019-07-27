@@ -1,4 +1,5 @@
 #include "SendWnd.h"
+#include "Log.h"
 using namespace hudp;
 
 CSendWnd::CSendWnd(uint16_t send_wnd_size) : _end(nullptr),
@@ -14,6 +15,7 @@ CSendWnd::~CSendWnd() {
 
 void CSendWnd::PushBack(uint16_t id, CSendWndSolt* data) {
     if (data == nullptr) {
+        base::LOG_WARN("send a nullptr to send wnd. id : %d", id);
         return;
     }
 
@@ -21,15 +23,17 @@ void CSendWnd::PushBack(uint16_t id, CSendWndSolt* data) {
         std::unique_lock<std::mutex> lock(_mutex);
         // repeat msg
         if (_id_map.find(id) != _id_map.end()) {
+            base::LOG_WARN("send a repeat mag to send wnd. id : %d", id);
             return;
         }
         
         _id_map[id] = data;
         data->_next = nullptr;
-        data->_done_ack = false;
+        data->_prev = nullptr;
 
         if (_end) {
             _end->_next = data;
+            data->_prev = _end;
             _end = data;
         }
 
@@ -40,7 +44,6 @@ void CSendWnd::PushBack(uint16_t id, CSendWndSolt* data) {
         if (_start == nullptr) {
             _start = data;
             _end = data;
-            _cur = data;
         }
 
         if (_cur_send_size < _send_wnd_size) {
@@ -55,25 +58,42 @@ void CSendWnd::PushBack(uint16_t id, CSendWndSolt* data) {
 
 void CSendWnd::AcceptAck(uint16_t id) {
     {
+        
+        base::LOG_DEBUG("recv a ack. id : %d", id);
         std::unique_lock<std::mutex> lock(_mutex);
         auto iter = _id_map.find(id);
         if (iter == _id_map.end()) {
             return;
         }
 
-        iter->second->_done_ack = true;
-        // call back done ack
         if (iter->second == _start) {
-            while (_start && _start->_done_ack) {
-                // move start point
-                _ack_queue.Push(_start);
-                _start = _start->_next;
-                _cur_send_size--;
-
-                // send next bag
-                SendNext();
+            _start = _start->_next;
+            if (_start) {
+                _start->_prev = nullptr;
             }
+
+        } else if (iter->second == _end) {
+            _end = _end->_prev;
+            if (_end) {
+                _end->_next = nullptr;
+            }
+
+        } else {
+            // remove fron list
+            iter->second->_next->_prev = iter->second->_prev;
+            iter->second->_prev->_next = iter->second->_next;
         }
+
+        if (iter->second == _cur) {
+            _cur = iter->second->_next;
+        } 
+
+        _ack_queue.Push(iter->second);
+        _cur_send_size--;
+
+        // send next bag
+        SendNext();
+
         _id_map.erase(iter);
     }
     SendAndAck();
@@ -85,9 +105,10 @@ void CSendWnd::AcceptAck(uint16_t start_id, uint16_t len) {
     }
 }
 
-void CSendWnd::AcceptAck(std::vector<uint16_t>& vec_id) {
-    for (auto iter = vec_id.begin(); iter != vec_id.end(); ++iter) {
-        AcceptAck(*iter);
+void CSendWnd::AcceptAck(std::vector<uint16_t>& vec_id, uint16_t start_index, uint16_t len) {
+    len = start_index + len;
+    for (; start_index < len; start_index++) {
+        AcceptAck(vec_id[start_index]);
     }
 }
 
@@ -151,16 +172,9 @@ void CSendWnd::SendAndAck() {
 void CSendWnd::SendNext() {
     // send next bag
     if (_cur_send_size < _send_wnd_size && _cur) {
-        if (!_cur->_done_ack) {
-            _send_queue.Push(_cur);
-            _cur_send_size++;
-        }
+        _send_queue.Push(_cur);
+        _cur_send_size++;
         _cur = _cur->_next;
     
-    // all msg are sended
-    } else if (_cur == nullptr) {
-        _start = nullptr;
-        _cur = nullptr;
-        _end = nullptr;
-    }
+    } 
 }

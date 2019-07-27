@@ -12,8 +12,16 @@ void CSenderOrderlyNetMsg::ToSend() {
     // first into process filter. in process loop
     if (_phase == PP_HEAD_HANDLE) {
         NextPhase();
+        auto socket = _socket.lock();
+        if (socket) {
+            socket->AttachPendAck(this);
+        }
 
     } else {
+        auto socket = _socket.lock();
+        if (socket) {
+            socket->AttachPendAck(this);
+        }
         CFilterProcess::Instance().SendProcess(this);
     }
 }
@@ -32,15 +40,18 @@ void CSenderRelialeOrderlyNetMsg::ToSend() {
     // first into process filter. in process loop
     if (_phase == PP_HEAD_HANDLE) {
         NextPhase();
-
-    } else {
-        CFilterProcess::Instance().SendProcess(this);
         auto socket = _socket.lock();
         if (socket) {
-            socket->AddToTimer(this);
+            socket->AttachPendAck(this);
         }
+    } else {
+        auto socket = _socket.lock();
+        if (socket) {
+            socket->AttachPendAck(this);
+        }
+        CFilterProcess::Instance().SendProcess(this);
     }
-    
+    base::LOG_DEBUG("send wnd send msg. id : %d", _head._id);
 }
 
 void CSenderRelialeOrderlyNetMsg::AckDone() {
@@ -56,9 +67,10 @@ void CSenderRelialeOrderlyNetMsg::OnTimer() {
         // add to timer again
         auto socket = _socket.lock();
         if (socket) {
+            ClearAck();
+            socket->AttachPendAck(this);
             // send to process again
             CFilterProcess::Instance().SendProcess(this);
-            socket->AddToTimer(this);
             base::LOG_DEBUG("resend msg to net. id : %d", _head._id);
 
         } else {

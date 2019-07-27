@@ -38,7 +38,7 @@ void CSocketManager::GetSendSocket(const HudpHandle& handle, std::shared_ptr<CSo
 bool CSocketManager::GetRecvSocket(const HudpHandle& handle, uint16_t flag, std::shared_ptr<CSocket>& socket) {
     // if a normal udp, send to upper direct.
     if (!(flag & HPF_NEED_ACK && flag & HPF_IS_ORDERLY) && 
-        !((flag & HPF_WITH_ACK_ARRAY | flag & HPF_WITH_ACK_RANGE))) {
+        !((flag & HPF_WITH_RELIABLE_ORDERLY_ACK | flag & HPF_WITH_RELIABLE_ACK))) {
         return false;
     }
 

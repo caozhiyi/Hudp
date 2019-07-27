@@ -34,7 +34,7 @@ void CSendThread::Run() {
             COsNet::SendTo(_send_socket, msg->_bit_stream->GetDataPoint(), msg->_bit_stream->GetCurrentLength(), msg->_ip_port);
 
             // if msg don't need ack, destroy here
-            if (!(msg->_head._flag & HPF_NEED_ACK)) {
+            if (!(msg->_head._flag & HPF_NEED_ACK) && msg->_use) {
                 CBitStreamPool::Instance().FreeBitStream(msg->_bit_stream);
                 CNetMsgPool::Instance().FreeMsg(msg);
             }

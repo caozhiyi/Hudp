@@ -22,16 +22,34 @@ bool CSerializes::Serializes(const Head& head, CBitStreamWriter& bit_stream) {
     if (head._flag & HPF_WITH_ID) {
         CHECK_RET(bit_stream.Write(head._id));
     }
-    if (head._flag & HPF_WITH_ACK_RANGE) {
-        CHECK_RET(bit_stream.Write(head._ack_len));
-        CHECK_RET(bit_stream.Write(head._ack_start));
-    }
-    if (head._flag & HPF_WITH_ACK_ARRAY) {
-        CHECK_RET(bit_stream.Write(head._ack_len));
-        for(auto iter = head._ack_vec.begin(); iter != head._ack_vec.end(); ++iter) {
-            CHECK_RET(bit_stream.Write(*iter));
+
+    if (head._flag & HPF_WITH_RELIABLE_ORDERLY_ACK) {
+        if (head._ack_reliable_orderly_len > 0) {
+            CHECK_RET(bit_stream.Write(head._ack_reliable_orderly_len));
+            if (head._flag & HPF_RELIABLE_ORDERLY_ACK_RANGE) {
+                CHECK_RET(bit_stream.Write(head._ack_vec[0]));
+
+            } else {
+                for (uint16_t i = 0; i < head._ack_reliable_orderly_len; i++) {
+                    CHECK_RET(bit_stream.Write(head._ack_vec[i]));
+                }
+            }
         }
     }
+    if (head._flag & HPF_WITH_RELIABLE_ACK) {
+        if (head._ack_reliable_len > 0) {
+            CHECK_RET(bit_stream.Write(head._ack_reliable_len));
+            if (head._flag & HPF_RELIABLE_ACK_RANGE) {
+                CHECK_RET(bit_stream.Write(head._ack_vec[head._ack_reliable_orderly_len]));
+
+            } else {
+                for (uint16_t i = head._ack_reliable_orderly_len; i < head._ack_reliable_len; i++) {
+                    CHECK_RET(bit_stream.Write(head._ack_vec[i]));
+                }
+            }
+        }
+    }
+    
     if (head._flag & HPF_WITH_BODY) {
         CHECK_RET(bit_stream.Write(head._body_len));
     }
@@ -60,16 +78,36 @@ bool CSerializes::Deseriali(CBitStreamReader& bit_stream, Head& head) {
     if (head._flag & HPF_WITH_ID) {
         CHECK_RET(bit_stream.Read(head._id));
     }
-    if (head._flag & HPF_WITH_ACK_RANGE) {
-        CHECK_RET(bit_stream.Read(head._ack_len));
-        CHECK_RET(bit_stream.Read(head._ack_start));
-    }
-    if (head._flag & HPF_WITH_ACK_ARRAY) {
-        CHECK_RET(bit_stream.Read(head._ack_len));
-        for (auto iter = head._ack_vec.begin(); iter != head._ack_vec.end(); ++iter) {
-            CHECK_RET(bit_stream.Read(*iter));
+
+    if (head._flag & HPF_WITH_RELIABLE_ORDERLY_ACK) {
+        CHECK_RET(bit_stream.Read(head._ack_reliable_orderly_len));
+        uint16_t tmp = 0;
+        if (head._flag & HPF_RELIABLE_ORDERLY_ACK_RANGE) {
+            CHECK_RET(bit_stream.Read(tmp));
+            head._ack_vec.push_back(tmp);
+
+        } else {
+            for (uint16_t i = 0; i < head._ack_reliable_orderly_len; i++) {
+                CHECK_RET(bit_stream.Read(tmp));
+                head._ack_vec.push_back(tmp);
+            }
         }
     }
+    if (head._flag & HPF_WITH_RELIABLE_ACK) {
+        CHECK_RET(bit_stream.Read(head._ack_reliable_len));
+        uint16_t tmp = 0;
+        if (head._flag & HPF_RELIABLE_ACK_RANGE) {
+            CHECK_RET(bit_stream.Read(tmp));
+            head._ack_vec.push_back(tmp);
+
+        } else {
+            for (uint16_t i = head._ack_reliable_orderly_len; i < head._ack_reliable_len; i++) {
+                CHECK_RET(bit_stream.Read(tmp));
+                head._ack_vec.push_back(tmp);
+            }
+        }
+    }
+
     if (head._flag & HPF_WITH_BODY) {
         CHECK_RET(bit_stream.Read(head._body_len));
     }

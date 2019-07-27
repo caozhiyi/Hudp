@@ -16,23 +16,12 @@ namespace hudp {
         void AddAck(uint16_t ack_id);
 
         // get all ack and clear cache
-        bool GetAllAck(std::vector<uint16_t>& ack_vec);
+        bool GetAllAck(std::vector<uint16_t>& ack_vec, bool& continuity);
 
-        // get consecutive ack id. only clear consecutive id cache.
-        bool GetConsecutiveAck(uint16_t& start, uint16_t& len);
-
-    private:
-        // check id in set is consecutive?
-        void CheckConsecutive();
+        bool HasAck();
 
     private:
         std::mutex  _mutex;
-        // consecutive ack id length
-        uint16_t    _ack_len;
-        // start id of consecutive ack
-        uint16_t    _ack_start;
-        // expect start id
-        uint16_t   _expect_start_id;
         // all ack id cache
         std::set<uint16_t> _ack_set;
     };

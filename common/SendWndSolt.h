@@ -8,7 +8,7 @@ namespace hudp {
     // send wnd interface, call back when can send a bag
     class CSendWndSolt {
     public:
-        CSendWndSolt() : _next(nullptr), _done_ack(false) {}
+        CSendWndSolt() : _next(nullptr), _prev(nullptr) {}
         virtual ~CSendWndSolt() {}
         
         //*********************
@@ -22,14 +22,14 @@ namespace hudp {
         virtual void AckDone() = 0;
 
         void Clear() {
+            _prev = nullptr;
             _next = nullptr;
-            _done_ack = false;
         }
 
     private:
         friend class CSendWnd;
         CSendWndSolt* _next;
-        bool          _done_ack;    // is receive ack?
+        CSendWndSolt* _prev;
     };
 }
 #endif

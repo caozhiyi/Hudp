@@ -21,7 +21,7 @@ void CFilterProcess::SendProcess(NetMsg* msg) {
             _filer_list[(int)(i - 1)]->OnSend(msg);
 
         } else {
-            base::LOG_INFO("send process loop break, id : %d, phase : %d", msg->_head._id, (int)msg->_phase);
+            //base::LOG_INFO("send process loop break, id : %d, phase : %d", msg->_head._id, (int)msg->_phase);
             break;
         }
     }
@@ -33,7 +33,7 @@ void CFilterProcess::RecvProcess(NetMsg* msg) {
             _filer_list[(int)(i - 1)]->OnRecv(msg);
 
         } else {
-            base::LOG_INFO("recv process loop break, id : %d, phase : %d", msg->_head._id, (int)msg->_phase);
+            //base::LOG_INFO("recv process loop break, id : %d, phase : %d", msg->_head._id, (int)msg->_phase);
             break;
         }
     }

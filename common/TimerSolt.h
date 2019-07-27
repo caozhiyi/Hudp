@@ -8,7 +8,7 @@ namespace hudp {
     // timer event interface
     class CTimerSolt {
     public:
-        CTimerSolt() : _next(nullptr) {}
+        CTimerSolt() : _next(nullptr), _timer_id(0) {}
         virtual ~CTimerSolt() {}
 
         //*********************
@@ -17,8 +17,8 @@ namespace hudp {
         virtual void OnTimer() = 0;
         
         // attach to timer
-        void Attach(CTimer* timer, uint16_t ms) {
-            timer->AddTimer(ms, this);
+        void Attach(uint16_t ms) {
+            CTimer::Instance().AddTimer(ms, this);
         }
 
         CTimerSolt* GetNext() {
@@ -33,10 +33,14 @@ namespace hudp {
        
         void Clear() {
             _next = nullptr;
+            CTimer::Instance().RemoveTimer(this);
+            _timer_id = 0;
         }
 
     private:
+        friend CTimer;
         CTimerSolt *_next;
+        uint64_t    _timer_id;
     };
 }
 

@@ -36,7 +36,7 @@ bool CRelialeOrderlyFilter::OnRecv(NetMsg* msg) {
     CSocketManager::Instance().GetRecvSocket(msg->_ip_port, msg->_head._flag, socket);
     
     // with ack
-    if ((msg->_head._flag & HPF_WITH_ACK_ARRAY || msg->_head._flag & HPF_WITH_ACK_RANGE) && socket) {
+    if ((msg->_head._flag & HPF_WITH_RELIABLE_ACK || msg->_head._flag & HPF_WITH_RELIABLE_ORDERLY_ACK) && socket) {
         socket->RecvAck(msg);
     }
 

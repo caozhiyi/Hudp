@@ -14,11 +14,11 @@ CTimer::CTimer() : _wait_time(EMPTY_WAIT) {
 
 CTimer::~CTimer() {
     Stop();
-    AddTimer(1, nullptr);
+    _notify.notify_one();
     Join();
 }
 
-void CTimer::AddTimer(uint16_t ms, CTimerSolt* ti) {
+uint64_t CTimer::AddTimer(uint16_t ms, CTimerSolt* ti) {
     _time_tool.Now();
 
     uint64_t expiration_time = ms + _time_tool.GetMsec();
@@ -26,7 +26,7 @@ void CTimer::AddTimer(uint16_t ms, CTimerSolt* ti) {
     std::unique_lock<std::mutex> lock(_mutex);
     auto iter = _timer_map.find(expiration_time);
     // add to timer map
-    if (iter != _timer_map.end()) {
+    if (iter == _timer_map.end()) {
         ti->SetNext(nullptr);
         _timer_map[expiration_time] = ti;
 
@@ -37,7 +37,7 @@ void CTimer::AddTimer(uint16_t ms, CTimerSolt* ti) {
         while (tmp) {
             // the same item
             if (tmp == ti) {
-                return;
+                return 0;
             } else {
                 tmp = tmp->GetNext();
             }
@@ -49,13 +49,22 @@ void CTimer::AddTimer(uint16_t ms, CTimerSolt* ti) {
     if (ms < _wait_time) {
         _notify.notify_one();
     }
+
+    return expiration_time;
+}
+
+void CTimer::RemoveTimer(CTimerSolt* ti) {
+    std::unique_lock<std::mutex> lock(_mutex);
+    _timer_map.erase(ti->_timer_id);
 }
 
 void CTimer::Run() {
     std::vector<CTimerSolt*> timer_vec;
     std::map<uint64_t, CTimerSolt*>::iterator iter;
+    bool timer_out = false;
     while (!_stop) {
         {
+            timer_out = false;
             std::unique_lock<std::mutex> lock(_mutex);
             if (_timer_map.empty()) {
                 _wait_time = EMPTY_WAIT;
@@ -68,16 +77,17 @@ void CTimer::Run() {
 
                 } else {
                     _wait_time = 0;
+                    timer_out = true;
                 }
             }
             if (_wait_time > 0) {
-                _notify.wait_for(lock, std::chrono::microseconds(_wait_time));
+                timer_out = _notify.wait_for(lock, std::chrono::milliseconds(_wait_time)) == std::cv_status::timeout;
             }
 
             _time_tool.Now();
             
             // if timer out
-            if (iter->first >= _time_tool.GetMsec()) {
+            if (timer_out && iter->first <= _time_tool.GetMsec()) {
                 while (iter->second) {
                     timer_vec.push_back(iter->second);
                     iter->second = iter->second->GetNext();

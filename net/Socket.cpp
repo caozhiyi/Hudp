@@ -14,6 +14,7 @@
 #include "BitStreamPool.h"
 #include "SocketManager.h"
 #include "Log.h"
+#include "FunctionNetMsg.h"
 
 using namespace hudp;
 
@@ -26,7 +27,7 @@ CSocket::CSocket(const HudpHandle& handle) : _handle(handle), _pri_queue(new CPr
     memset(_recv_list, 0, sizeof(_recv_list));
     memset(_pend_ack, 0, sizeof(_pend_ack));
     // init out timer
-    _timer_out_time = 500;
+    _timer_out_time = 10000;
     _is_in_timer = false;
 }
 
@@ -103,31 +104,35 @@ void CSocket::SendMsgToSendWnd(NetMsg* msg) {
 }
 
 void CSocket::SendMsgToNet(NetMsg* msg) {
-    // already with ack
-    if (msg->_head._flag & HPF_WITH_ACK_ARRAY || msg->_head._flag & HPF_WITH_ACK_RANGE) {
-        CHudpImpl::Instance().SendMsgToNet(msg);
-        return;
-    }
-    
-    // add ack to net msg
-    if (msg->_head._flag & HPF_NEED_ACK && msg->_head._flag & HPF_IS_ORDERLY) {
-        if (_pend_ack[WI_RELIABLE_ORDERLY]->GetConsecutiveAck(msg->_head._ack_start, msg->_head._ack_len)) {
-            msg->_head._flag |= HPF_WITH_ACK_RANGE;
+    // add to timer
+    if (msg->_head._flag & HPF_NEED_ACK) {
+        auto socket = msg->_socket.lock();
+        if (socket) {
+            socket->AddToTimer(dynamic_cast<CSenderRelialeOrderlyNetMsg*>(msg));
         }
+    }
 
-    } else if (msg->_head._flag & HPF_NEED_ACK) {
-        if (_pend_ack[WI_RELIABLE]->GetAllAck(msg->_head._ack_vec)) {
-            msg->_head._flag |= HPF_WITH_ACK_ARRAY;
-        }
-    }
+    CHudpImpl::Instance().SendMsgToNet(msg);
 }
 
 void CSocket::RecvAck(NetMsg* msg) {
-    if (msg->_head._flag & HPF_WITH_ACK_ARRAY) {
-        _send_wnd[WI_RELIABLE]->AcceptAck(msg->_head._ack_vec);
+    if (msg->_head._flag & HPF_WITH_RELIABLE_ORDERLY_ACK) {
+        if (msg->_head._flag & HPF_RELIABLE_ORDERLY_ACK_RANGE) {
+            _send_wnd[WI_RELIABLE_ORDERLY]->AcceptAck(msg->_head._ack_vec[0], msg->_head._ack_reliable_orderly_len);
 
-    } else if (msg->_head._flag & HPF_WITH_ACK_RANGE) {
-        _send_wnd[WI_RELIABLE_ORDERLY]->AcceptAck(msg->_head._ack_start, msg->_head._ack_len);
+        } else {
+            _send_wnd[WI_RELIABLE_ORDERLY]->AcceptAck(msg->_head._ack_vec, 0, msg->_head._ack_reliable_orderly_len);
+        }
+
+    } 
+
+    if (msg->_head._flag & HPF_WITH_RELIABLE_ACK) {
+        if (msg->_head._flag & HPF_RELIABLE_ACK_RANGE) {
+            _send_wnd[WI_RELIABLE]->AcceptAck(msg->_head._ack_vec[msg->_head._ack_reliable_orderly_len], msg->_head._ack_reliable_len);
+
+        } else {
+            _send_wnd[WI_RELIABLE_ORDERLY]->AcceptAck(msg->_head._ack_vec, msg->_head._ack_reliable_orderly_len, msg->_head._ack_reliable_len);
+        }
     }
 }
 
@@ -174,28 +179,8 @@ void CSocket::RecvMsgToOrderList(NetMsg* msg) {
 
     // get a repeat msg
     if (ret == 1) {
-        RecvAck(msg);
+        AddAck(msg);
         return;
-    }
-
-    // with ack
-    if (msg->_head._flag & HPF_WITH_ACK_RANGE) {
-        _send_wnd[WI_RELIABLE_ORDERLY]->AcceptAck(msg->_head._ack_start, msg->_head._ack_len);
-        // the msg only with ack. release here
-        if (!done && msg->_head._body_len == 0) {
-           CNetMsgPool::Instance().FreeMsg(msg, true);
-           done = true;
-        }
-        
-    } else if (msg->_head._flag & HPF_WITH_ACK_ARRAY) {
-        for (auto iter = msg->_head._ack_vec.begin(); iter != msg->_head._ack_vec.end(); ++iter) {
-            _send_wnd[WI_RELIABLE_ORDERLY]->AcceptAck(*iter);
-        }
-        // the msg only with ack. release here
-        if (!done && msg->_head._body_len == 0) {
-           CNetMsgPool::Instance().FreeMsg(msg, true);
-           done = true;
-        }
     }
 
     // normal udp. 
@@ -222,7 +207,6 @@ void CSocket::AddAck(NetMsg* msg) {
             CreatePendAck(WI_RELIABLE);
             _pend_ack[WI_RELIABLE]->AddAck(msg->_head._id);
         }
-
     }
 
     // add to timer
@@ -232,34 +216,38 @@ void CSocket::AddAck(NetMsg* msg) {
     }
 }
 
+void CSocket::AttachPendAck(NetMsg* msg) {
+    if (_pend_ack[WI_RELIABLE_ORDERLY] && _pend_ack[WI_RELIABLE_ORDERLY]->HasAck()) {
+        bool continuity = false;
+        bool ret = _pend_ack[WI_RELIABLE_ORDERLY]->GetAllAck(msg->_head._ack_vec, continuity);
+        if (ret && continuity) {
+            msg->_head._flag |= HPF_RELIABLE_ORDERLY_ACK_RANGE;
+        }
+        msg->_head._ack_reliable_orderly_len = msg->_head._ack_vec.size();
+        msg->_head._flag |= HPF_WITH_RELIABLE_ORDERLY_ACK;
+    }
+
+    if (_pend_ack[WI_RELIABLE] && _pend_ack[WI_RELIABLE]->HasAck()) {
+        bool continuity = false;
+        bool ret = _pend_ack[WI_RELIABLE]->GetAllAck(msg->_head._ack_vec, continuity);
+        if (ret && continuity) {
+            msg->_head._flag |= HPF_RELIABLE_ACK_RANGE;
+        }
+        msg->_head._ack_reliable_len = msg->_head._ack_vec.size() - msg->_head._ack_reliable_orderly_len;
+        msg->_head._flag |= HPF_WITH_RELIABLE_ACK;
+    }
+}
+
 void CSocket::OnTimer() {
     // create a ack msg and send to remote.
-    if (_pend_ack[WI_RELIABLE]) {
-        std::vector<uint16_t> ack_vec;
+    if ((_pend_ack[WI_RELIABLE] && _pend_ack[WI_RELIABLE]->HasAck())
+       || (_pend_ack[WI_RELIABLE_ORDERLY] && _pend_ack[WI_RELIABLE_ORDERLY]->HasAck())) {
         // ack may added to net msg already, check pendack
-        if (_pend_ack[WI_RELIABLE]->GetAllAck(ack_vec)) {
-            NetMsg* msg = CNetMsgPool::Instance().GetAckMsg();
-            msg->_head._flag |= HPF_WITH_ACK_ARRAY;
-            msg->_head._ack_vec = std::move(ack_vec);
-            msg->_ip_port = _handle;
-            SendMsgToPriQueue(msg);
-        }
-       
-
-    } else if (_pend_ack[WI_RELIABLE_ORDERLY]) {
-        uint16_t start = 0;
-        uint16_t len = 0;
-        
-        // ack may added to net msg already, check pendack 
-        if (_pend_ack[WI_RELIABLE_ORDERLY]->GetConsecutiveAck(start, len)){
-            NetMsg* msg = CNetMsgPool::Instance().GetAckMsg();
-            msg->_head._flag |= HPF_WITH_ACK_RANGE;
-            msg->_head._ack_start = start;
-            msg->_head._ack_len = len;
-            msg->_ip_port = _handle;
-            SendMsgToPriQueue(msg);
-        }
+        NetMsg* msg = CNetMsgPool::Instance().GetAckMsg();
+        AttachPendAck(msg);
+        SendMsgToPriQueue(msg);
     }
+
     _is_in_timer = false;
 }
 
@@ -268,7 +256,7 @@ void CSocket::SetTimerOutTime(uint16_t timer_out) {
 }
 
 void CSocket::AddToTimer(CSenderRelialeOrderlyNetMsg* msg) {
-    CTimer::Instance().AddTimer(_timer_out_time, msg);
+    msg->Attach(_timer_out_time);
 }
 
 void CSocket::CreateSendWnd(WndIndex index) {
