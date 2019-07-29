@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 #include <memory>
+#include <cstring>		//for memset
 
 #include "CommonType.h"
 #include "CommonFlag.h"

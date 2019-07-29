@@ -2,6 +2,7 @@
 #define HEADER_COMMON_TIMERSOLT
 
 #include "Timer.h"
+#include "CommonType.h"
 
 namespace hudp {
 

@@ -11,6 +11,7 @@
 using namespace hudp;
 
 bool CSerializesFilter::OnSend(NetMsg* msg) {
+    // msg is destroyed.
     if (msg->_socket.expired()) {
         return true;
     }

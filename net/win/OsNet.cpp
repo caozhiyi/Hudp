@@ -2,6 +2,7 @@
 
 #include <Winsock2.h>
 #include <ws2tcpip.h>
+#include <Mstcpip.h>
 
 #include "../OsNet.h"
 #include "Log.h"
@@ -81,7 +82,6 @@ int COsNet::RecvFrom(uint64_t sockfd, char *buf, size_t len, std::string& ip, ui
 
     return ret;
 }
-#include <Mstcpip.h>
 
 uint64_t COsNet::UdpSocket() {
     auto ret = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);

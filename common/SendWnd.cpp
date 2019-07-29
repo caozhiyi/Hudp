@@ -59,7 +59,7 @@ void CSendWnd::PushBack(uint16_t id, CSendWndSolt* data) {
 void CSendWnd::AcceptAck(uint16_t id) {
     {
         
-        base::LOG_DEBUG("recv a ack. id : %d", id);
+        base::LOG_DEBUG("send wnd recv a ack. id : %d", id);
         std::unique_lock<std::mutex> lock(_mutex);
         auto iter = _id_map.find(id);
         if (iter == _id_map.end()) {

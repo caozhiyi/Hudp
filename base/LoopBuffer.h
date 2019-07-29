@@ -62,7 +62,7 @@ namespace base {
     	char*	_write;			//write pos
     	char*	_buffer_start;
     	char*	_buffer_end;
-    	bool	_can_read;		//when _read == _write£¬Is there any data can be read.
+    	bool	_can_read;		//when _read == _writeï¿½ï¿½Is there any data can be read.
     	int		_index;			//buffer use it. compare CLoopBuffers
     	std::mutex _mutex;
     
@@ -70,7 +70,13 @@ namespace base {
     	std::shared_ptr<CMemoryPool>	_pool;
     };
 
-
+	bool operator<(const CLoopBuffer& buf1, const CLoopBuffer& buf2);
+    bool operator>(const CLoopBuffer& buf1, const CLoopBuffer& buf2);
+    bool operator<=(const CLoopBuffer& buf1, const CLoopBuffer& buf2);
+    bool operator>=(const CLoopBuffer& buf1, const CLoopBuffer& buf2);
+    bool operator==(const CLoopBuffer& buf1, const CLoopBuffer& buf2);
+    bool operator!=(const CLoopBuffer& buf1, const CLoopBuffer& buf2);
+    std::ostream & operator<< (std::ostream &out, const CLoopBuffer &obj);
 }
 
 #endif

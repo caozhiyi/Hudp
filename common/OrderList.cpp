@@ -1,3 +1,4 @@
+#include <cstring>		//for memset
 #include "OrderList.h"
 using namespace hudp;
 
