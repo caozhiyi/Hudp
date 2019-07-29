@@ -54,8 +54,12 @@ uint64_t CTimer::AddTimer(uint16_t ms, CTimerSolt* ti) {
 }
 
 void CTimer::RemoveTimer(CTimerSolt* ti) {
-    std::unique_lock<std::mutex> lock(_mutex);
-    _timer_map.erase(ti->_timer_id);
+    {
+        std::unique_lock<std::mutex> lock(_mutex);
+        _timer_map.erase(ti->_timer_id);
+    }
+    _notify.notify_one();
+    
 }
 
 void CTimer::Run() {

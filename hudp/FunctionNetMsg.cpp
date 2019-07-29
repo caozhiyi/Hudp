@@ -24,17 +24,17 @@ void CSenderOrderlyNetMsg::ToSend() {
         }
         CFilterProcess::Instance().SendProcess(this);
     }
-    base::LOG_DEBUG("send wnd send msg. id : %d", _head._id);
+    base::LOG_DEBUG("[sender] : send wnd send msg. id : %d", _head._id);
 }
 
 void CSenderOrderlyNetMsg::AckDone() {
-    base::LOG_DEBUG("send wnd ack done. id : %d", _head._id);
+    base::LOG_DEBUG("[ack] : send wnd ack done. id : %d", _head._id);
     CBitStreamPool::Instance().FreeBitStream(this->_bit_stream);
     CNetMsgPool::Instance().FreeMsg(this);
 }
 
 void CSenderOrderlyNetMsg::Clear() {
-    base::LOG_DEBUG("sender orderly msg clear. id : %d", _head._id);
+    base::LOG_DEBUG("[sender] : sender orderly msg clear. id : %d", _head._id);
     NetMsg::Clear();
     CSendWndSolt::Clear();
 }
@@ -54,11 +54,11 @@ void CSenderRelialeOrderlyNetMsg::ToSend() {
         }
         CFilterProcess::Instance().SendProcess(this);
     }
-    base::LOG_DEBUG("send wnd send msg. id : %d", _head._id);
+    base::LOG_DEBUG("[sender] : send wnd send msg. id : %d", _head._id);
 }
 
 void CSenderRelialeOrderlyNetMsg::AckDone() {
-    base::LOG_DEBUG("send wnd ack done. id : %d", _head._id);
+    base::LOG_DEBUG("[ack] : send wnd ack done. id : %d", _head._id);
     CBitStreamPool::Instance().FreeBitStream(this->_bit_stream);
     CNetMsgPool::Instance().FreeMsg(this);
 }
@@ -75,13 +75,13 @@ void CSenderRelialeOrderlyNetMsg::OnTimer() {
             socket->AttachPendAck(this);
             // send to process again
             CFilterProcess::Instance().SendProcess(this);
-            base::LOG_DEBUG("resend msg to net. id : %d", _head._id);
+            base::LOG_DEBUG("[sender] : resend msg to net. id : %d", _head._id);
         }
     }
 }
 
 void CSenderRelialeOrderlyNetMsg::Clear() {
-    base::LOG_DEBUG("sender reliable orderly msg clear. id : %d", _head._id);
+    base::LOG_DEBUG("[sender] : sender reliable orderly msg clear. id : %d", _head._id);
     NetMsg::Clear();
     CSendWndSolt::Clear();
     CTimerSolt::Clear();
@@ -97,11 +97,11 @@ void CReceiverNetMsg::ToRecv() {
         return;
     }
 
-    base::LOG_DEBUG("receiver msg. id : %d", _head._id);
+    base::LOG_DEBUG("[reveiver] :receiver msg. id : %d", _head._id);
     socket->AddAck(this);
 }
 
  void CReceiverNetMsg::Clear() {
-     base::LOG_DEBUG("reveiver msg clear. id : %d", _head._id);
+     base::LOG_DEBUG("[reveiver] : reveiver msg clear. id : %d", _head._id);
      NetMsg::Clear();
  }

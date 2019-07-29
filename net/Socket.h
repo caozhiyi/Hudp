@@ -3,6 +3,7 @@
 
 #include <atomic>
 #include <vector>
+#include <memory>       // for enable shared from this
 #include "CommonType.h"
 #include "TimerSolt.h"
 #include "HudpFlag.h"
@@ -25,7 +26,7 @@ namespace hudp {
     class CSenderRelialeOrderlyNetMsg;
     class CPendAck;
 
-    class CSocket : public CTimerSolt {
+    class CSocket : public CTimerSolt, public std::enable_shared_from_this<CSocket> {
     public:
         CSocket(const HudpHandle& handle);
         ~CSocket();

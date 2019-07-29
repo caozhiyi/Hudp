@@ -12,7 +12,7 @@ CPendAck::~CPendAck() {
 
 void CPendAck::AddAck(uint16_t ack_id) {
     std::unique_lock<std::mutex> lock(_mutex);
-
+    base::LOG_DEBUG("[ACK] : pend ack add a msg. id : %d", ack_id);
     _ack_set.insert(ack_id);
 }
 
@@ -42,7 +42,7 @@ bool CPendAck::GetAllAck(std::vector<uint16_t>& ack_vec, bool& continuity) {
     if (continuity && ack_vec.size() == 1) {
         continuity = false;
     }
-    base::LOG_DEBUG("attach ack msg. id : %d, size : %d", ack_vec[0], ack_vec.size());
+    base::LOG_DEBUG("[ACK] : attach ack msg. id : %d, size : %d", ack_vec[0], ack_vec.size());
     _ack_set.clear();
     return true;
 }

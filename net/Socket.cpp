@@ -244,6 +244,8 @@ void CSocket::OnTimer() {
        || (_pend_ack[WI_RELIABLE_ORDERLY] && _pend_ack[WI_RELIABLE_ORDERLY]->HasAck())) {
         // ack may added to net msg already, check pendack
         NetMsg* msg = CNetMsgPool::Instance().GetAckMsg();
+        msg->_socket = shared_from_this();
+        msg->_ip_port = _handle;
         AttachPendAck(msg);
         SendMsgToPriQueue(msg);
     }

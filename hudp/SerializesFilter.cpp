@@ -13,6 +13,7 @@ using namespace hudp;
 bool CSerializesFilter::OnSend(NetMsg* msg) {
     // msg is destroyed.
     if (msg->_socket.expired()) {
+        base::LOG_INFO("socket of msg is expired while serializes.");
         return true;
     }
     if (msg->_bit_stream) {
