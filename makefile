@@ -12,9 +12,9 @@ INCLUDES = -I.          \
            -I./hudp     \
            -I./include  \
 
-CCFLAGS = -lpthread -fPIC -m64 -std=c++11 -lstdc++ -fpermissive
+CCFLAGS = -lpthread -fPIC -m64 -std=c++11 -lstdc++ -fpermissive -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS
 
-OUTPUT = HudpServer
+OUTPUT = HudpServer.exe
 
 all:$(OUTPUT)
 

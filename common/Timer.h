@@ -8,6 +8,7 @@
 #include "Runnable.h"
 #include "TimeTool.h"
 #include "Single.h"
+#include "CommonType.h"
 
 namespace hudp {
 
