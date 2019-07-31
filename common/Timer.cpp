@@ -57,6 +57,7 @@ void CTimer::RemoveTimer(CTimerSolt* ti) {
     {
         std::unique_lock<std::mutex> lock(_mutex);
         _timer_map.erase(ti->_timer_id);
+        ti->_timer_id = 0;
     }
     _notify.notify_one();
     
@@ -65,9 +66,11 @@ void CTimer::RemoveTimer(CTimerSolt* ti) {
 void CTimer::Run() {
     std::vector<CTimerSolt*> timer_vec;
     std::map<uint64_t, CTimerSolt*>::iterator iter;
+    CTimerSolt* cur_solt = nullptr;
     bool timer_out = false;
     while (!_stop) {
         {
+            cur_solt = nullptr;
             timer_out = false;
             std::unique_lock<std::mutex> lock(_mutex);
             if (_timer_map.empty()) {
@@ -76,6 +79,7 @@ void CTimer::Run() {
             } else {
                 iter = _timer_map.begin();
                 _time_tool.Now();
+                cur_solt = iter->second;
                 if (iter->first > _time_tool.GetMsec()) {
                     _wait_time = iter->first - _time_tool.GetMsec();
 
@@ -91,10 +95,10 @@ void CTimer::Run() {
             _time_tool.Now();
             
             // if timer out
-            if (timer_out && iter->first <= _time_tool.GetMsec()) {
-                while (iter->second) {
-                    timer_vec.push_back(iter->second);
-                    iter->second = iter->second->GetNext();
+            if (timer_out && cur_solt && cur_solt->_timer_id > 0 && cur_solt->_timer_id <= _time_tool.GetMsec()) {
+                while (cur_solt) {
+                    timer_vec.push_back(cur_solt);
+                    cur_solt = cur_solt->GetNext();
                 }
                 _timer_map.erase(iter);
             }

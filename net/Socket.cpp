@@ -211,7 +211,7 @@ void CSocket::AddAck(NetMsg* msg) {
 
     // add to timer
     if (!_is_in_timer) {
-        CTimer::Instance().AddTimer(_timer_out_time.load(), this);
+        CTimer::Instance().AddTimer(500, this);
         _is_in_timer = true;
     }
 }
