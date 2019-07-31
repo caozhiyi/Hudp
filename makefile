@@ -1,6 +1,6 @@
-SRCS = $(wildcard ./base/*.cpp ./common/*.cpp ./hudp/*.cpp ./HudpServer/*.cpp ./HudpServer/*.cpp ./net/*.cpp ./net/unix/*.cpp)
+SRCS = $(wildcard ./base/*.cpp ./common/*.cpp ./hudp/*.cpp ./HudpServer/*.cpp ./net/*.cpp ./net/unix/*.cpp)
 
-OBJS = $(SRCS:.cpp = .o)
+OBJS = $(patsubst %.cpp, %.o, $(SRCS))
 
 CC = g++
 
@@ -12,19 +12,18 @@ INCLUDES = -I.          \
            -I./hudp     \
            -I./include  \
 
-CCFLAGS = -lpthread -fPIC -m64 -std=c++11 -lstdc++ -fpermissive -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS
+CCFLAGS = -lpthread -fPIC -m64 -std=c++11 -lstdc++ -fpermissive
 
-OUTPUT = HudpServer.exe
+TARGET = libhudp.a
+all:$(TARGET)
 
-all:$(OUTPUT)
+$(TARGET):$(OBJS)
+	ar rcs $(TARGET) $^
 
-$(OUTPUT) : $(OBJS)
-	$(CC) $^ -o $@ $(INCLUDES)  $(CCFLAGS)
-
-%.o : %.c
-	$(CC) -c $< $(CCFLAGS)
+$(OBJS):$(SRCS)
+	$(CC) $(CCFLAGS) $(INCLUDES) -c $^
 
 clean:
-	rm -rf *.out *.o
+	rm -rf *.a *.o
 
 .PHONY:clean
