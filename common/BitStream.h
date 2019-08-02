@@ -3,6 +3,7 @@
 
 #include <mutex>    // for mutex
 #include <string>   // for string
+#include <string.h> // for memset
 #include "CommonType.h"
 #include "Single.h"
 namespace hudp {

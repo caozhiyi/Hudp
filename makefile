@@ -1,8 +1,14 @@
-SRCS = $(wildcard ./base/*.cpp ./common/*.cpp ./hudp/*.cpp ./HudpServer/*.cpp ./net/*.cpp ./net/unix/*.cpp)
+SRCS = $(wildcard ./base/*.cpp ./common/*.cpp ./hudp/*.cpp ./net/*.cpp ./net/unix/*.cpp)
 
 OBJS = $(patsubst %.cpp, %.o, $(SRCS))
 
+SER = HudpServer/HudpServer.cpp
+
+CLI = HudpClient/HudpClient.cpp
+
 CC = g++
+
+OUTPUT = output
 
 INCLUDES = -I.          \
            -I./base     \
@@ -12,18 +18,26 @@ INCLUDES = -I.          \
            -I./hudp     \
            -I./include  \
 
-CCFLAGS = -lpthread -fPIC -m64 -std=c++11 -lstdc++ -fpermissive
+CCFLAGS = -lpthread -fPIC -m64 -std=c++11 -lstdc++
 
 TARGET = libhudp.a
-all:$(TARGET)
+SERBIN = hudpser
+CLIBIN = hudpcli
+
+all:$(TARGET) $(SERBIN) $(CLIBIN)
+
+$(SERBIN):$(SER)
+	$(CC) $(SER) -o $@  $(TARGET)  $(CCFLAGS) $(INCLUDES)
+
+$(CLIBIN):$(CLI)
+	$(CC) $(CLI) -o $@  $(TARGET)  $(CCFLAGS) $(INCLUDES)
 
 $(TARGET):$(OBJS)
-	ar rcs $(TARGET) $^
+	ar rcs $@ $^
 
 $(OBJS):$(SRCS)
-	$(CC) $(CCFLAGS) $(INCLUDES) -c $^
+	mkdir -p $(@D)
+	$(CC) -c $(patsubst %.o, %.cpp, $@) -o $@ $(CCFLAGS) $(INCLUDES) 
 
 clean:
-	rm -rf *.a *.o
-
-.PHONY:clean
+	rm -rf $(OBJS) $(TARGET) $(SERBIN) $(CLIBIN)
