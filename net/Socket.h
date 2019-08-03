@@ -49,7 +49,7 @@ namespace hudp {
         // add a ack msg to remote 
         void AddAck(NetMsg* msg);
         // attach ack info to msg
-        void AttachPendAck(NetMsg* msg);
+        bool AttachPendAck(NetMsg* msg);
 
         // timer call back
         void OnTimer();
@@ -58,6 +58,10 @@ namespace hudp {
         void SetTimerOutTime(uint16_t timer_out);
         // add a msg to timer.
         void AddToTimer(CSenderRelialeOrderlyNetMsg* msg);
+
+        // about serializes
+        bool Serializes(NetMsg* msg);
+        bool Deseriali(NetMsg* msg);
 
     private:
         // Instantiating corresponding classes.

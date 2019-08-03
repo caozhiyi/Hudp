@@ -53,7 +53,7 @@ namespace hudp {
         uint8_t       _phase;       // phase in process
         std::weak_ptr<CSocket> _socket;
 
-        bool          _flag;   // head may be changes,should serialize again. set true
+        bool          _flag;   // head may be changes, should serialize again. set true
                                // in recv msg. if send to upper set true
 
         bool          _use;    // check msg is used

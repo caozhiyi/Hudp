@@ -15,6 +15,7 @@
 #include "SocketManager.h"
 #include "Log.h"
 #include "FunctionNetMsg.h"
+#include "Serializes.h"
 
 using namespace hudp;
 
@@ -27,7 +28,7 @@ CSocket::CSocket(const HudpHandle& handle) : _handle(handle), _pri_queue(new CPr
     memset(_recv_list, 0, sizeof(_recv_list));
     memset(_pend_ack, 0, sizeof(_pend_ack));
     // init out timer
-    _timer_out_time = 10000;
+    _timer_out_time = 5000;
     _is_in_timer = false;
 }
 
@@ -104,14 +105,20 @@ void CSocket::SendMsgToSendWnd(NetMsg* msg) {
 }
 
 void CSocket::SendMsgToNet(NetMsg* msg) {
+    // add ack info to msg
+    AttachPendAck(msg);
+
+    // serializes
+    Serializes(msg);
+    
     // add to timer
     if (msg->_head._flag & HPF_NEED_ACK) {
         auto socket = msg->_socket.lock();
         if (socket) {
             socket->AddToTimer(dynamic_cast<CSenderRelialeOrderlyNetMsg*>(msg));
-        }
+        } 
     }
-
+    
     CHudpImpl::Instance().SendMsgToNet(msg);
 }
 
@@ -131,7 +138,7 @@ void CSocket::RecvAck(NetMsg* msg) {
             _send_wnd[WI_RELIABLE]->AcceptAck(msg->_head._ack_vec[msg->_head._ack_reliable_orderly_len], msg->_head._ack_reliable_len);
 
         } else {
-            _send_wnd[WI_RELIABLE_ORDERLY]->AcceptAck(msg->_head._ack_vec, msg->_head._ack_reliable_orderly_len, msg->_head._ack_reliable_len);
+            _send_wnd[WI_RELIABLE]->AcceptAck(msg->_head._ack_vec, msg->_head._ack_reliable_orderly_len, msg->_head._ack_reliable_len);
         }
     }
 }
@@ -199,7 +206,7 @@ void CSocket::AddAck(NetMsg* msg) {
             _pend_ack[WI_RELIABLE_ORDERLY]->AddAck(msg->_head._id);
         }
 
-    } else if (msg->_head._flag & HPF_IS_ORDERLY) {
+    } else if (msg->_head._flag & HPF_NEED_ACK) {
         if (_pend_ack[WI_RELIABLE]) {
             _pend_ack[WI_RELIABLE]->AddAck(msg->_head._id);
 
@@ -211,12 +218,15 @@ void CSocket::AddAck(NetMsg* msg) {
 
     // add to timer
     if (!_is_in_timer) {
-        CTimer::Instance().AddTimer(500, this);
+        Attach(50);
         _is_in_timer = true;
     }
 }
 
-void CSocket::AttachPendAck(NetMsg* msg) {
+bool CSocket::AttachPendAck(NetMsg* msg) {
+    // clear prv ack info
+    msg->ClearAck();
+
     if (_pend_ack[WI_RELIABLE_ORDERLY] && _pend_ack[WI_RELIABLE_ORDERLY]->HasAck()) {
         bool continuity = false;
         bool ret = _pend_ack[WI_RELIABLE_ORDERLY]->GetAllAck(msg->_head._ack_vec, continuity);
@@ -225,6 +235,7 @@ void CSocket::AttachPendAck(NetMsg* msg) {
         }
         msg->_head._ack_reliable_orderly_len = msg->_head._ack_vec.size();
         msg->_head._flag |= HPF_WITH_RELIABLE_ORDERLY_ACK;
+        msg->_flag = true;
     }
 
     if (_pend_ack[WI_RELIABLE] && _pend_ack[WI_RELIABLE]->HasAck()) {
@@ -235,7 +246,9 @@ void CSocket::AttachPendAck(NetMsg* msg) {
         }
         msg->_head._ack_reliable_len = msg->_head._ack_vec.size() - msg->_head._ack_reliable_orderly_len;
         msg->_head._flag |= HPF_WITH_RELIABLE_ACK;
+        msg->_flag = true;
     }
+    return msg->_flag;
 }
 
 void CSocket::OnTimer() {
@@ -246,8 +259,7 @@ void CSocket::OnTimer() {
         NetMsg* msg = CNetMsgPool::Instance().GetAckMsg();
         msg->_socket = shared_from_this();
         msg->_ip_port = _handle;
-        AttachPendAck(msg);
-        SendMsgToPriQueue(msg);
+        SendMsgToNet(msg);
     }
 
     _is_in_timer = false;
@@ -289,4 +301,45 @@ void CSocket::CreatePendAck(WndIndex index) {
     if (_pend_ack[index] == nullptr) {
         _pend_ack[index] = new CPendAck();
     }
+}
+
+bool CSocket::Serializes(NetMsg* msg) {
+    if (msg->_bit_stream) {
+        if (msg->_flag) {
+            msg->_bit_stream->Clear();
+            CBitStreamWriter* temp_bit_stream = static_cast<CBitStreamWriter*>(msg->_bit_stream);
+            if (CSerializes::Serializes(*msg, *temp_bit_stream)) {
+                msg->_bit_stream = temp_bit_stream;
+                return true;            
+
+            } else {
+                base::LOG_ERROR("serializes msg to stream failed. id : %d, handle : %s", msg->_head._id, msg->_ip_port.c_str());
+                return false;
+            }
+        } 
+
+    } else {
+        CBitStreamWriter* temp_bit_stream = static_cast<CBitStreamWriter*>(CBitStreamPool::Instance().GetBitStream());
+
+        if (CSerializes::Serializes(*msg, *temp_bit_stream)) {
+            msg->_bit_stream = temp_bit_stream;
+
+        }
+        else {
+            base::LOG_ERROR("serializes msg to stream failed. id : %d, handle : %s", msg->_head._id, msg->_ip_port.c_str());
+            return false;
+        }
+    }
+   
+    return true;
+}
+
+bool CSocket::Deseriali(NetMsg* msg) {
+    CBitStreamReader* temp_bit_stream = static_cast<CBitStreamReader*>(msg->_bit_stream);
+    msg->_socket = shared_from_this();
+    if (!CSerializes::Deseriali(*temp_bit_stream, *msg)) {
+        base::LOG_ERROR("deserialize stream to msg failed. id : %d, handle : %s", msg->_head._id, msg->_ip_port.c_str());
+        return false;
+    }
+    return true;
 }

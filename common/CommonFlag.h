@@ -11,14 +11,13 @@
 namespace hudp {
 
     // processing phase
-    // protocol resolution 
-    const uint8_t     PP_PROTO_PARSE      = 1;
+    // protocol resolution
     // head handle
-    const uint8_t     PP_HEAD_HANDLE      = 2;
+    const uint8_t     PP_HEAD_HANDLE      = 1;
     // body handle
-    const uint8_t     PP_BODY_HANDLE      = 3;
+    const uint8_t     PP_BODY_HANDLE      = 2;
     // upper program handle
-    const uint8_t     PP_UPPER_HANDLE     = 4;
+    const uint8_t     PP_UPPER_HANDLE     = 3;
 
     // hudp use by itself
     enum hudp_proto_flag {
