@@ -152,7 +152,6 @@
     <ClCompile Include="hudp\RecvThread.cpp" />
     <ClCompile Include="hudp\RelialeOrderlyFilter.cpp" />
     <ClCompile Include="hudp\SendThread.cpp" />
-    <ClCompile Include="hudp\SerializesFilter.cpp" />
     <ClCompile Include="hudp\UpperThread.cpp" />
     <ClCompile Include="net\Socket.cpp" />
     <ClCompile Include="net\SocketManager.cpp" />
@@ -208,7 +207,6 @@
     <ClInclude Include="hudp\RecvThread.h" />
     <ClInclude Include="hudp\RelialeOrderlyFilter.h" />
     <ClInclude Include="hudp\SendThread.h" />
-    <ClInclude Include="hudp\SerializesFilter.h" />
     <ClInclude Include="hudp\UpperThread.h" />
     <ClInclude Include="include\Hudp.h" />
     <ClInclude Include="include\HudpFlag.h" />

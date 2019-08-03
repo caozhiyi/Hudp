@@ -19,7 +19,7 @@ namespace hudp {
         
         // attach to timer
         void Attach(uint16_t ms) {
-            _timer_id = CTimer::Instance().AddTimer(ms, this);
+            CTimer::Instance().AddTimer(ms, this);
         }
 
         CTimerSolt* GetNext() {

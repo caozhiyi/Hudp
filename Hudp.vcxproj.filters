@@ -81,9 +81,6 @@
     <ClCompile Include="hudp\FilterProcess.cpp">
       <Filter>hudp</Filter>
     </ClCompile>
-    <ClCompile Include="hudp\SerializesFilter.cpp">
-      <Filter>hudp</Filter>
-    </ClCompile>
     <ClCompile Include="utest\common\Ut_IncrementalId.cpp">
       <Filter>utest\common</Filter>
     </ClCompile>
@@ -246,9 +243,6 @@
       <Filter>hudp</Filter>
     </ClInclude>
     <ClInclude Include="hudp\FilterProcess.h">
-      <Filter>hudp</Filter>
-    </ClInclude>
-    <ClInclude Include="hudp\SerializesFilter.h">
       <Filter>hudp</Filter>
     </ClInclude>
     <ClInclude Include="utest\Test.h">

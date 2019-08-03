@@ -49,10 +49,9 @@ void CSendWnd::PushBack(uint16_t id, CSendWndSolt* data) {
         if (_cur_send_size < _send_wnd_size) {
             _send_queue.Push(data);
             _cur_send_size++;
-            _cur = _end->_next;
+            _cur = nullptr;
         }
     }
-    
     SendAndAck();
 }
 
@@ -90,7 +89,6 @@ void CSendWnd::AcceptAck(uint16_t id) {
 
         _ack_queue.Push(iter->second);
         _cur_send_size--;
-
         // send next bag
         SendNext();
 

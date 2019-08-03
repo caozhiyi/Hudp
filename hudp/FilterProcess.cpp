@@ -5,13 +5,11 @@
 #include "Log.h"
 #include "NetMsg.h"
 #include "RelialeOrderlyFilter.h"
-#include "SerializesFilter.h"
 
 using namespace hudp;
 
 void CFilterProcess::Init() {
     // create all filter.
-    CSerializesFilter* serializes_filter = new CSerializesFilter();
     CRelialeOrderlyFilter* reliale_orderly_filter = new CRelialeOrderlyFilter();
 }
 

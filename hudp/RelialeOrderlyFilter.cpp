@@ -18,42 +18,38 @@ bool CRelialeOrderlyFilter::OnSend(NetMsg* msg) {
         return false;
     }
 
-    // normal udp send to net direct
-    if (!(msg->_head._flag & HPF_NEED_ACK && msg->_head._flag & HPF_IS_ORDERLY)) {
-        // set msg to next phase 
-        static_cast<CSenderOrderlyNetMsg*>(msg)->NextPhase();
+    if (msg->_head._flag & HPF_NEED_ACK && msg->_head._flag & HPF_IS_ORDERLY) {
+        share_pt->SendMsgToSendWnd(msg);
+       
+    } else if (msg->_head._flag & HPF_NEED_ACK) {
+        share_pt->SendMsgToSendWnd(msg);
 
     } else {
-        share_pt->SendMsgToSendWnd(msg);
+        // normal udp send to net direct
+        share_pt->SendMsgToNet(msg);
     }
     
     return true;
 }
 
 bool CRelialeOrderlyFilter::OnRecv(NetMsg* msg) {
-
     std::shared_ptr<CSocket> socket;
     CSocketManager::Instance().GetRecvSocket(msg->_ip_port, msg->_head._flag, socket);
-    
+    // deseriali msg
+    socket->Deseriali(msg);
     // with ack
     if ((msg->_head._flag & HPF_WITH_RELIABLE_ACK || msg->_head._flag & HPF_WITH_RELIABLE_ORDERLY_ACK) && socket) {
         socket->RecvAck(msg);
     }
 
-    if (!(msg->_head._flag & HPF_NEED_ACK && msg->_head._flag & HPF_IS_ORDERLY) && msg->_head._body_len != 0) {
-        // set msg to next phase 
-        // static_cast<CReceiverNetMsg*>(msg)->NextPhase();
-
-        // now don't have other phase, send to upper
-        CHudpImpl::Instance().SendMsgToUpper(msg);
-
-    } else if (socket && msg->_head._body_len != 0){
-        msg->_socket = socket;
+    if (msg->_head._flag & HPF_NEED_ACK && msg->_head._flag & HPF_IS_ORDERLY) {
         socket->RecvMsgToOrderList(msg);
 
-    } else if (!socket) {
-        base::LOG_ERROR("get a recv socket error.");
-        return false;
+    } else if (msg->_head._flag & HPF_NEED_ACK) {
+        socket->RecvMsgToOrderList(msg);
+
+    } else if (msg->_head._body_len != 0){
+        CHudpImpl::Instance().SendMsgToUpper(msg);
     }
 
     return true;

@@ -10,19 +10,10 @@ using namespace hudp;
 
 void CSenderOrderlyNetMsg::ToSend() {
     // first into process filter. in process loop
-    if (_phase == PP_HEAD_HANDLE) {
-        NextPhase();
-        auto socket = _socket.lock();
-        if (socket) {
-            socket->AttachPendAck(this);
-        }
-
-    } else {
-        auto socket = _socket.lock();
-        if (socket) {
-            socket->AttachPendAck(this);
-        }
-        CFilterProcess::Instance().SendProcess(this);
+    auto socket = _socket.lock();
+    if (socket) {
+        // send to process again
+        socket->SendMsgToNet(this);
     }
     base::LOG_DEBUG("[sender] : send wnd send msg. id : %d", _head._id);
 }
@@ -41,18 +32,10 @@ void CSenderOrderlyNetMsg::Clear() {
 
 void CSenderRelialeOrderlyNetMsg::ToSend() {
     // first into process filter. in process loop
-    if (_phase == PP_HEAD_HANDLE) {
-        NextPhase();
-        auto socket = _socket.lock();
-        if (socket) {
-            socket->AttachPendAck(this);
-        }
-    } else {
-        auto socket = _socket.lock();
-        if (socket) {
-            socket->AttachPendAck(this);
-        }
-        CFilterProcess::Instance().SendProcess(this);
+    auto socket = _socket.lock();
+    if (socket) {
+        // send to process again
+        socket->SendMsgToNet(this);
     }
     base::LOG_DEBUG("[sender] : send wnd send msg. id : %d", _head._id);
 }
@@ -64,41 +47,35 @@ void CSenderRelialeOrderlyNetMsg::AckDone() {
 }
 
 void CSenderRelialeOrderlyNetMsg::OnTimer() {
-    if (_phase == PP_HEAD_HANDLE) {
-        NextPhase();
-
-    } else {
-        // add to timer again
-        auto socket = _socket.lock();
-        if (socket) {
-            ClearAck();
-            socket->AttachPendAck(this);
-            // send to process again
-            CFilterProcess::Instance().SendProcess(this);
-            base::LOG_DEBUG("[sender] : resend msg to net. id : %d", _head._id);
-        }
+    // add to timer again
+    auto socket = _socket.lock();
+    if (socket) {
+        // send to process again
+        socket->SendMsgToNet(this);
+        base::LOG_DEBUG("[sender] : resend msg to net. id : %d", _head._id);
     }
 }
 
 void CSenderRelialeOrderlyNetMsg::Clear() {
     base::LOG_DEBUG("[sender] : sender reliable orderly msg clear. id : %d", _head._id);
+    // first remove from timer
+    CTimerSolt::Clear();
     NetMsg::Clear();
     CSendWndSolt::Clear();
-    CTimerSolt::Clear();
 }
 
 void CReceiverNetMsg::ToRecv() {
-    CHudpImpl::Instance().SendMsgToUpper(this);
-
     // send ack msg to remote
     auto socket = _socket.lock();
     if (!socket) {
-        base::LOG_ERROR("a recv net msg can't find socket");
+        base::LOG_ERROR("[reveiver] a recv net msg can't find socket");
         return;
     }
 
     base::LOG_DEBUG("[reveiver] :receiver msg. id : %d", _head._id);
     socket->AddAck(this);
+
+    CHudpImpl::Instance().SendMsgToUpper(this);
 }
 
  void CReceiverNetMsg::Clear() {

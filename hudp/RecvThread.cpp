@@ -48,7 +48,7 @@ void CRecvThread::Run() {
             CReceiverNetMsg* msg = static_cast<CReceiverNetMsg*>(CNetMsgPool::Instance().GetRecvMsg());
             msg->_ip_port = ip + ":" + std::to_string(port);
             msg->_bit_stream = bit_stream;
-            msg->_phase = PP_PROTO_PARSE;
+            msg->_phase = PP_HEAD_HANDLE;
             
             CHudpImpl::Instance().SendMsgToRecvProcessThread(msg);
         }
