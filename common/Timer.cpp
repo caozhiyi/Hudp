@@ -1,6 +1,6 @@
 #include "Timer.h"
-#include "Log.h"
 #include "TimerSolt.h"
+#include "FunctionNetMsg.h"
 
 #include <iostream>
 
@@ -18,39 +18,42 @@ CTimer::~CTimer() {
     Join();
 }
 
-uint64_t CTimer::AddTimer(uint16_t ms, CTimerSolt* ti) {
+void CTimer::AddTimer(uint16_t ms, CTimerSolt* ti) {
     _time_tool.Now();
-
     uint64_t expiration_time = ms + _time_tool.GetMsec();
 
     std::unique_lock<std::mutex> lock(_mutex);
     auto iter = _timer_map.find(expiration_time);
+    ti->SetNext(nullptr);
     // add to timer map
     if (iter == _timer_map.end()) {
-        ti->SetNext(nullptr);
         _timer_map[expiration_time] = ti;
 
     // add same time
     } else {
         // check same item
         CTimerSolt* tmp = iter->second;
-        while (tmp) {
+        while (tmp->GetNext()) {
             // the same item
             if (tmp == ti) {
-                return 0;
+                return;
             } else {
                 tmp = tmp->GetNext();
             }
         }
-        ti->SetNext(iter->second);
-        iter->second = ti;
+        // the same item
+        if (tmp == ti) {
+            return;
+        }
+
+        // add to list
+        tmp->SetNext(ti);
     }
+    ti->_timer_id = expiration_time;
     // wake up timer thread
     if (ms < _wait_time) {
         _notify.notify_one();
     }
-
-    return expiration_time;
 }
 
 void CTimer::RemoveTimer(CTimerSolt* ti) {
@@ -100,6 +103,9 @@ void CTimer::Run() {
                     timer_vec.push_back(cur_solt);
                     cur_solt = cur_solt->GetNext();
                 }
+                _timer_map.erase(iter);
+
+            } else if (timer_out && cur_solt && cur_solt->_timer_id == 0 && iter != _timer_map.end()) {
                 _timer_map.erase(iter);
             }
         }

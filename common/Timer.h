@@ -18,7 +18,7 @@ namespace hudp {
         CTimer();
         ~CTimer();
         // add a timer event
-        uint64_t AddTimer(uint16_t ms, CTimerSolt* ti);
+        void AddTimer(uint16_t ms, CTimerSolt* ti);
 
         // remove a timer event
         void RemoveTimer(CTimerSolt* ti);
