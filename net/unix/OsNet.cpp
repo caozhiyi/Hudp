@@ -4,15 +4,21 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <unistd.h>       // for close
-#include <netdb.h>        // for gethostbyname
+#include <netdb.h>        // for gethostbyname  
+#include <ifaddrs.h>
+#include <netinet/in.h> 
+#include <string.h>       // for strlen strcmp
+
 #include "../OsNet.h"
 #include "Log.h"
 #include "CommonFunc.h"
+#include "LinuxFunc.h"
 
 using namespace hudp;
 
 bool COsNet::Init() {
-    
+    SetCoreFileUnlimit();
+    return true;
 }
 
 void COsNet::Destroy() {
@@ -89,59 +95,40 @@ uint64_t COsNet::UdpSocket() {
 
 std::string COsNet::GetOsIp(bool is_ipv4) {
 
-    char hostname[255] = { 0 };
-    // get ipv4 
-    if (is_ipv4) {
-        char name[256] = { 0 };
-	    gethostname(name, sizeof(name));
-	
-	    struct hostent* host = gethostbyname(name);
-	    char ip_str[32];
-	    const char* ret = inet_ntop(host->h_addrtype, host->h_addr_list[0], ip_str, sizeof(ip_str));
-	    if (nullptr == ret) {
-		    base::LOG_ERROR("get local ip failed. errno : %d", errno);
-		    return "";
-	    }
-	    return ip_str;
+    struct ifaddrs * if_addr_struct = nullptr;
+    void * tmp_addr_ptr = nullptr;
+
+    getifaddrs(&if_addr_struct);
+
+    while (if_addr_struct != nullptr) {
+        if (if_addr_struct->ifa_addr->sa_family==AF_INET) { // check it is IP4
+            // is a valid IP4 Address
+            tmp_addr_ptr = &((struct sockaddr_in *)if_addr_struct->ifa_addr)->sin_addr;
+            char addressBuffer[INET_ADDRSTRLEN];
+            inet_ntop(AF_INET, tmp_addr_ptr, addressBuffer, INET_ADDRSTRLEN);
+            // get first not local ip
+            if (is_ipv4 && strcmp(addressBuffer, "127.0.0.1") != 0) {
+                return addressBuffer;
+            }
+
+        } else if (if_addr_struct->ifa_addr->sa_family==AF_INET6) { // check it is IP6
+            // is a valid IP6 Address
+            tmp_addr_ptr = &((struct sockaddr_in *)if_addr_struct->ifa_addr)->sin_addr;
+            char addressBuffer[INET6_ADDRSTRLEN];
+            inet_ntop(AF_INET6, tmp_addr_ptr, addressBuffer, INET6_ADDRSTRLEN);
+
+            // get first not local ip
+            if (!is_ipv4 && strlen(addressBuffer) > 8) {
+                return addressBuffer;
+            }
+        } 
+        if_addr_struct = if_addr_struct->ifa_next;
     }
-
-    // struct addrinfo addr_info;
-    // memset(&addr_info, 0, sizeof(addr_info));
-    // addr_info.ai_family   = AF_INET6;
-    // addr_info.ai_socktype = SOCK_DGRAM;
-    // addr_info.ai_flags    = AI_PASSIVE;
-
-    // struct addrinfo *into_list;
-    // int ret = -1;
-    // ret = getaddrinfo(hostname, "", &addr_info, &into_list);
-    // if (ret < 0) {
-    //     base::LOG_ERROR("get address info failed. error : %d.", errno);
-    //     return "";
-    // }
-    // if(into_list == NULL) {
-    //     base::LOG_ERROR("get address info failed. into_list is null.");
-    //     return "";
-    // }
-    // char ipv6[128] = { 0 };
-    // int cur_len = 0;
-    // // only get first one
-    // struct sockaddr_in6 *sinp6;
-    // sinp6 = (struct sockaddr_in6 *)into_list->ai_addr;
-    // for (int i = 0; i < 16; i++) {
-    //     if (((i - 1) % 2) && (i > 0)) {
-    //         sprintf(ipv6 + cur_len, ":", sinp6->sin6_addr.u.Byte[i]);
-    //         cur_len++;
-    //     }
-
-    //     sprintf(ipv6 + cur_len, "%02x", sinp6->sin6_addr.u.Byte[i]);
-    //     cur_len += 2;
-    // }
-    // return std::string(ipv6);
     return "";
 }
 
 bool COsNet::Close(uint64_t socket) {
-    if (close(socket) <= 0) {
+    if (close(socket) < 0) {
         base::LOG_ERROR("close socket failed. errno %d : ", errno);
         return false;
     }

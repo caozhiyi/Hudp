@@ -1,9 +1,9 @@
-SRCS = $(wildcard ./base/*.cpp ./common/*.cpp ./hudp/*.cpp ./net/*.cpp ./net/unix/*.cpp)
+SRCS = $(wildcard ./base/*.cpp ./common/*.cpp ./hudp/*.cpp ./net/*.cpp ./net/unix/*.cpp ./os/unix/*.cpp) 
 
 OBJS = $(patsubst %.cpp, %.o, $(SRCS))
 
 SER = HudpServer/HudpServer.cpp
-
+#SER = utest/net/Ut_OsNet.cpp
 CLI = HudpClient/HudpClient.cpp
 
 CC = g++
@@ -17,8 +17,9 @@ INCLUDES = -I.          \
            -I./common   \
            -I./hudp     \
            -I./include  \
-
-CCFLAGS = -lpthread -fPIC -m64 -std=c++11 -lstdc++
+		   -I./os/unix  \
+# NET_LOSS_TEST add packet loss
+CCFLAGS = -lpthread -fPIC -m64 -std=c++11 -lstdc++ -D NET_LOSS_TEST
 
 TARGET = libhudp.a
 SERBIN = hudpser

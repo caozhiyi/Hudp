@@ -22,6 +22,7 @@ namespace hudp {
         void Init(bool log = false);
         // start thread and recv
         bool Start(uint16_t port, const recv_back& func);
+        bool Start(const std::string& ip, uint16_t port, const recv_back& func);
 
         void Join();
 

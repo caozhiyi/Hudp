@@ -12,6 +12,13 @@ namespace hudp {
 
         virtual void Start(uint64_t socket);
         virtual void Run();
+#ifdef NET_LOSS_TEST
+    private: 
+        // get a random number between 0-10
+        int GetRandomNumber();
+#endif
+    
+
     private:
         uint64_t _send_socket;
     };
