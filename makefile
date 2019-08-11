@@ -18,8 +18,8 @@ INCLUDES = -I.          \
            -I./hudp     \
            -I./include  \
 		   -I./os/unix  \
-# NET_LOSS_TEST add packet loss
-CCFLAGS = -lpthread -fPIC -m64 -std=c++11 -lstdc++ -D NET_LOSS_TEST
+# NET_LOSS_TEST add packet loss -D NET_LOSS_TEST
+CCFLAGS = -lpthread -fPIC -m64 -std=c++11 -lstdc++
 
 TARGET = libhudp.a
 SERBIN = hudpser
