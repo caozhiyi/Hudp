@@ -7,6 +7,7 @@
 #include "CommonType.h"
 #include "TimerSolt.h"
 #include "HudpFlag.h"
+#include "Rto.h"
 
 namespace hudp {
 
@@ -54,10 +55,8 @@ namespace hudp {
         // timer call back
         void OnTimer();
 
-        // set RTT time. a msg will be send again in timer.
-        void SetTimerOutTime(uint16_t timer_out);
-        // add a msg to timer.
-        void AddToTimer(CSenderRelialeOrderlyNetMsg* msg);
+        // add a msg to timer. return cur time stamp.
+        uint64_t AddToTimer(CSenderRelialeOrderlyNetMsg* msg);
 
         // about serializes
         bool Serializes(NetMsg* msg);
@@ -70,14 +69,22 @@ namespace hudp {
         void CreatePendAck(WndIndex index);
 
     private:
+        // reliable correlation
         CIncrementalId* _inc_id[__wnd_size];
         CSendWnd*       _send_wnd[__wnd_size];
         CRecvList*      _recv_list[__wnd_size];
         CPendAck*       _pend_ack[__wnd_size];
+
+        // msg priority queue
         CPriorityQueue* _pri_queue;
-        std::atomic<uint16_t> _timer_out_time; //default 50ms
+
+        // about pend ack timer
         std::atomic<bool>     _is_in_timer;
+        // rto
+        CRto            _rto;
+        // socket handle
         HudpHandle      _handle;
+        
     };
 }
 

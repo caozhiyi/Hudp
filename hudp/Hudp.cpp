@@ -9,8 +9,8 @@ bool hudp::Start(uint16_t port, const recv_back& func) {
     return CHudpImpl::Instance().Start(port, func);
 }
 
-bool hudp::Start(const std::string& ip,uint16_t port, const recv_back& func) {
-    
+bool hudp::Start(const std::string& ip, uint16_t port, const recv_back& func) {
+    return CHudpImpl::Instance().Start(ip, port, func);
 }
 
 void hudp::Join() {

@@ -14,7 +14,7 @@ namespace hudp {
         uint16_t _flag;
         uint16_t _id;
         uint16_t _body_len;
-
+ 
         // ack
         uint16_t _ack_reliable_len;
         uint16_t _ack_reliable_orderly_len;
@@ -53,19 +53,24 @@ namespace hudp {
         uint8_t       _phase;       // phase in process
         std::weak_ptr<CSocket> _socket;
 
+        uint16_t      _backoff_factor;  // timer out resend backoff factor
+        bool          _re_send;// is resend?
         bool          _flag;   // head may be changes, should serialize again. set true
                                // in recv msg. if send to upper set true
 
         bool          _use;    // check msg is used
 
         NetMsg() : _flag(false),
-                   _use(true) {
+                   _use(true),
+                   _re_send(false),
+                   _backoff_factor(1) {
             memset(_body, 0, __body_size);
         }
 
         virtual ~NetMsg() {}
 
         void Clear() {
+            _re_send = false;
             _flag = false;
             _ip_port.clear();
             _head.Clear();
@@ -73,6 +78,7 @@ namespace hudp {
             _socket.reset();
             _bit_stream = nullptr;
             _use = false;
+            _backoff_factor = 1;
         }
 
         void ClearAck() {

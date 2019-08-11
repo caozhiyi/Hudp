@@ -18,7 +18,7 @@ CTimer::~CTimer() {
     Join();
 }
 
-void CTimer::AddTimer(uint16_t ms, CTimerSolt* ti) {
+uint64_t CTimer::AddTimer(uint32_t ms, CTimerSolt* ti) {
     _time_tool.Now();
     uint64_t expiration_time = ms + _time_tool.GetMsec();
 
@@ -36,14 +36,14 @@ void CTimer::AddTimer(uint16_t ms, CTimerSolt* ti) {
         while (tmp->GetNext()) {
             // the same item
             if (tmp == ti) {
-                return;
+                return _time_tool.GetMsec();
             } else {
                 tmp = tmp->GetNext();
             }
         }
         // the same item
         if (tmp == ti) {
-            return;
+            return _time_tool.GetMsec();
         }
 
         // add to list
@@ -54,6 +54,7 @@ void CTimer::AddTimer(uint16_t ms, CTimerSolt* ti) {
     if (ms < _wait_time) {
         _notify.notify_one();
     }
+    return _time_tool.GetMsec();
 }
 
 void CTimer::RemoveTimer(CTimerSolt* ti) {
@@ -63,7 +64,11 @@ void CTimer::RemoveTimer(CTimerSolt* ti) {
         ti->_timer_id = 0;
     }
     _notify.notify_one();
-    
+}
+
+uint64_t CTimer::GetTimeStamp() {
+    _time_tool.Now();
+    return _time_tool.GetMsec();
 }
 
 void CTimer::Run() {

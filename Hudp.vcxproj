@@ -84,7 +84,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;NET_LOSS_TEST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -93,7 +93,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;NET_LOSS_TEST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -139,6 +139,7 @@
     <ClCompile Include="common\OrderList.cpp" />
     <ClCompile Include="common\PendAck.cpp" />
     <ClCompile Include="common\PriorityQueue.cpp" />
+    <ClCompile Include="common\Rto.cpp" />
     <ClCompile Include="common\SendWnd.cpp" />
     <ClCompile Include="common\Serializes.cpp" />
     <ClCompile Include="common\Timer.cpp" />
@@ -192,6 +193,7 @@
     <ClInclude Include="common\OrderListSolt.h" />
     <ClInclude Include="common\PendAck.h" />
     <ClInclude Include="common\PriorityQueue.h" />
+    <ClInclude Include="common\Rto.h" />
     <ClInclude Include="common\SendWnd.h" />
     <ClInclude Include="common\SendWndSolt.h" />
     <ClInclude Include="common\Serializes.h" />

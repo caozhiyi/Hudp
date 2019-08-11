@@ -39,8 +39,9 @@ void CHudpImpl::Init(bool log) {
 }
 
 bool CHudpImpl::Start(uint16_t port, const recv_back& func) {
-     std::string ip = COsNet::GetOsIp();
-     return Start(ip, port, func);
+    std::string ip = COsNet::GetOsIp();
+    
+    return Start(ip, port, func);
 }
 
 bool CHudpImpl::Start(const std::string& ip, uint16_t port, const recv_back& func) {
@@ -49,7 +50,6 @@ bool CHudpImpl::Start(const std::string& ip, uint16_t port, const recv_back& fun
         return false;
     }
 
-   
     if (!COsNet::Bind(socket, ip, port)) {
         return false;
     }

@@ -147,6 +147,9 @@
     <ClCompile Include="hudp\Hudp.cpp">
       <Filter>hudp</Filter>
     </ClCompile>
+    <ClCompile Include="common\Rto.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="base\Any.h">
@@ -289,6 +292,9 @@
     </ClInclude>
     <ClInclude Include="include\HudpFlag.h">
       <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="common\Rto.h">
+      <Filter>common</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -50,8 +50,11 @@ void CSenderRelialeOrderlyNetMsg::OnTimer() {
     // add to timer again
     auto socket = _socket.lock();
     if (socket) {
+        _re_send = true;
         // send to process again
         socket->SendMsgToNet(this);
+        // _backoff_factor * 2
+        _backoff_factor = _backoff_factor << 1;
         base::LOG_DEBUG("[sender] : resend msg to net. id : %d", _head._id);
     }
 }

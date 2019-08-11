@@ -17,11 +17,14 @@ namespace hudp {
     public:
         CTimer();
         ~CTimer();
-        // add a timer event
-        void AddTimer(uint16_t ms, CTimerSolt* ti);
+        // add a timer event. return cur time stamp
+        uint64_t AddTimer(uint32_t ms, CTimerSolt* ti);
 
-        // remove a timer event
+        // remove a timer event.  return cur time stamp
         void RemoveTimer(CTimerSolt* ti);
+
+        // get cur time stamp
+        uint64_t GetTimeStamp();
 
         // thread func 
         virtual void Run();

@@ -21,14 +21,14 @@ using namespace hudp;
 
 // this size may be a dynamic algorithm control
 static const uint16_t __send_wnd_size = 5;
+static const uint16_t __pend_ack_send = 50;     // 50ms
+static const uint16_t __max_rto_time  = 12000;  // max rto 120s 
 
 CSocket::CSocket(const HudpHandle& handle) : _handle(handle), _pri_queue(new CPriorityQueue) {
     memset(_inc_id, 0, sizeof(_inc_id));
     memset(_send_wnd, 0, sizeof(_send_wnd));
     memset(_recv_list, 0, sizeof(_recv_list));
     memset(_pend_ack, 0, sizeof(_pend_ack));
-    // init out timer
-    _timer_out_time = 5000;
     _is_in_timer = false;
 }
 
@@ -115,7 +115,14 @@ void CSocket::SendMsgToNet(NetMsg* msg) {
     if (msg->_head._flag & HPF_NEED_ACK) {
         auto socket = msg->_socket.lock();
         if (socket) {
-            socket->AddToTimer(dynamic_cast<CSenderRelialeOrderlyNetMsg*>(msg));
+            uint64_t time_stamp = socket->AddToTimer(dynamic_cast<CSenderRelialeOrderlyNetMsg*>(msg));
+            if (!msg->_re_send) {
+                // set rtt sample
+                _rto.SetIdTime(msg->_head._id, time_stamp);
+
+            } else {
+                _rto.RemoveIdTime(msg->_head._id);
+            }
         } 
     }
     
@@ -125,20 +132,45 @@ void CSocket::SendMsgToNet(NetMsg* msg) {
 void CSocket::RecvAck(NetMsg* msg) {
     if (msg->_head._flag & HPF_WITH_RELIABLE_ORDERLY_ACK) {
         if (msg->_head._flag & HPF_RELIABLE_ORDERLY_ACK_RANGE) {
-            _send_wnd[WI_RELIABLE_ORDERLY]->AcceptAck(msg->_head._ack_vec[0], msg->_head._ack_reliable_orderly_len);
+
+            auto time_stap = CTimer::Instance().GetTimeStamp();
+            for (uint16_t index = msg->_head._ack_vec[0], i = 0; i < msg->_head._ack_reliable_orderly_len; index++, i++) {
+                _send_wnd[WI_RELIABLE_ORDERLY]->AcceptAck(index);
+                // set rtt sample
+                _rto.SetAckTime(index, time_stap);
+            }
 
         } else {
-            _send_wnd[WI_RELIABLE_ORDERLY]->AcceptAck(msg->_head._ack_vec, 0, msg->_head._ack_reliable_orderly_len);
-        }
 
+            auto time_stap = CTimer::Instance().GetTimeStamp();
+            uint16_t start_index = 0;
+            for (; start_index < msg->_head._ack_reliable_orderly_len; start_index++) {
+                _send_wnd[WI_RELIABLE_ORDERLY]->AcceptAck(msg->_head._ack_vec[start_index]);
+                // set rtt sample
+                _rto.SetAckTime(msg->_head._ack_vec[start_index], time_stap);
+            }
+        }
     } 
 
     if (msg->_head._flag & HPF_WITH_RELIABLE_ACK) {
         if (msg->_head._flag & HPF_RELIABLE_ACK_RANGE) {
-            _send_wnd[WI_RELIABLE]->AcceptAck(msg->_head._ack_vec[msg->_head._ack_reliable_orderly_len], msg->_head._ack_reliable_len);
+
+            auto time_stap = CTimer::Instance().GetTimeStamp();
+            for (uint16_t index = msg->_head._ack_vec[msg->_head._ack_reliable_orderly_len], i = 0; i < msg->_head._ack_reliable_len; index++, i++) {
+                _send_wnd[WI_RELIABLE]->AcceptAck(index);
+                // set rtt sample
+                _rto.SetAckTime(index, time_stap);
+            }
 
         } else {
-            _send_wnd[WI_RELIABLE]->AcceptAck(msg->_head._ack_vec, msg->_head._ack_reliable_orderly_len, msg->_head._ack_reliable_len);
+
+            auto time_stap = CTimer::Instance().GetTimeStamp();
+            uint16_t start_index = msg->_head._ack_reliable_orderly_len;
+            for (; start_index < msg->_head._ack_reliable_len; start_index++) {
+                _send_wnd[WI_RELIABLE]->AcceptAck(msg->_head._ack_vec[start_index]);
+                // set rtt sample
+                _rto.SetAckTime(msg->_head._ack_vec[start_index], time_stap);
+            }
         }
     }
 }
@@ -218,7 +250,7 @@ void CSocket::AddAck(NetMsg* msg) {
 
     // add to timer
     if (!_is_in_timer) {
-        Attach(50);
+        Attach(__pend_ack_send);
         _is_in_timer = true;
     }
 }
@@ -265,12 +297,11 @@ void CSocket::OnTimer() {
     _is_in_timer = false;
 }
 
-void CSocket::SetTimerOutTime(uint16_t timer_out) {
-    _timer_out_time = timer_out;
-}
-
-void CSocket::AddToTimer(CSenderRelialeOrderlyNetMsg* msg) {
-    msg->Attach(_timer_out_time);
+uint64_t CSocket::AddToTimer(CSenderRelialeOrderlyNetMsg* msg) {
+    uint32_t time = _rto.GetRto() * msg->_backoff_factor;
+    time = time > __max_rto_time ? __max_rto_time : time;
+    base::LOG_DEBUG("[resend] time : %d", time);
+    return msg->Attach(time);
 }
 
 void CSocket::CreateSendWnd(WndIndex index) {

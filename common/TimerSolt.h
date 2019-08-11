@@ -18,8 +18,8 @@ namespace hudp {
         virtual void OnTimer() = 0;
         
         // attach to timer
-        void Attach(uint16_t ms) {
-            CTimer::Instance().AddTimer(ms, this);
+        uint64_t Attach(uint32_t ms) {
+            return CTimer::Instance().AddTimer(ms, this);
         }
 
         CTimerSolt* GetNext() {

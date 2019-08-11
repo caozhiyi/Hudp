@@ -6,7 +6,7 @@
 
 #ifdef NET_LOSS_TEST
 #include <random>
-static const int __packet_loss = 5;
+static const int __packet_loss = 2;
 #endif
 
 using namespace hudp;
@@ -61,7 +61,9 @@ void CSendThread::Run() {
 
 #ifdef NET_LOSS_TEST
 int CSendThread::GetRandomNumber() {
-    std::default_random_engine engine;
-    return engine() % 10;
+    static std::default_random_engine engine;
+    std::uniform_int_distribution<unsigned> u(0, 9);
+    int ret = u(engine);
+    return ret;
 }
 #endif
