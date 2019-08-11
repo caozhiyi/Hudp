@@ -17,7 +17,7 @@ Hudp 还在进一步完善。。。
 
 ## 选项
 Hudp提供四种关于可靠性的选项：
-```cpp
+```c++
  enum hudp_tran_flag {
         // only orderly. may lost some bag
         HTF_ORDERLY          = 0x0001，
@@ -35,7 +35,7 @@ HTF_RELIABLE_ORDERLY : 即保证可靠性，又保证顺序性，看起来像是
 HTF_NORMAL : 普通udp传输，没有任何控制的udp传输。   
 
 Hudp提供四种优先级选项：
-```cpp
+```c++
 enum hudp_pri_flag {
         // the lowest priority.
         HPF_LOW_PRI          = 0x0010，
@@ -53,7 +53,7 @@ enum hudp_pri_flag {
 
 ## 接口
 Hudp提供了最少的接口供用户使用，使用起来就像是在用原始的udp接口
-```cpp
+```c++
     void Init(bool log = false);
     bool Start(uint16_t port， const recv_back& func);
     bool Start(const std::string& ip，uint16_t port， const recv_back& func);
