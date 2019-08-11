@@ -1,19 +1,5 @@
-                                  
- ***   ***                   ***         
- ***   ***                   ***         
- ***   ***                   ***         
- ***   ***                   ***         
- *********   ***  ***    *******   *******    
- *********   ***  ***   ***  ***   **** ***    
- ***   ***   ***  ***   ***  ***   ***  ***    
- ***   ***   ***  ***   ***  ***   ***  ***    
- ***   ***   ***  ***   ***  ***   ***  ***    
- ***   ***   ***  ***    *******   ********    
- ***   ***    ******       *****   *******    
-                                   ***         
-                                   ***   
-                                   ***		    						  
-                                  
+<p align="left"><img width="340" src="./doc/image/logo.png" alt="cppnet logo"></p>
+
 <p align="left">
     <a href="https://travis-ci.org/caozhiyi/Hudp"><img src="https://travis-ci.org/caozhiyi/Hudp.svg?branch=master" alt="Build Status"></a>
     <a href="https://opensource.org/licenses/BSD-3-Clause"><img src="https://img.shields.io/badge/license-bsd-orange.svg" alt="Licenses"></a>
