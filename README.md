@@ -6,7 +6,7 @@
 </p> 
 
 See [chinese](/README_cn.md) 
-## Introduce
+## Introduction
 
 Hudp is a rudp library, rudp means reliable UDP. But comparing with TCP mandatory and non-optional reliable transmission, UDP is more like a blank sheet of paper that you can define the reliability you need.    
 Hudp provides different options for users, realizing different reliability and priority by controlling message transmission.   
