@@ -62,7 +62,7 @@ Hudp provides a minimum number of interfaces for users to use, which is like usi
     void Join();
     void SendTo(const HudpHandle& handlle, uint16_t flag, const std::string& msg);
     void SendTo(const HudpHandle& handlle, uint16_t flag, const char* msg, uint16_t len);
-    void Destroy(const HudpHandle& handlle);
+    void Close(const HudpHandle& handlle);
 ```
 The annotations of interface can be see[Hudp](/include/Hudp.h).   
 The Start interface opens listening on the port and receives notification in the callback function when a message arrives.   

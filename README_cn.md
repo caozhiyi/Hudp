@@ -60,7 +60,7 @@ Hudp提供了最少的接口供用户使用，使用起来就像是在用原始�
     void Join();
     void SendTo(const HudpHandle& handlle， uint16_t flag， const std::string& msg);
     void SendTo(const HudpHandle& handlle， uint16_t flag， const char* msg， uint16_t len);
-    void Destroy(const HudpHandle& handlle);
+    void Close(const HudpHandle& handlle);
 ```
 对应的接口注释可以查看[Hudp](/include/Hudp.h)。   
 Start接口会开启对应端口的监听，有消息到达时会在回调函数中收到通知。   

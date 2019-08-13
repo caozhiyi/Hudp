@@ -25,6 +25,6 @@ void hudp::SendTo(const HudpHandle& handlle, uint16_t flag, const char* msg, uin
     CHudpImpl::Instance().SendTo(handlle, flag, msg, len);
 }
 
-void hudp::Destroy(const HudpHandle& handlle) {
-    CHudpImpl::Instance().Destroy(handlle);
+void hudp::Close(const HudpHandle& handlle) {
+    CHudpImpl::Instance().Close(handlle);
 }

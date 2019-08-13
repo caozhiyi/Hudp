@@ -105,7 +105,7 @@ void CHudpImpl::SendTo(const HudpHandle& handlle, uint16_t flag, const char* msg
     socket->SendMsgToPriQueue(net_msg);
 }
 
-void CHudpImpl::Destroy(const HudpHandle& handlle) {
+void CHudpImpl::Close(const HudpHandle& handlle) {
     CSocketManager::Instance().Destroy(handlle);
 }
 

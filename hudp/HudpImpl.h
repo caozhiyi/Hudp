@@ -31,7 +31,7 @@ namespace hudp {
         void SendTo(const HudpHandle& handlle, uint16_t flag, const char* msg, uint16_t len);
 
         // destory socket. release resources
-        void Destroy(const HudpHandle& handlle);
+        void Close(const HudpHandle& handlle);
 
     public:
         // send msg to send thread
