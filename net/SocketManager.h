@@ -28,17 +28,15 @@ namespace hudp {
         // notify msg arrive 
         void NotifyMsg(const HudpHandle& handle);
 
-        // get a socket for send msg.
+        // get a socket.
         // if there isn't a socket, just create it.
-        void GetSendSocket(const HudpHandle& handle, std::shared_ptr<CSocket>& socket);
-
-        // recv a msg to upper or order list.
-        // if msg need a socket then return true and socket, else return false.
-        // if there isn't a socket, just create it.
-        bool GetRecvSocket(const HudpHandle& handle, uint16_t flag, std::shared_ptr<CSocket>& socket);
+        void GetSocket(const HudpHandle& handle, std::shared_ptr<CSocket>& socket);
 
         // destroy resource of socket and send destroy msg to remote.
         void Destroy(const HudpHandle& handle);
+
+        // check socket exist
+        bool Exist(const HudpHandle& handle);
 
     private:
         // get a socket from _socket_map. 

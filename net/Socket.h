@@ -62,6 +62,9 @@ namespace hudp {
         bool Serializes(NetMsg* msg);
         bool Deseriali(NetMsg* msg);
 
+        // get ip port handle
+        HudpHandle GetHandle();
+
     private:
         // Instantiating corresponding classes.
         void CreateSendWnd(WndIndex index);

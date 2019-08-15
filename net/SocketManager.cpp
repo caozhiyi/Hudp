@@ -30,25 +30,13 @@ void CSocketManager::NotifyMsg(const HudpHandle& handle) {
     _notify.notify_one();
 }
 
-void CSocketManager::GetSendSocket(const HudpHandle& handle, std::shared_ptr<CSocket>& socket) {
+void CSocketManager::GetSocket(const HudpHandle& handle, std::shared_ptr<CSocket>& socket) {
     std::unique_lock<std::mutex> lock(_mutex);
     socket = GetSocket(handle);
-}
-
-bool CSocketManager::GetRecvSocket(const HudpHandle& handle, uint16_t flag, std::shared_ptr<CSocket>& socket) {
-    // if a normal udp, send to upper direct.
-    //if (!(flag & HPF_NEED_ACK && flag & HPF_IS_ORDERLY) && 
-    //    !((flag & HPF_WITH_RELIABLE_ORDERLY_ACK | flag & HPF_WITH_RELIABLE_ACK))) {
-    //    return false;
-    //}
-
-    // add to order list.
-    std::unique_lock<std::mutex> lock(_mutex);
-    socket = GetSocket(handle);
-    return true;
 }
 
 void CSocketManager::Destroy(const HudpHandle& handle) {
+    std::unique_lock<std::mutex> lock(_mutex);
     auto iter = _socket_map.find(handle);
     if (iter == _socket_map.end()) {
         return;
@@ -57,6 +45,15 @@ void CSocketManager::Destroy(const HudpHandle& handle) {
     // there should add msg to notify remote side destroy too.
     iter->second.reset();
 }
+
+ bool CSocketManager::Exist(const HudpHandle& handle) {
+    std::unique_lock<std::mutex> lock(_mutex);
+    auto iter = _socket_map.find(handle);
+    if (iter == _socket_map.end()) {
+        return false;
+    }
+    return true;
+ }
 
 std::shared_ptr<CSocket> CSocketManager::GetSocket(const HudpHandle& handle) {
     auto iter = _socket_map.find(handle);

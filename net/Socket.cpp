@@ -288,7 +288,7 @@ void CSocket::OnTimer() {
     if ((_pend_ack[WI_RELIABLE] && _pend_ack[WI_RELIABLE]->HasAck())
        || (_pend_ack[WI_RELIABLE_ORDERLY] && _pend_ack[WI_RELIABLE_ORDERLY]->HasAck())) {
         // ack may added to net msg already, check pendack
-        NetMsg* msg = CNetMsgPool::Instance().GetAckMsg();
+        NetMsg* msg = CNetMsgPool::Instance().GetNormalMsg();
         msg->_socket = shared_from_this();
         msg->_ip_port = _handle;
         SendMsgToNet(msg);
@@ -373,4 +373,8 @@ bool CSocket::Deseriali(NetMsg* msg) {
         return false;
     }
     return true;
+}
+
+HudpHandle CSocket::GetHandle() {
+    return _handle;
 }

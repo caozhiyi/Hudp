@@ -27,11 +27,11 @@ namespace hudp {
         void Join();
 
         // send msg
-        void SendTo(const HudpHandle& handlle, uint16_t flag, const std::string& msg);
-        void SendTo(const HudpHandle& handlle, uint16_t flag, const char* msg, uint16_t len);
+        void SendTo(const HudpHandle& handle, uint16_t flag, const std::string& msg);
+        void SendTo(const HudpHandle& handle, uint16_t flag, const char* msg, uint16_t len);
 
         // destory socket. release resources
-        void Close(const HudpHandle& handlle);
+        void Close(const HudpHandle& handle);
 
     public:
         // send msg to send thread

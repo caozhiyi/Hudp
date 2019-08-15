@@ -41,6 +41,11 @@ namespace hudp {
         HPF_IS_ORDERLY                 = 0x0800,
 
         // 0x0010 ~ 0x0080 is priority
+
+        // to close connection
+        HPF_CLOSE                      = 0x1000,
+        // close ack
+        HPF_CLOSE_ACK                  = 0x2000,
     };
 
     const uint16_t __mtu = 400;

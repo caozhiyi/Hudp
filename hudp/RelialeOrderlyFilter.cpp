@@ -34,7 +34,7 @@ bool CRelialeOrderlyFilter::OnSend(NetMsg* msg) {
 
 bool CRelialeOrderlyFilter::OnRecv(NetMsg* msg) {
     std::shared_ptr<CSocket> socket;
-    CSocketManager::Instance().GetRecvSocket(msg->_ip_port, msg->_head._flag, socket);
+    CSocketManager::Instance().GetSocket(msg->_ip_port, socket);
     // deseriali msg
     socket->Deseriali(msg);
     // with ack

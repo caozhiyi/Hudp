@@ -86,14 +86,13 @@ void CNetMsgPool::ReduceFree() {
     }
 }
 
-NetMsg* CNetMsgPool::GetAckMsg() {
+NetMsg* CNetMsgPool::GetNormalMsg() {
     NetMsg* net_msg;
     if (!_free_net_msg_queue.Pop(net_msg)) {
         net_msg = new NetMsg();
     }
 
     if (net_msg) {
-        net_msg->_phase = PP_HEAD_HANDLE;
         net_msg->_head._flag |= HPF_HIGH_PRI;
         net_msg->_use = true;
         return net_msg;

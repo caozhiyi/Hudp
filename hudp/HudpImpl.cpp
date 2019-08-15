@@ -74,11 +74,11 @@ void CHudpImpl::Join() {
 
 }
 
-void CHudpImpl::SendTo(const HudpHandle& handlle, uint16_t flag, const std::string& msg) {
-    SendTo(handlle, flag, msg.c_str(), msg.length());
+void CHudpImpl::SendTo(const HudpHandle& handle, uint16_t flag, const std::string& msg) {
+    SendTo(handle, flag, msg.c_str(), msg.length());
 }
 
-void CHudpImpl::SendTo(const HudpHandle& handlle, uint16_t flag, const char* msg, uint16_t len) {
+void CHudpImpl::SendTo(const HudpHandle& handle, uint16_t flag, const char* msg, uint16_t len) {
     if (len > __body_size) {
         base::LOG_ERROR("msg size is bigger than msg bosy size.");
         return;
@@ -97,16 +97,16 @@ void CHudpImpl::SendTo(const HudpHandle& handlle, uint16_t flag, const char* msg
 
     //get a socket. 
     std::shared_ptr<CSocket> socket;
-    CSocketManager::Instance().GetSendSocket(handlle, socket);
+    CSocketManager::Instance().GetSocket(handle, socket);
     net_msg->_socket = socket;
-    net_msg->_ip_port = handlle;
+    net_msg->_ip_port = handle;
 
     // send msg to pri queue.
     socket->SendMsgToPriQueue(net_msg);
 }
 
-void CHudpImpl::Close(const HudpHandle& handlle) {
-    CSocketManager::Instance().Destroy(handlle);
+void CHudpImpl::Close(const HudpHandle& handle) {
+    CSocketManager::Instance().Destroy(handle);
 }
 
 void CHudpImpl::SendMsgToNet(NetMsg* msg) {

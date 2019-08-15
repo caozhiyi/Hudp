@@ -25,7 +25,7 @@ namespace hudp {
         // reduce half of free queue every time 
         void ReduceFree();
 
-        NetMsg* GetAckMsg();
+        NetMsg* GetNormalMsg();
         NetMsg* GetSendMsg(uint32_t flag);
         NetMsg* GetRecvMsg();
 
