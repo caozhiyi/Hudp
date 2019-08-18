@@ -10,7 +10,7 @@ CSendWnd::CSendWnd(uint16_t send_wnd_size) : _end(nullptr),
 }
 
 CSendWnd::~CSendWnd() {
-
+    Clear();
 }
 
 void CSendWnd::PushBack(uint16_t id, CSendWndSolt* data) {
@@ -150,8 +150,12 @@ void CSendWnd::SetIndexResend(uint16_t id) {
     }
 }
 
-void CSendWnd::Clear(CNetMsgPool* msg_pool, CBitStreamPool* bit_pool) {
-    
+void CSendWnd::Clear() {
+    std::unique_lock<std::mutex> lock(_mutex);
+    for (auto iter = _id_map.begin(); iter != _id_map.end(); ++iter) {
+        iter->second->AckDone();
+    }
+    _id_map.clear();
 }
 
 void CSendWnd::SendAndAck() {

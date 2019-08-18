@@ -12,7 +12,7 @@ void RecvFunc(const hudp::HudpHandle& handlle, const char* msg, uint16_t len) {
 
 void UtestHudpServer() {
     hudp::Init();
-    hudp::Start("192.168.1.4", 8012, RecvFunc);
+    hudp::Start("192.168.1.10", 8012, RecvFunc);
 
     //base::CRunnable::Sleep(3000);
     //CHudp::SendTo("192.168.1.7:8011", HTF_NORMAL, "a normal msg.");

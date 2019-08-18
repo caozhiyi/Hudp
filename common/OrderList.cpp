@@ -1,5 +1,6 @@
 #include <cstring>		//for memset
 #include "OrderList.h"
+#include "NetMsgPool.h"
 using namespace hudp;
 
 static const uint16_t __msx_cache_msg_num = 100;
@@ -21,7 +22,13 @@ CReliableOrderlyList::CReliableOrderlyList() : _expect_id(1) {
 }
 
 CReliableOrderlyList::~CReliableOrderlyList() {
-
+    std::unique_lock<std::mutex> lock(_mutex);
+    for (size_t i = 0; i < __order_list_size; i++) {
+        if (_order_list[i]) {
+            // return to msg pool
+            CNetMsgPool::Instance().FreeMsg((NetMsg*)_order_list[i], true);
+        }
+    }
 }
 
 uint16_t CReliableOrderlyList::Insert(uint16_t id, COrderListSolt* ol) {
@@ -71,7 +78,7 @@ CReliableList::CReliableList() : _msg_num(0), _start(0) {
 }
 
 CReliableList::~CReliableList() {
-
+    
 }
    
 uint16_t CReliableList::Insert(uint16_t id, COrderListSolt* ol) {

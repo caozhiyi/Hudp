@@ -8,6 +8,7 @@
 #include "SocketManager.h"
 #include "HudpImpl.h"
 #include "FunctionNetMsg.h"
+#include "CloseManager.h"
 
 using namespace hudp;
 
@@ -33,10 +34,27 @@ bool CRelialeOrderlyFilter::OnSend(NetMsg* msg) {
 }
 
 bool CRelialeOrderlyFilter::OnRecv(NetMsg* msg) {
+    CBitStreamReader* temp_bit_stream = static_cast<CBitStreamReader*>(msg->_bit_stream);
+    if (!CSerializes::Deseriali(*temp_bit_stream, *msg)) {
+        base::LOG_ERROR("deserialize stream to msg failed. handle : %s", msg->_ip_port.c_str());
+        return false;
+    }
+
+    if (msg->_head._flag & HPF_CLOSE_ACK) {
+        CCloseManager::Instance().CloseAck(msg->_ip_port);
+        return true;
+    }
+
+    // close msg
+    if (msg->_head._flag & HPF_CLOSE) {
+        CCloseManager::Instance().RecvClose(msg->_ip_port);
+        return true;
+    }
+
     std::shared_ptr<CSocket> socket;
     CSocketManager::Instance().GetSocket(msg->_ip_port, socket);
-    // deseriali msg
-    socket->Deseriali(msg);
+    msg->_socket = socket;
+
     // with ack
     if ((msg->_head._flag & HPF_WITH_RELIABLE_ACK || msg->_head._flag & HPF_WITH_RELIABLE_ORDERLY_ACK) && socket) {
         socket->RecvAck(msg);

@@ -42,8 +42,8 @@ void CSocketManager::Destroy(const HudpHandle& handle) {
         return;
     }
 
-    // there should add msg to notify remote side destroy too.
     iter->second.reset();
+    _socket_map.erase(iter);
 }
 
  bool CSocketManager::Exist(const HudpHandle& handle) {

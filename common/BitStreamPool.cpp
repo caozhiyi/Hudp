@@ -41,6 +41,9 @@ CBitStream* CBitStreamPool::GetBitStream() {
 }
 
 void CBitStreamPool::FreeBitStream(CBitStream* bit_stream) {
+    if (!bit_stream) {
+        return;
+    }
     bit_stream->Clear();
     _free_queue.Push(bit_stream);
 }

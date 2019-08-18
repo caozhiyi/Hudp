@@ -16,7 +16,7 @@ CRecvThread::CRecvThread() : _recv_socket(0) {
 
 CRecvThread::~CRecvThread() {
     Stop();
-    COsNet::SendTo(_recv_socket, "1", 1);
+    //COsNet::SendTo(_recv_socket, "1", 1);
     Join();
     COsNet::Close(_recv_socket);
 }

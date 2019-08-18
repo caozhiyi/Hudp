@@ -150,6 +150,9 @@
     <ClCompile Include="common\Rto.cpp">
       <Filter>common</Filter>
     </ClCompile>
+    <ClCompile Include="hudp\CloseMageger.cpp">
+      <Filter>hudp</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="base\Any.h">
@@ -295,6 +298,9 @@
     </ClInclude>
     <ClInclude Include="common\Rto.h">
       <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="hudp\CloseManager.h">
+      <Filter>hudp</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

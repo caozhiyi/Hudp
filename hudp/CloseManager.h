@@ -1,10 +1,6 @@
 #ifndef HEADER_NET_CLOSEMANAGER
 #define HEADER_NET_CLOSEMANAGER
 
-#include <unordered_map>
-#include <memory>
-#include <mutex>
-
 #include "CommonFlag.h"
 #include "Single.h"
 

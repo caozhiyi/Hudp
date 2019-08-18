@@ -84,7 +84,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;NET_LOSS_TEST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -93,7 +93,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;NET_LOSS_TEST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -143,6 +143,7 @@
     <ClCompile Include="common\SendWnd.cpp" />
     <ClCompile Include="common\Serializes.cpp" />
     <ClCompile Include="common\Timer.cpp" />
+    <ClCompile Include="hudp\CloseMageger.cpp" />
     <ClCompile Include="hudp\FilterInterface.cpp" />
     <ClCompile Include="hudp\FilterProcess.cpp" />
     <ClCompile Include="hudp\FunctionNetMsg.cpp" />
@@ -200,6 +201,7 @@
     <ClInclude Include="common\Timer.h" />
     <ClInclude Include="common\TimerSolt.h" />
     <ClInclude Include="common\CommonFunc.h" />
+    <ClInclude Include="hudp\CloseManager.h" />
     <ClInclude Include="hudp\FilterInterface.h" />
     <ClInclude Include="hudp\FilterProcess.h" />
     <ClInclude Include="hudp\FunctionNetMsg.h" />

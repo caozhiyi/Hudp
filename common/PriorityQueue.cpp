@@ -1,6 +1,7 @@
 #include "PriorityQueue.h"
 #include "CommonFlag.h"
 #include "Log.h"
+#include "NetMsgPool.h"
 using namespace hudp;
 
 CPriorityQueue::CPriorityQueue() : _pri_normal_count(__pri_surplus),
@@ -12,7 +13,7 @@ CPriorityQueue::CPriorityQueue() : _pri_normal_count(__pri_surplus),
 }
 
 CPriorityQueue::~CPriorityQueue() {
-
+    Clear();
 }
 
 void CPriorityQueue::Push(NetMsg* msg) {
@@ -106,6 +107,10 @@ uint64_t CPriorityQueue::Size() {
 
 void CPriorityQueue::Clear() {
     for (size_t i = 0; i < __pri_queue_size; i++) {
-        _queue_arr[i].Clear();
+        NetMsg* msg = nullptr;
+        while (_queue_arr[i].Pop(msg)) {
+            // return to msg pool
+            CNetMsgPool::Instance().FreeMsg(msg);
+        }
     }
 }

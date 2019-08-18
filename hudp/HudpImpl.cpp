@@ -6,6 +6,7 @@
 #include "NetMsg.h"
 #include "Socket.h"
 #include "FilterProcess.h"
+#include "CloseManager.h"
 
 using namespace hudp;
 
@@ -106,7 +107,8 @@ void CHudpImpl::SendTo(const HudpHandle& handle, uint16_t flag, const char* msg,
 }
 
 void CHudpImpl::Close(const HudpHandle& handle) {
-    CSocketManager::Instance().Destroy(handle);
+    // send close msg to remote
+    CCloseManager::Instance().StartClose(handle);
 }
 
 void CHudpImpl::SendMsgToNet(NetMsg* msg) {

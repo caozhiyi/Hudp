@@ -5,6 +5,11 @@
 #include "NetMsgPool.h"
 #include "HudpImpl.h"
 #include "SocketManager.h"
+#include "BitStreamPool.h"
+#include "Serializes.h"
+#include "Log.h"
+
+static const uint16_t __two_msl_time = 30000; // 15s
 
 using namespace hudp;
 
@@ -28,10 +33,13 @@ void CCloseManager::StartClose(const HudpHandle& handle) {
     
     // send a close msg
     NetMsg* msg = CNetMsgPool::Instance().GetSendMsg(HTF_RELIABLE);
-    msg->_head._flag |= HPF_CLOSE | HPF_NEED_ACK;
+    msg->_head._flag |= HPF_CLOSE | HPF_NEED_ACK | HPF_NROMAL_PRI;
     msg->_socket = socket;
     msg->_ip_port = socket->GetHandle();
-    CHudpImpl::Instance().SendMsgToSendProcessThread(msg);
+    msg->_phase = PP_HEAD_HANDLE;
+    socket->SendMsgToPriQueue(msg);
+
+    base::LOG_DEBUG("sclose socket . handle : %s", msg->_ip_port.c_str());
 }
 
 void CCloseManager::RecvClose(const HudpHandle& handle) {
@@ -39,8 +47,18 @@ void CCloseManager::RecvClose(const HudpHandle& handle) {
     NetMsg* msg = CNetMsgPool::Instance().GetNormalMsg();
     msg->_head._flag |= HPF_CLOSE_ACK;
     msg->_ip_port = handle;
-    CHudpImpl::Instance().SendMsgToSendProcessThread(msg);
 
+    CBitStreamWriter* temp_bit_stream = static_cast<CBitStreamWriter*>(CBitStreamPool::Instance().GetBitStream());
+
+    if (CSerializes::Serializes(*msg, *temp_bit_stream)) {
+        msg->_bit_stream = temp_bit_stream;
+
+    } else {
+        base::LOG_ERROR("serializes msg to stream failed. handle : %s", msg->_ip_port.c_str());
+        return;
+    }
+
+    CHudpImpl::Instance().SendMsgToNet(msg);
     // don't have this socket. 
     if (!CSocketManager::Instance().Exist(handle)) {
         return;
@@ -53,4 +71,5 @@ void CCloseManager::RecvClose(const HudpHandle& handle) {
 bool CCloseManager::CloseAck(const HudpHandle& handle) {
     // destory socket
     CSocketManager::Instance().Destroy(handle);
+    return true;
 }

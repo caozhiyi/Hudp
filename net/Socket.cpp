@@ -355,8 +355,7 @@ bool CSocket::Serializes(NetMsg* msg) {
         if (CSerializes::Serializes(*msg, *temp_bit_stream)) {
             msg->_bit_stream = temp_bit_stream;
 
-        }
-        else {
+        } else {
             base::LOG_ERROR("serializes msg to stream failed. id : %d, handle : %s", msg->_head._id, msg->_ip_port.c_str());
             return false;
         }

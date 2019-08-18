@@ -34,7 +34,7 @@ namespace hudp {
         void SetIndexResend(uint16_t id);
 
         // move item to pool
-        void Clear(CNetMsgPool* msg_pool, CBitStreamPool* bit_pool);
+        void Clear();
 
     private:
         // call callback func
