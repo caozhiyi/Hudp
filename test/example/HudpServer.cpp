@@ -13,7 +13,7 @@ void RecvFunc(const hudp::HudpHandle& handlle, const char* msg, uint16_t len) {
 void UtestHudpServer() {
     hudp::Init(true);
 
-    hudp::Start("192.168.1.10", 8011, RecvFunc);
+    hudp::Start("127.0.0.1", 8011, RecvFunc);
     
     int index = 0;
     while (1)
@@ -23,9 +23,9 @@ void UtestHudpServer() {
         
         base::CRunnable::Sleep(1000);
         if (index == 10) {
-            hudp::Close("192.168.1.10:8012");
+            hudp::Close("127.0.0.1:8012");
         } else if (index < 10) {
-            hudp::SendTo("192.168.1.10:8012", hudp::HTF_RELIABLE_ORDERLY | hudp::HPF_HIGHEST_PRI, msg);
+            hudp::SendTo("127.0.0.1:8012", hudp::HTF_RELIABLE_ORDERLY | hudp::HPF_HIGHEST_PRI, msg);
         }
     }
 

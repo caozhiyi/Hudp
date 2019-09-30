@@ -2,10 +2,6 @@ SRCS = $(wildcard ./base/*.cpp ./common/*.cpp ./hudp/*.cpp ./net/*.cpp ./net/uni
 
 OBJS = $(patsubst %.cpp, %.o, $(SRCS))
 
-SER = HudpServer/HudpServer.cpp
-#SER = utest/net/Ut_OsNet.cpp
-CLI = HudpClient/HudpClient.cpp
-
 CC = g++
 
 OUTPUT = output
@@ -22,16 +18,8 @@ INCLUDES = -I.          \
 CCFLAGS = -lpthread -fPIC -m64 -std=c++11 -lstdc++
 
 TARGET = libhudp.a
-SERBIN = hudpser
-CLIBIN = hudpcli
 
-all:$(TARGET) $(SERBIN) $(CLIBIN)
-
-$(SERBIN):$(SER) $(TARGET)
-	$(CC) $(SER) -o $@  $(TARGET)  $(CCFLAGS) $(INCLUDES)
-
-$(CLIBIN):$(CLI) $(TARGET)
-	$(CC) $(CLI) -o $@  $(TARGET)  $(CCFLAGS) $(INCLUDES)
+all:$(TARGET)
 
 $(TARGET):$(OBJS)
 	ar rcs $@ $^
