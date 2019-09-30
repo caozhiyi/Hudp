@@ -60,10 +60,10 @@ namespace hudp {
 
         bool          _use;    // check msg is used
 
-        NetMsg() : _flag(false),
-                   _use(true),
+        NetMsg() : _backoff_factor(1),
                    _re_send(false),
-                   _backoff_factor(1) {
+                   _flag(false),
+                   _use(true) {
             memset(_body, 0, __body_size);
         }
 

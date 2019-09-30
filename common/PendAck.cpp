@@ -11,8 +11,8 @@ CPendAck::~CPendAck() {
 }
 
 void CPendAck::AddAck(uint16_t ack_id) {
-    std::unique_lock<std::mutex> lock(_mutex);
     base::LOG_DEBUG("[ACK] : pend ack add a msg. id : %d", ack_id);
+    std::unique_lock<std::mutex> lock(_mutex);
     _ack_set.insert(ack_id);
 }
 

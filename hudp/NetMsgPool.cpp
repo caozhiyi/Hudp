@@ -12,25 +12,25 @@ CNetMsgPool::CNetMsgPool() {
 CNetMsgPool::~CNetMsgPool() {
     size_t size = _free_net_msg_queue.Size();
     NetMsg* net_msg;
-    for (int i = 0; i < size; i++) {
+    for (size_t i = 0; i < size; i++) {
         _free_net_msg_queue.Pop(net_msg);
         delete net_msg;
     }
     size = _free_order_queue.Size();
     CSenderOrderlyNetMsg* order_msg;
-    for (int i = 0; i < size; i++) {
+    for (size_t i = 0; i < size; i++) {
         _free_order_queue.Pop(order_msg);
         delete order_msg;
     }
     size = _free_reliale_order_queue.Size();
     CSenderRelialeOrderlyNetMsg* reliale_msg;
-    for (int i = 0; i < size; i++) {
+    for (size_t i = 0; i < size; i++) {
         _free_reliale_order_queue.Pop(reliale_msg);
         delete reliale_msg;
     }
     size = _free_revceiver_queue.Size();
     CReceiverNetMsg* recv_msg;
-    for (int i = 0; i < size; i++) {
+    for (size_t i = 0; i < size; i++) {
         _free_revceiver_queue.Pop(recv_msg);
         delete recv_msg;
     }
@@ -49,7 +49,7 @@ void CNetMsgPool::ReduceFree() {
     if (size > __reduce_limit_size) {
         size = size / 2;
         NetMsg* net_msg;
-        for (int i = 0; i < size; i++) {
+        for (size_t i = 0; i < size; i++) {
             _free_net_msg_queue.Pop(net_msg);
             delete net_msg;
         }
@@ -59,7 +59,7 @@ void CNetMsgPool::ReduceFree() {
     if (size > __reduce_limit_size) {
         size = size / 2;
         CSenderOrderlyNetMsg* order_msg;
-        for (int i = 0; i < size; i++) {
+        for (size_t i = 0; i < size; i++) {
             _free_order_queue.Pop(order_msg);
             delete order_msg;
         }
@@ -69,7 +69,7 @@ void CNetMsgPool::ReduceFree() {
     if (size > __reduce_limit_size) {
         size = size / 2;
         CSenderRelialeOrderlyNetMsg* reliale_msg;
-        for (int i = 0; i < size; i++) {
+        for (size_t i = 0; i < size; i++) {
             _free_reliale_order_queue.Pop(reliale_msg);
             delete reliale_msg;
         }
@@ -79,7 +79,7 @@ void CNetMsgPool::ReduceFree() {
     if (size > __reduce_limit_size) {
         size = size / 2;
         CReceiverNetMsg* recv_msg;
-        for (int i = 0; i < size; i++) {
+        for (size_t i = 0; i < size; i++) {
             _free_revceiver_queue.Pop(recv_msg);
             delete recv_msg;
         }

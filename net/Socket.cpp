@@ -24,7 +24,7 @@ static const uint16_t __send_wnd_size = 5;
 static const uint16_t __pend_ack_send = 50;     // 50ms
 static const uint16_t __max_rto_time  = 12000;  // max rto 120s 
 
-CSocket::CSocket(const HudpHandle& handle) : _handle(handle), _pri_queue(new CPriorityQueue) {
+CSocket::CSocket(const HudpHandle& handle) : _pri_queue(new CPriorityQueue), _handle(handle) {
     memset(_inc_id, 0, sizeof(_inc_id));
     memset(_send_wnd, 0, sizeof(_send_wnd));
     memset(_recv_list, 0, sizeof(_recv_list));

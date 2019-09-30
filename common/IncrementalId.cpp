@@ -24,10 +24,10 @@ bool CIncrementalId::IsSmallerThan(const uint16_t& prev, const uint16_t& next) {
 }
 
 bool CIncrementalId::IsBiggerThan(const uint16_t& prev, const uint16_t& next) {
-    if ((prev >= 0 && prev <= __max_compare_num) && next > __max_id - 100) {
+    if (prev <= __max_compare_num && next > (__max_id - 100)) {
         return true;
 
-    } else if ((next >= 0 && next <= __max_compare_num) && prev > __max_id - 100) {
+    } else if (next <= __max_compare_num && prev > (__max_id - 100)) {
         return false;        
 
     } else {

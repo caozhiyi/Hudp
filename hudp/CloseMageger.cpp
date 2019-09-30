@@ -39,7 +39,7 @@ void CCloseManager::StartClose(const HudpHandle& handle) {
     msg->_phase = PP_HEAD_HANDLE;
     socket->SendMsgToPriQueue(msg);
 
-    base::LOG_DEBUG("sclose socket . handle : %s", msg->_ip_port.c_str());
+    base::LOG_DEBUG("close socket . handle : %s", msg->_ip_port.c_str());
 }
 
 void CCloseManager::RecvClose(const HudpHandle& handle) {

@@ -3,8 +3,8 @@
 using namespace hudp;
 
 CSendWnd::CSendWnd(uint16_t send_wnd_size) : _end(nullptr),
-                                             _cur_send_size(0),
-                                             _send_wnd_size(send_wnd_size) {
+                                             _send_wnd_size(send_wnd_size),
+                                             _cur_send_size(0) {
     _start = _end;
     _cur = _end;
 }
@@ -57,7 +57,6 @@ void CSendWnd::PushBack(uint16_t id, CSendWndSolt* data) {
 
 void CSendWnd::AcceptAck(uint16_t id) {
     {
-        
         base::LOG_DEBUG("send wnd recv a ack. id : %d", id);
         std::unique_lock<std::mutex> lock(_mutex);
         auto iter = _id_map.find(id);

@@ -7,9 +7,9 @@
 using namespace hudp;
 
 CBitStream::CBitStream() : _data(nullptr),
-                                   _cur_point(nullptr),
-                                   _length(__mtu),
-                                   _cur_length(0) {
+                           _cur_point(nullptr),
+                           _length(__mtu),
+                           _cur_length(0) {
     _data = new char[__mtu];
     memset(_data, 0, __mtu);
     _cur_point = _data;

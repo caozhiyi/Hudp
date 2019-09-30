@@ -88,7 +88,7 @@ void CTimer::Run() {
                 iter = _timer_map.begin();
                 _time_tool.Now();
                 cur_solt = iter->second;
-                if (iter->first > _time_tool.GetMsec()) {
+                if (iter->first > (uint64_t)_time_tool.GetMsec()) {
                     _wait_time = iter->first - _time_tool.GetMsec();
 
                 } else {
@@ -103,7 +103,7 @@ void CTimer::Run() {
             _time_tool.Now();
             
             // if timer out
-            if (timer_out && cur_solt && cur_solt->_timer_id > 0 && cur_solt->_timer_id <= _time_tool.GetMsec()) {
+            if (timer_out && cur_solt && cur_solt->_timer_id > 0 && cur_solt->_timer_id <= (uint64_t)_time_tool.GetMsec()) {
                 while (cur_solt) {
                     timer_vec.push_back(cur_solt);
                     cur_solt = cur_solt->GetNext();
