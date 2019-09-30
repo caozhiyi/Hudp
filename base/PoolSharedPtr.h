@@ -4,7 +4,7 @@
 #include <functional>
 #include <stddef.h>
 
-#include "MemaryPool.h"
+#include "MemoryPool.h"
 
 namespace base {
 
@@ -16,10 +16,8 @@ namespace base {
 
 
     enum MemoryType {
-        TYPE_NEW = 0x00,
+        TYPE_NEW    = 0x00,
         TYPE_MALLOC = 0x01,
-        TYPE_LARGE = 0x02,
-        TYPE_LARGE_WITH_SIZE = 0x03
     };
 
     template<class Ty>
@@ -59,11 +57,11 @@ namespace base {
     //not useful on gcc.
     //template<typename T>
     //struct has_member_weak_ptr {
-    //	template <typename _T>
-    //	static auto check(_T)->typename std::decay<decltype(_T::_weak_ptr)>::type;
-    //	static void check(...);
-    //	using type = decltype(check(std::declval<T>()));
-    //	enum { value = !std::is_void<type>::value };
+    //    template <typename _T>
+    //    static auto check(_T)->typename std::decay<decltype(_T::_weak_ptr)>::type;
+    //    static void check(...);
+    //    using type = decltype(check(std::declval<T>()));
+    //    enum { value = !std::is_void<type>::value };
     //};
 
     template<class Ty>
@@ -73,7 +71,7 @@ namespace base {
         }
     }
 
-    inline void EnableShared(const volatile void *, const volatile void *, CMemoryPool* pool = nullptr, int size = 0, MemoryType type = TYPE_NEW) {
+    inline void EnableShared(const volatile void *, const volatile void *, CMemoryPool* = nullptr, int = 0, MemoryType = TYPE_NEW) {
 
     }
 
@@ -136,19 +134,19 @@ namespace base {
     template<typename T>
     class CBasePtr {
     public:
-        typedef CBasePtr<T>	 _BasePtr;
+        typedef CBasePtr<T>     _BasePtr;
 
         // construct
         CBasePtr() noexcept : _ptr(nullptr), _ref_count(nullptr), _pool(nullptr) {
             EnableShared(_ptr, _ref_count, _pool);
         }
-        CBasePtr(T* ptr, CRefCount* ref, CMemoryPool* pool, MemoryType type, int large_size = 0) noexcept : _ptr(ptr), _ref_count(ref), _pool(pool), _memory_type(type), _malloc_size(large_size) {
+        CBasePtr(T* ptr, CRefCount* ref, CMemoryPool* pool, MemoryType type, int large_size = 0) noexcept : _ptr(ptr), _ref_count(ref), _pool(pool), _malloc_size(large_size), _memory_type(type) {
             EnableShared(_ptr, _ref_count, _pool, _malloc_size, _memory_type);
         }
 
 
         // construct CBasePtr object that takes resource from _Right
-        CBasePtr(const _BasePtr& r) : _ptr(r._ptr), _ref_count(r._ref_count), _pool(r._pool), _memory_type(r._memory_type), _malloc_size(r._malloc_size) {
+        CBasePtr(const _BasePtr& r) : _ptr(r._ptr), _ref_count(r._ref_count), _pool(r._pool), _malloc_size(r._malloc_size), _memory_type(r._memory_type) {
             if (_ref_count) {
                 _ref_count->IncrefUse();
             }
@@ -359,12 +357,6 @@ namespace base {
                 case TYPE_MALLOC:
                     _pool->PoolFree<T>(_ptr, _malloc_size);
                     break;
-                case TYPE_LARGE:
-                    _pool->PoolLargeFree<T>(_ptr);
-                    break;
-                case TYPE_LARGE_WITH_SIZE:
-                    _pool->PoolLargeFree<T>(_ptr, _malloc_size);
-                    break;
                 case TYPE_NEW:
                     _pool->PoolDelete<T>(_ptr);
                     break;
@@ -381,21 +373,21 @@ namespace base {
         virtual ~CBasePtr() {}
 
     protected:
-        T			*_ptr;			//real data ptr
-        CRefCount	*_ref_count;
-        CMemoryPool	*_pool;			//base memory pool
+        T            *_ptr;            //real data ptr
+        CRefCount    *_ref_count;
+        CMemoryPool  *_pool;            //base memory pool
 
-        int			_malloc_size;	//if malloc large memory from pool. that use to free
-        MemoryType	_memory_type;	//malloc memory type from pool
+        int           _malloc_size;    //if malloc large memory from pool. that use to free
+        MemoryType    _memory_type;    //malloc memory type from pool
 
-        std::mutex	_mutex;
+        std::mutex    _mutex;
     };
 
     // class for reference counted resource management
     template<class T>
     class CMemSharePtr : public CBasePtr<T> {
     public:
-        typedef CBasePtr<T>	 _BasePtr;
+        typedef CBasePtr<T>     _BasePtr;
         // construct
         CMemSharePtr() noexcept : _BasePtr() {}
         CMemSharePtr(nullptr_t) noexcept : _BasePtr() {}
@@ -449,7 +441,7 @@ namespace base {
     template<class T>
     class CMemWeakPtr : public CBasePtr<T> {
     public:
-        typedef CBasePtr<T>	 _BasePtr;
+        typedef CBasePtr<T>     _BasePtr;
         CMemWeakPtr() {
             this->Resetw();
         }
@@ -461,6 +453,18 @@ namespace base {
         // construct CBasePtr object that takes resource from _Right
         CMemWeakPtr<T>& operator=(_BasePtr&& r) {
             _BasePtr::operator=(r);
+            return (*this);
+        }
+
+        // construct CBasePtr object that takes resource from _Right
+        CMemWeakPtr<T>& operator=(CMemSharePtr<T>&& r) {
+            this->Resetw(r);
+            return (*this);
+        }
+
+        // construct CBasePtr object that takes resource from _Right
+        CMemWeakPtr<T>& operator=(CMemWeakPtr<T>&& r) {
+            this->Resetw(r);
             return (*this);
         }
 
@@ -511,21 +515,5 @@ namespace base {
         CRefCount* ref = pool->PoolNew<CRefCount>();
         return CMemSharePtr<T>(o, ref, pool, TYPE_MALLOC, size);
     }
-
-    //malloc large memory from pool
-    template<typename T>
-    CMemSharePtr<T> MakeLargeSharedPtr(CMemoryPool* pool) {
-        T* o = pool->PoolLargeMalloc<T>();
-        CRefCount* ref = pool->PoolNew<CRefCount>();
-        return CMemSharePtr<T>(o, ref, pool, TYPE_LARGE);
-    }
-
-    template<typename T>
-    CMemSharePtr<T> MakeLargeSharedPtr(CMemoryPool* pool, int size) {
-        T* o = pool->PoolLargeMalloc<T>(size);
-        CRefCount* ref = pool->PoolNew<CRefCount>();
-        return CMemSharePtr<T>(o, ref, pool, TYPE_LARGE_WITH_SIZE, size);
-    }
-
 }
 #endif

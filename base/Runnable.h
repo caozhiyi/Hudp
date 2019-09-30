@@ -8,7 +8,7 @@ namespace base {
     class CRunnable
     {
     public:
-        CRunnable() : _stop(false) {}
+        CRunnable() : _stop(true) {}
         virtual ~CRunnable() {}
 
         //base option
@@ -43,8 +43,8 @@ namespace base {
         CRunnable& operator=(const CRunnable&) = delete;
 
     protected:
-        std::atomic_bool				_stop;
-        std::shared_ptr<std::thread>	_pthread;
+        volatile std::atomic_bool       _stop;
+        std::shared_ptr<std::thread>    _pthread;
     };
 }
 #endif

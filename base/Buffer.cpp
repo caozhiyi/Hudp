@@ -1,656 +1,360 @@
-#include <iostream>
 #include "Buffer.h"
-#include "MemaryPool.h"
+#include "MemoryPool.h"
 #include "LoopBuffer.h"
 #include "Log.h"
 
 using namespace base;
-
-CBuffer::CBuffer(std::shared_ptr<CMemoryPool>& pool) : 
-	_pool(pool), 
-	_buffer_num(0),
-	_buffer_start(nullptr),
-	_buffer_read(nullptr),
-	_buffer_write(nullptr) {
+int          _buff_count;
+CLoopBuffer* _buffer_read;
+CLoopBuffer* _buffer_write;
+CLoopBuffer* _buffer_end;
+CBuffer::CBuffer(std::shared_ptr<CMemoryPool>& pool) :
+    _buff_count(0),
+    _buffer_read(nullptr),
+    _buffer_write(nullptr),
+    _buffer_end(nullptr),
+    _pool(pool){
 
 }
 
 CBuffer::~CBuffer() {
-	CLoopBuffer* temp = _buffer_start;
-	while (temp) {
-		_buffer_start = _buffer_start->GetNext();
-		_pool->PoolDelete<CLoopBuffer>(temp);
-		temp = _buffer_start;
-	}
+    CLoopBuffer* temp = _buffer_read;
+    while (temp) {
+        _buffer_read = _buffer_read->GetNext();
+        _pool->PoolDelete<CLoopBuffer>(temp);
+        temp = _buffer_read;
+    }
 }
 
 int CBuffer::ReadNotClear(char* res, int len) {
-	if (!_buffer_read) {
-		return 0;
-	}
+    if (!_buffer_read) {
+        return 0;
+    }
 
-	std::unique_lock<std::mutex> lock(_mutex);
-	int size = 0, current_read_bytes = 0;
-	int left = len;
-	if (*_buffer_read < *_buffer_write) {
-		CLoopBuffer* temp = _buffer_read;
-		while (temp && *temp != *_buffer_write) {
-			current_read_bytes = temp->ReadNotClear(res + size, left);
-			left -= current_read_bytes;
-			size += current_read_bytes;
-			if (size == len) {
-				return size;
-			}
-			temp = temp->GetNext();
-		}
-		size += temp->ReadNotClear(res + size, left);
-
-	} else if (*_buffer_read >= *_buffer_write) {
-		CLoopBuffer* temp = _buffer_read;
-		while (temp && *temp != *_buffer_end) {
-			current_read_bytes = temp->ReadNotClear(res + size, left);
-			left -= current_read_bytes;
-			size += current_read_bytes;
-			if (size == len) {
-				return size;
-			}
-			temp = temp->GetNext();
-		}
-
-		if (temp) {
-			current_read_bytes = temp->ReadNotClear(res + size, left);
-			left -= current_read_bytes;
-			size += current_read_bytes;
-			if (size == len) {
-				return size;
-			}
-		}
-
-		temp = _buffer_start;
-		while (temp && *temp != *_buffer_write) {
-			current_read_bytes = temp->ReadNotClear(res + size, left);
-			left -= current_read_bytes;
-			size += current_read_bytes;
-			if (size == len) {
-				return size;
-			}
-			temp = temp->GetNext();
-		}
-		size += temp->ReadNotClear(res + size, left);
-	}
-	return size;
+    std::unique_lock<std::mutex> lock(_mutex);
+    CLoopBuffer* temp = _buffer_read;
+    int cur_len = 0;
+    while (temp && cur_len < len) {
+        cur_len += temp->ReadNotClear(res, len - cur_len);
+        if (temp == _buffer_write) {
+            break;
+        }
+        temp = temp->GetNext();
+    }
+    return cur_len;
 }
 
 int CBuffer::Read(char* res, int len) {
-	if (!_buffer_read) {
-		return 0;
-	}
+    if (!_buffer_read) {
+        return 0;
+    }
 
-	std::unique_lock<std::mutex> lock(_mutex);
-	if (_buffer_num > __max_node_size) {
-		ReleaseUnuseBuffer();
-	}
+    std::unique_lock<std::mutex> lock(_mutex);
+    CLoopBuffer* temp = _buffer_read;
+    CLoopBuffer* del_temp = nullptr;;
+    int cur_len = 0;
+    while (temp) {
+        cur_len += temp->Read(res, len - cur_len);
+        if (cur_len >= len) {
+            break;
+        }
+        if (temp == _buffer_write) {
+            if (_buffer_write->GetNext()) {
+                _buffer_write = _buffer_write->GetNext();
 
-	int size = 0, current_read_bytes = 0;
-	int left = len;
-	if (*_buffer_read < *_buffer_write) {
-		CLoopBuffer* temp = _buffer_read;
-		while (temp && *temp != *_buffer_write) {
-			current_read_bytes = temp->Read(res + size, left);
-			left -= current_read_bytes;
-			size += current_read_bytes;
-			if (size == len) {
-				_buffer_read = temp;
-				return size;
-			}
-			temp = temp->GetNext();
-		}
-		size += temp->Read(res + size, left);
-		_buffer_read = temp;
-
-	} else if (*_buffer_read >= *_buffer_write) {
-		CLoopBuffer* temp = _buffer_read;
-		while (temp && *temp != *_buffer_end) {
-			current_read_bytes = temp->Read(res + size, left);
-			left -= current_read_bytes;
-			size += current_read_bytes;
-			if (size == len) {
-				_buffer_read = temp;
-				return size;
-			}
-			temp = temp->GetNext();
-		}
-
-		if (temp) {
-			current_read_bytes = temp->Read(res + size, left);
-			left -= current_read_bytes;
-			size += current_read_bytes;
-			if (size == len) {
-				_buffer_read = temp;
-				return size;
-			}
-		}
-
-		temp = _buffer_start;
-		while (temp && *temp != *_buffer_write) {
-			current_read_bytes = temp->Read(res + size, left);
-			left -= current_read_bytes;
-			size += current_read_bytes;
-			if (size == len) {
-				_buffer_read = temp;
-				return size;
-			}
-			temp = temp->GetNext();
-		}
-		size += temp->Read(res + size, left);
-		_buffer_read = temp;
-	}
-	return size;
+            } else {
+                _Reset();
+            }
+        }
+        del_temp = temp;
+        temp = temp->GetNext();
+        _pool->PoolDelete<CLoopBuffer>(del_temp);
+        _buff_count--;
+    }
+    _buffer_read = temp;
+    return cur_len;
 }
 
-int CBuffer::Write(char* str, int len) {
-	int size = 0, current_write_bytes = 0;
-	int left = len;
+int CBuffer::Write(const char* str, int len) {
+    std::unique_lock<std::mutex> lock(_mutex);
+    CLoopBuffer* prv_temp = nullptr;
+    CLoopBuffer* temp = _buffer_write;
+    int cur_len = 0;
+    while (1) {
+        if (temp == nullptr) {
+            temp = _pool->PoolNew<CLoopBuffer>(_pool);
+            _buff_count++;
+            // set buffer end to net node
+            _buffer_end = temp;
+        }
+        if (prv_temp != nullptr) {
+            prv_temp->SetNext(temp);
+        }
 
-	std::unique_lock<std::mutex> lock(_mutex);
-	//first buffer node
-	if (!_buffer_write && !_buffer_read) {
-		try {
-			CLoopBuffer* buffer = _pool->PoolNew<CLoopBuffer>(_pool, left, 1);
-			_buffer_start = _buffer_end = buffer;
-			_buffer_write = buffer;
-			_buffer_read = buffer;
-			_buffer_num++;
+        cur_len += temp->Write(str + cur_len, len - cur_len);
 
-		} catch (std::exception& e) {
-			LOG_FATAL("memory is not enough! %s", e.what());
-			abort();
-		}
-	}
+        // set buffer read to first
+        if (_buffer_read == nullptr) {
+            _buffer_read = temp;
+        }
 
-	if (*_buffer_read <= *_buffer_write) {
-		CLoopBuffer* temp = _buffer_write;
-		while (true) {
-			current_write_bytes = temp->Write(str + size, left);
-			left -= current_write_bytes;
-			size += current_write_bytes;
-			if (size == len) {
-				_buffer_write = temp;
-				return size;
-			}
-			CLoopBuffer* next = temp->GetNext();
-			if (!next || *next == *_buffer_read) {
-				break;
-			}
-			temp = next;
-		}
-		if (temp) {
-			current_write_bytes = temp->Write(str + size, left);
-			left -= current_write_bytes;
-			size += current_write_bytes;
-			if (size == len) {
-				_buffer_write = temp;
-				return size;
-			}
-		}
-		
-		temp = _buffer_start;
-		while (true) {
-			current_write_bytes = temp->Write(str + size, left);
-			left -= current_write_bytes;
-			size += current_write_bytes;
-			if (size == len) {
-				_buffer_write = temp;
-				return size;
-			}
-			CLoopBuffer* next = temp->GetNext();
-			if (!next || *next == *_buffer_read) {
-				break;
-			}
-			temp = next;
-		}
-
-		if (left > 0) {
-			try {
-				CLoopBuffer* buffer = _pool->PoolNew<CLoopBuffer>(_pool, left, temp->GetIndex());
-				buffer->SetNext(temp->GetNext());
-				temp->SetNext(buffer);
-				temp = temp->GetNext();
-				_IncrefIndex(temp);
-				_buffer_num++;
-
-			} catch (std::exception& e) {
-				LOG_FATAL("memory is not enough! %s", e.what());
-				abort();
-			}
-		}
-		size += temp->Write(str + size, left);
-		_buffer_write = temp;
-		_buffer_end = temp;
-
-	} else if (*_buffer_read > *_buffer_write) {
-		CLoopBuffer* temp = _buffer_write;
-		while (true) {
-			current_write_bytes = temp->Write(str + size, left);
-			left -= current_write_bytes;
-			size += current_write_bytes;
-			if (size == len) {
-				_buffer_write = temp;
-				return size;
-			}
-			CLoopBuffer* next = temp->GetNext();
-			if (!next || *next == *_buffer_read) {
-				break;
-			}
-			temp = next;
-		}
-
-		if (left > 0) {
-			try {
-				CLoopBuffer* buffer = _pool->PoolNew<CLoopBuffer>(_pool, left, temp->GetIndex());
-				buffer->SetNext(temp->GetNext());
-				temp->SetNext(buffer);
-				temp = temp->GetNext();
-				_IncrefIndex(temp);
-				_buffer_num++;
-
-			} catch (std::exception& e) {
-				LOG_FATAL("memory is not enough! %s", e.what());
-				abort();
-			}
-		}
-		size += temp->Write(str + size, left);
-		_buffer_write = temp;
-	}
-	return size;
-}
-
-void CBuffer::Clear() {
-	if (!_buffer_start) {
-		return;
-	}
-	std::unique_lock<std::mutex> lock(_mutex);
-	CLoopBuffer* temp = _buffer_start;
-	while (temp && *temp != *_buffer_write) {
-		temp->Clear();
-		temp = temp->GetNext();
-	}
-	temp->Clear();
-	_buffer_read = _buffer_start;
-	_buffer_write = _buffer_start;
+        prv_temp = temp;
+        if (cur_len >= len) {
+            break;
+        }
+        temp = temp->GetNext();
+    }
+    _buffer_write = temp;
+    return cur_len;
 }
 
 void CBuffer::Clear(int len) {
-	if (!_buffer_read) {
-		return;
-	}
+    if (len == 0) {
+        std::unique_lock<std::mutex> lock(_mutex);
+        CLoopBuffer* temp = _buffer_read;
+        CLoopBuffer* cur = nullptr;
+        while (temp) {
+            cur = temp;
+            temp = temp->GetNext();
+            _pool->PoolDelete<CLoopBuffer>(cur);
+            _buff_count--;
+        }
+        _Reset();
+        return;
+    }
+    
+    std::unique_lock<std::mutex> lock(_mutex);
+    CLoopBuffer* temp = _buffer_read;
+    CLoopBuffer* del_temp = nullptr;
+    int cur_len = 0;
+    while (temp) {
+        cur_len += temp->Clear(len - cur_len);
+        if (cur_len >= len) {
+            break;
+        }
+        if (temp == _buffer_write) {
+            if (_buffer_write->GetNext()) {
+                _buffer_write = _buffer_write->GetNext();
 
-	std::unique_lock<std::mutex> lock(_mutex);
-	if (_buffer_num > __max_node_size) {
-		ReleaseUnuseBuffer();
-	}
+            } else {
+                _Reset();
+            }
+        }
+        del_temp = temp;
+        temp = temp->GetNext();
+        _pool->PoolDelete<CLoopBuffer>(del_temp);
+        _buff_count--;
+    }
+    _buffer_read = temp;
+}
 
-	int size = 0, current_read_bytes = 0;
-	int left = len;
-	if (*_buffer_read < *_buffer_write) {
-		CLoopBuffer* temp = _buffer_read;
-		while (temp && *temp != *_buffer_write) {
-			current_read_bytes = temp->Clear(left);
-			left -= current_read_bytes;
-			size += current_read_bytes;
-			if (size == len) {
-				_buffer_read = temp;
-				return;
-			}
-			temp = temp->GetNext();
-		}
-		size += temp->Clear(left);
-		_buffer_read = temp;
-
-	} else if (*_buffer_read >= *_buffer_write) {
-		CLoopBuffer* temp = _buffer_read;
-		while (temp && *temp != *_buffer_end) {
-			current_read_bytes = temp->Clear(left);
-			left -= current_read_bytes;
-			size += current_read_bytes;
-			if (size == len) {
-				_buffer_read = temp;
-				return;
-			}
-			temp = temp->GetNext();
-		}
-
-		if (temp) {
-			current_read_bytes = temp->Clear(left);
-			left -= current_read_bytes;
-			size += current_read_bytes;
-			if (size == len) {
-				_buffer_read = temp;
-				return;
-			}
-		}
-
-		temp = _buffer_start;
-		while (temp && *temp != *_buffer_write) {
-			current_read_bytes = temp->Clear(left);
-			left -= current_read_bytes;
-			size += current_read_bytes;
-			if (size == len) {
-				_buffer_read = temp;
-				return;
-			}
-			temp = temp->GetNext();
-		}
-		size += temp->Clear(left);
-		_buffer_read = temp;
-	}
+int CBuffer::MoveWritePt(int len) {
+    std::unique_lock<std::mutex> lock(_mutex);
+    CLoopBuffer* temp = _buffer_write;
+    int cur_len = 0;
+    while (temp) {
+        cur_len += temp->MoveWritePt(len - cur_len);
+        if (temp == _buffer_end || len <= cur_len) {
+            break;
+        }
+        temp = temp->GetNext();
+    }
+    _buffer_write = temp;
+    return cur_len;
 }
 
 int CBuffer::ReadUntil(char* res, int len) {
-	if (GetCanReadSize() < len) {
-		return 0;
+    if (GetCanReadLength() < len) {
+        return 0;
 
-	} else {
-		return Read(res, len);
-	}
+    } else {
+        return Read(res, len);
+    }
 }
 
 int CBuffer::ReadUntil(char* res, int len, const char* find, int find_len, int& need_len) {
-	int size = FindStr(find, find_len);
-	if (size) {
-		if (size <= len) {
-			return Read(res, size);
+    int size = FindStr(find, find_len);
+    if (size) {
+        if (size <= len) {
+            return Read(res, size);
 
-		} else {
-			need_len = size;
-			return 0;
-		}
-	}
-	
-	return 0;
+        } else {
+            need_len = size;
+            return 0;
+        }
+    }
+    return 0;
 }
 
-int CBuffer::GetFreeSize() const {
-	if (!_buffer_write) {
-		return 0;
-	}
-	
-	int res = 0;
-	if (*_buffer_write >= *_buffer_read) {
-		CLoopBuffer* temp = _buffer_write;
-		while (*temp != *_buffer_end) {
-			res += temp->GetFreeSize();
-			temp = temp->GetNext();
-		}
-		res += temp->GetFreeSize();
-
-		temp = _buffer_start;
-		while (*temp != *_buffer_read) {
-			res += temp->GetFreeSize();
-			temp = temp->GetNext();
-		}
-		res += temp->GetFreeSize();
-		
-	} else if (*_buffer_write < *_buffer_read) {
-		CLoopBuffer* temp = _buffer_write;
-		while (*temp != *_buffer_read) {
-			res += temp->GetFreeSize();
-			temp = temp->GetNext();
-		}
-		res += temp->GetFreeSize();
-
-	}
-	return res;
+int CBuffer::GetFreeLength() {
+    if (!_buffer_write) {
+        return 0;
+    }
+    
+    std::unique_lock<std::mutex> lock(_mutex);
+    CLoopBuffer* temp = _buffer_write;
+    int cur_len = 0;
+    while (temp) {
+        cur_len += temp->GetFreeLength();
+        if (temp == _buffer_end) {
+            break;
+        }
+        temp = temp->GetNext();
+    }
+    return cur_len;
 }
 
-int CBuffer::GetCanReadSize() const {
-	if (!_buffer_read) {
-		return 0;
-	}
+int CBuffer::GetCanReadLength() {
+    if (!_buffer_read) {
+        return 0;
+    }
 
-	int res = 0;
-	if (*_buffer_write > *_buffer_read) {
-		CLoopBuffer* temp = _buffer_read;
-		while (*temp != *_buffer_write) {
-			res += temp->GetCanReadSize();
-			temp = temp->GetNext();
-		}
-		res += temp->GetCanReadSize();
+    std::unique_lock<std::mutex> lock(_mutex);
+    CLoopBuffer* temp = _buffer_read;
+    int cur_len = 0;
+    while (temp) {
+        cur_len += temp->GetCanReadLength();
+        if (temp == _buffer_write) {
+            break;
+        }
+        temp = temp->GetNext();
+    }
+    return cur_len;
+}
 
-	} else if (*_buffer_write <= *_buffer_read) {
-		CLoopBuffer* temp = _buffer_read;
-		while (*temp != *_buffer_end) {
-			res += temp->GetCanReadSize();
-			temp = temp->GetNext();
-		}
-		res += temp->GetCanReadSize();
+int CBuffer::GetFreeMemoryBlock(std::vector<iovec>& block_vec, int size) {
+    void* mem_1 = nullptr;
+    void* mem_2 = nullptr;
+    int mem_len_1 = 0;
+    int mem_len_2 = 0;
 
-		temp = _buffer_start;
-		while (*temp != *_buffer_write) {
-			res += temp->GetCanReadSize();
-			temp = temp->GetNext();
-		}
-		res += temp->GetCanReadSize();
-	}
-	return res;
+    CLoopBuffer* temp = _buffer_write;
+    CLoopBuffer* prv_temp = nullptr;
+    int cur_len = 0;
+    if (size > 0) {
+        std::unique_lock<std::mutex> lock(_mutex);
+        while (cur_len < size) {
+            if (temp == nullptr) {
+                temp = _pool->PoolNew<CLoopBuffer>(_pool);
+                _buff_count++;
+            }
+            if (prv_temp != nullptr) {
+                prv_temp->SetNext(temp);
+            }
+        
+            temp->GetFreeMemoryBlock(mem_1, mem_len_1, mem_2, mem_len_2);
+            if (mem_len_1 > 0) {
+                block_vec.push_back(iovec(mem_1, mem_len_1));
+                cur_len += mem_len_1;
+            }
+            if (mem_len_2 > 0) {
+                block_vec.push_back(iovec(mem_2, mem_len_2));
+                cur_len += mem_len_2;
+            }
+            // set buffer read to first
+            if (_buffer_read == nullptr) {
+                _buffer_read = temp;
+            }
+            // set buffer read to first
+            if (_buffer_write == nullptr) {
+                _buffer_write = temp;
+            }
+            prv_temp = temp;
+            temp = temp->GetNext();
+        }
+        _buffer_end = prv_temp;
+
+    } else {
+        std::unique_lock<std::mutex> lock(_mutex);
+        while (temp) {
+            temp->GetFreeMemoryBlock(mem_1, mem_len_1, mem_2, mem_len_2);
+            if (mem_len_1 > 0) {
+                block_vec.push_back(iovec(mem_1, mem_len_1));
+                cur_len += mem_len_1;
+            }
+            if (mem_len_2 > 0) {
+                block_vec.push_back(iovec(mem_2, mem_len_2));
+                cur_len += mem_len_2;
+            }
+            if (temp == _buffer_end) {
+                break;
+            }
+            temp = temp->GetNext();
+        }
+    }
+    return cur_len;
+}
+
+int CBuffer::GetUseMemoryBlock(std::vector<iovec>& block_vec, int max_size) {
+    void* mem_1 = nullptr;
+    void* mem_2 = nullptr;
+    int mem_len_1 = 0;
+    int mem_len_2 = 0;
+
+    std::unique_lock<std::mutex> lock(_mutex);
+    CLoopBuffer* temp = _buffer_read;
+    int cur_len = 0;
+    while (temp) {
+        temp->GetUseMemoryBlock(mem_1, mem_len_1, mem_2, mem_len_2);
+        if (mem_len_1 > 0) {
+            block_vec.push_back(iovec(mem_1, mem_len_1));
+            cur_len += mem_len_1;
+        }
+        if (mem_len_2 > 0) {
+            block_vec.push_back(iovec(mem_2, mem_len_2));
+            cur_len += mem_len_2;
+        }
+        if (temp == _buffer_write) {
+            break;
+        }
+        if (cur_len >= max_size) {
+            break;
+        }
+        temp = temp->GetNext();
+    }
+    return cur_len;
 }
 
 int CBuffer::FindStr(const char* s, int s_len) const {
-	if (!_buffer_read) {
-		return 0;
-	}
+    if (!_buffer_read) {
+        return 0;
+    }
 
-	if (*_buffer_write > *_buffer_read) {
-		int res_len = 0;
-		int can_read_bytes = 0;
-		bool find = false;
-
-		CLoopBuffer* temp = _buffer_read;
-		while (*temp != *_buffer_write) {
-			can_read_bytes = temp->FindStr(s, s_len);
-			if (can_read_bytes) {
-				res_len += can_read_bytes;
-				find = true;
-				break;
-			
-			} else {
-				res_len += temp->GetCanReadSize();
-			}
-		}
-		if (!find) {
-			can_read_bytes = temp->FindStr(s, s_len);
-			if (can_read_bytes) {
-				res_len += can_read_bytes;
-				find = true;
-			}
-		}
-		
-		if (find) {
-			return res_len;
-		}
-		return 0;
-
-	} else if (_buffer_write < _buffer_read) {
-		int res_len = 0;
-		int can_read_bytes = 0;
-		bool find = false;
-
-		CLoopBuffer* temp = _buffer_read;
-		while (*temp != *_buffer_end && !find) {
-			can_read_bytes = temp->FindStr(s, s_len);
-			if (can_read_bytes) {
-				res_len += can_read_bytes;
-				find = true;
-				break;
-
-			} else {
-				res_len += temp->GetCanReadSize();
-			}
-		}
-		if (!find) {
-			can_read_bytes = temp->FindStr(s, s_len);
-			if (can_read_bytes) {
-				res_len += can_read_bytes;
-				find = true;
-			}
-		}
-
-		temp = _buffer_start;
-		while (*temp != *_buffer_write && !find) {
-			can_read_bytes = temp->FindStr(s, s_len);
-			if (can_read_bytes) {
-				res_len += can_read_bytes;
-				find = true;
-				break;
-
-			} else {
-				res_len += temp->GetCanReadSize();
-			}
-		}
-		if (!find) {
-			can_read_bytes = temp->FindStr(s, s_len);
-			if (can_read_bytes) {
-				res_len += can_read_bytes;
-				find = true;
-			}
-		}
-
-		if (find) {
-			return res_len;
-		}
-		return 0;
-
-	} else {
-
-		return _buffer_read->FindStr(s, s_len);
-	}
+    CLoopBuffer* temp = _buffer_read;
+    int cur_len = 0;
+    int can_read_bytes = 0;
+    while (temp) {
+        can_read_bytes = temp->FindStr(s, s_len);
+        if (can_read_bytes > 0) {
+            cur_len += can_read_bytes;
+            break;
+        }
+        if (temp == _buffer_write) {
+            break;
+        }
+        cur_len += temp->GetCanReadLength();
+        temp = temp->GetNext();
+    }
+    return cur_len;
 }
 
-void CBuffer::ReleaseUnuseBuffer() {
-	if (!_buffer_start) {
-		return;
-	}
-	std::unique_lock<std::mutex> lock(_mutex);
-	if (*_buffer_read <= *_buffer_write) {
-		CLoopBuffer* temp = _buffer_write->GetNext();
-		while (temp && temp->CheckUnused() && temp != _buffer_end) {
-			_buffer_write->SetNext(temp->GetNext());
-			_pool->PoolDelete<CLoopBuffer>(temp);
-			_buffer_num--;
-			temp = _buffer_write->GetNext();
-		}
-
-		temp = _buffer_start->GetNext();
-		while (temp && temp->CheckUnused() && *temp < *_buffer_read) {
-			_buffer_start->SetNext(temp->GetNext());
-			_pool->PoolDelete<CLoopBuffer>(temp);
-			_buffer_num--;
-			temp = _buffer_start->GetNext();
-		}
-
-	} else if (*_buffer_read > *_buffer_write) {
-		CLoopBuffer* temp = _buffer_write->GetNext();
-		while (temp && temp->CheckUnused() && *temp != *_buffer_read) {
-			_buffer_write->SetNext(temp->GetNext());
-			_pool->PoolDelete<CLoopBuffer>(temp);
-			_buffer_num--;
-			temp = _buffer_write->GetNext();
-			_buffer_write = temp;
-		}
-	}
+void CBuffer::_Reset() {
+    _buffer_end = nullptr;
+    _buffer_read = nullptr;
+    _buffer_write = nullptr; 
 }
 
-std::vector<CLoopBuffer*> CBuffer::GetMaxCatch(int size) {
-	std::vector<CLoopBuffer*> res;
-	return res;
-}
-
-std::vector<CLoopBuffer*> CBuffer::GetReadBuffer() {
-	std::vector<CLoopBuffer*> res;
-	if (!_buffer_read) {
-		return res;
-	}
-	std::unique_lock<std::mutex> lock(_mutex);
-	if (*_buffer_read < *_buffer_write) {
-		CLoopBuffer* temp = _buffer_read;
-		while (temp && *temp != *_buffer_write) {
-			res.push_back(temp);
-			temp = temp->GetNext();
-		}
-		if (temp->GetCanReadSize()) {
-			res.push_back(temp);
-		}
-
-	} else if (*_buffer_read >= *_buffer_write) {
-		CLoopBuffer* temp = _buffer_read;
-		while (temp && *temp != *_buffer_end) {
-			res.push_back(temp);
-			temp = temp->GetNext();
-		}
-
-		if (temp->GetCanReadSize()) {
-			res.push_back(temp);
-		}
-
-		temp = _buffer_start;
-		while (temp && *temp != *_buffer_write) {
-			res.push_back(temp);
-			temp = temp->GetNext();
-		}
-		if (temp->GetCanReadSize()) {
-			res.push_back(temp);
-		}
-	}
-	return res;
-}
-
-std::ostream& operator<< (std::ostream &out, const CBuffer &obj) {
-	if (!obj._buffer_start) {
-		return out;
-	}
-
-	if (*obj._buffer_read < *obj._buffer_write) {
-		CLoopBuffer* temp = obj._buffer_read;
-		while (temp && *temp != *obj._buffer_write) {
-			out << *temp;
-		}
-		if (temp->GetCanReadSize()) {
-			out << *temp;
-		}
-
-	} else if (*obj._buffer_read >= *obj._buffer_write) {
-		CLoopBuffer* temp = obj._buffer_read;
-		while (temp && *temp != *obj._buffer_end) {
-			out << *temp;
-		}
-
-		if (temp->GetCanReadSize()) {
-			out << *temp;
-		}
-
-		temp = obj._buffer_start;
-		while (temp && *temp != *obj._buffer_write) {
-			out << *temp;
-		}
-		if (temp->GetCanReadSize() && *temp != *obj._buffer_start) {
-			out << *temp;
-		}
-	}
-	return out;
-}
-
-void CBuffer::_IncrefIndex(CLoopBuffer* start) {
-	CLoopBuffer* temp = start;
-	while (temp) {
-		temp->IncrefIndex();
-		temp = temp->GetNext();
-	}
-}
-
-void CBuffer::_DecrefIndex(CLoopBuffer* start) {
-	CLoopBuffer* temp = start;
-	while (temp) {
-		temp->DecrefIndex();
-		temp = temp->GetNext();
-	}
+std::ostream& base::operator<< (std::ostream &out, const CBuffer &obj) {
+    if (!obj._buffer_read) {
+        return out;
+    }
+    CLoopBuffer* temp = obj._buffer_read;
+    while (temp) {
+        out << *temp;
+        if (temp == obj._buffer_write) {
+            break;
+        }
+        temp = temp->GetNext();
+    }
+    return out;
 }
