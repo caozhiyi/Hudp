@@ -23,7 +23,7 @@ namespace base {
         void Push(const T& element) {
             std::unique_lock<std::mutex> lock(_block_mutex);
             _full_notify.wait(_block_mutex, [this]() {return this->_block_queue.size() < this->_list_size; });
-            _block_queue.push_front(element);
+            _block_queue.push_back(element);
             _empty_notify.notify_all();
         }
 
