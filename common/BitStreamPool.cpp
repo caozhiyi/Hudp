@@ -16,7 +16,7 @@ CBitStreamPool::~CBitStreamPool() {
 
 void CBitStreamPool::ExpendFree() {
     CBitStream* bit_stream;
-    for (size_t i = 0; i < __init_pool_size; i++) {
+    for (size_t i = 0; i < __expand_pool_size; i++) {
         bit_stream = new CBitStream();
         _free_queue.Push(bit_stream);
     }

@@ -98,10 +98,9 @@ void CTimer::Run() {
             }
             if (_wait_time > 0) {
                 timer_out = _notify.wait_for(lock, std::chrono::milliseconds(_wait_time)) == std::cv_status::timeout;
+                 _time_tool.Now();
             }
 
-            _time_tool.Now();
-            
             // if timer out
             if (timer_out && cur_solt && cur_solt->_timer_id > 0 && cur_solt->_timer_id <= (uint64_t)_time_tool.GetMsec()) {
                 while (cur_solt) {
@@ -110,6 +109,7 @@ void CTimer::Run() {
                 }
                 _timer_map.erase(iter);
 
+            // timer is removed
             } else if (timer_out && cur_solt && cur_solt->_timer_id == 0 && iter != _timer_map.end()) {
                 _timer_map.erase(iter);
             }

@@ -9,7 +9,7 @@
 namespace hudp {
     
     // pool size at initialization.
-    static const uint16_t __init_pool_size = 200;
+    static const uint16_t __expand_pool_size = 100;
     class CBitStreamPool : public base::CSingle<CBitStreamPool> {
     public:    
         CBitStreamPool();

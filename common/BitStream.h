@@ -11,20 +11,23 @@ namespace hudp {
     static const bool     __must_less_mtu  = false;
     static const uint16_t __max_length     = (uint16_t)0xFFFF;
 
-    // only can read or write once
-    class CBitStream : public base::CSingle<CBitStream> {
+    // only can read or write
+    class CBitStream {
     public:
         CBitStream();
         virtual ~CBitStream();
 
-        // get length interface
-        uint16_t GetTotalLength() const;
-        uint16_t GetCurrentLength() const;
+        // get all cache length
+        uint16_t GetTotalLength();
+        // get current data length
+        uint16_t GetCurrentLength();
 
-        // set init data 
+        // set init data, only copy data to cache.
+        // only can be called once
         bool Init(const char* value, uint16_t len);
 
-        const char* GetDataPoint() const;
+        // get source point to data
+        const char* GetDataPoint();
 
         void Clear();
         
@@ -64,7 +67,7 @@ namespace hudp {
         bool Write(const T& value);
         bool Write(const char* value, uint16_t len);
         bool Write(const std::string& value);
-        bool Write(const CBitStreamWriter& value);
+        bool Write(CBitStreamWriter& value);
     };
 
     template<typename T>

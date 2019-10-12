@@ -1,4 +1,3 @@
-#include <cstring>		//for memset
 #include "SocketManager.h"
 #include "NetMsg.h"
 #include "Socket.h"

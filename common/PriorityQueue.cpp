@@ -9,7 +9,6 @@ CPriorityQueue::CPriorityQueue() : _size(0),
                                    _pri_heig_count(__pri_surplus),
                                    _pri_heighest_count(__pri_surplus) {
 
-    _cur_queue = &_queue_arr[__pri_heighest];
 }
 
 CPriorityQueue::~CPriorityQueue() {

@@ -19,7 +19,7 @@ namespace hudp {
         // add a item to order list
         virtual uint16_t Insert(uint16_t id, COrderListSolt* ol) = 0;
 
-        // make id little than order list size
+        // make id little than order list max size
         uint16_t HashFunc(uint16_t id);
     };
 

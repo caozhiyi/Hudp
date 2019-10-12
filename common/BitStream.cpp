@@ -16,16 +16,19 @@ CBitStream::CBitStream() : _data(nullptr),
 }
 
 CBitStream::~CBitStream() {
+    std::unique_lock<std::mutex> lock(_mutex);
     if (_data) {
         delete _data;
     }
 }
 
-uint16_t CBitStream::GetTotalLength() const {
+uint16_t CBitStream::GetTotalLength() {
+    std::unique_lock<std::mutex> lock(_mutex);
     return _length;
 }
 
-uint16_t CBitStream::GetCurrentLength() const {
+uint16_t CBitStream::GetCurrentLength() {
+    std::unique_lock<std::mutex> lock(_mutex);
     return _cur_length;
 }
 
@@ -40,7 +43,8 @@ bool CBitStream::Init(const char* value, uint16_t len) {
     return true;
 }
 
-const char* CBitStream::GetDataPoint() const {
+const char* CBitStream::GetDataPoint() {
+    std::unique_lock<std::mutex> lock(_mutex);
     return _data;
 }
 
@@ -68,7 +72,7 @@ bool CBitStream::CheckBufferExpend(uint16_t len) {
         char* temp_data = new char[_length];
         memset(temp_data, 0, _length);
         memcpy(temp_data, _data, _cur_length);
-        delete _data;
+        delete []_data;
         _data = temp_data;
     }
     return true;
@@ -100,7 +104,7 @@ bool CBitStreamWriter::Write(const std::string& value) {
     return true;
 }
 
-bool CBitStreamWriter::Write(const CBitStreamWriter& value) {
+bool CBitStreamWriter::Write(CBitStreamWriter& value) {
     uint16_t len = value.GetCurrentLength();
     if (!CheckBufferExpend(len)) {
         return false;

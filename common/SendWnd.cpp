@@ -77,7 +77,7 @@ void CSendWnd::AcceptAck(uint16_t id) {
             }
 
         } else {
-            // remove fron list
+            // remove from list
             iter->second->_next->_prev = iter->second->_prev;
             iter->second->_prev->_next = iter->second->_next;
         }

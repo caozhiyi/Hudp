@@ -12,7 +12,7 @@ namespace hudp {
         ret.first = atoi(ip_port.substr(pos + 1, ip_port.length()).c_str());
         ret.second = ip_port.substr(0, pos);
 
-        return ret;
+        return std::move(ret);
     }
 
 }

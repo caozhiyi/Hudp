@@ -39,7 +39,6 @@ namespace hudp {
         
     private:
         base::CTSQueue<NetMsg*>     _queue_arr[__pri_queue_size];
-        base::CTSQueue<NetMsg*>*    _cur_queue;
 
         std::mutex				    _mutex;
         std::condition_variable_any	_notify;
