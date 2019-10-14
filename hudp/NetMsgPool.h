@@ -1,5 +1,5 @@
-#ifndef HEADER_COMMON_CNETMSGPOOL
-#define HEADER_COMMON_CNETMSGPOOL
+#ifndef HEADER_HUDP_CNETMSGPOOL
+#define HEADER_HUDP_CNETMSGPOOL
 
 #include "CommonFlag.h"
 #include "CommonType.h"

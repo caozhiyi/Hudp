@@ -1,5 +1,5 @@
-#ifndef HEADER_COMMON_FUNCTIONNETMSG
-#define HEADER_COMMON_FUNCTIONNETMSG
+#ifndef HEADER_HUDP_FUNCTIONNETMSG
+#define HEADER_HUDP_FUNCTIONNETMSG
 
 #include "TimerSolt.h"
 #include "OrderListSolt.h"

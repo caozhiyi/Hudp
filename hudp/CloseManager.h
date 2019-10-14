@@ -1,5 +1,5 @@
-#ifndef HEADER_NET_CLOSEMANAGER
-#define HEADER_NET_CLOSEMANAGER
+#ifndef HEADER_HUDP_CLOSEMANAGER
+#define HEADER_HUDP_CLOSEMANAGER
 
 #include "CommonFlag.h"
 #include "Single.h"

@@ -1,5 +1,5 @@
-#ifndef HEADER_NET_HUDPIMPL
-#define HEADER_NET_HUDPIMPL
+#ifndef HEADER_HUDP_HUDPIMPL
+#define HEADER_HUDP_HUDPIMPL
 
 #include <functional>
 #include "Single.h"
