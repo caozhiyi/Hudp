@@ -6,9 +6,7 @@
 
 using namespace hudp;
 
-#define EMPTY_WAIT  60000 // timer is empty. wait 1 min 
-
-CTimer::CTimer() : _wait_time(EMPTY_WAIT) {
+CTimer::CTimer() : _wait_time(__timer_empty_wait) {
     
 }
 
@@ -82,7 +80,7 @@ void CTimer::Run() {
             timer_out = false;
             std::unique_lock<std::mutex> lock(_mutex);
             if (_timer_map.empty()) {
-                _wait_time = EMPTY_WAIT;
+                _wait_time = __timer_empty_wait;
 
             } else {
                 iter = _timer_map.begin();

@@ -6,6 +6,7 @@
 namespace hudp {
 
     class CBitStream;
+
     // protocol resolution
     class CRelialeOrderlyFilter : public CFilterInterface {
     public:

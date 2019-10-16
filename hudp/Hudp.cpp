@@ -1,8 +1,8 @@
 #include "Hudp.h"
 #include "HudpImpl.h"
 
-void hudp::Init(bool log) {
-    CHudpImpl::Instance().Init(log);
+void hudp::Init() {
+    CHudpImpl::Instance().Init();
 }
 
 bool hudp::Start(uint16_t port, const recv_back& func) {

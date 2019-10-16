@@ -16,13 +16,12 @@
 #include "Log.h"
 #include "FunctionNetMsg.h"
 #include "Serializes.h"
+#include "HudpConfig.h"
 
 using namespace hudp;
 
 // this size may be a dynamic algorithm control
 static const uint16_t __send_wnd_size = 5;
-static const uint16_t __pend_ack_send = 50;     // 50ms
-static const uint16_t __max_rto_time  = 12000;  // max rto 120s 
 
 CSocket::CSocket(const HudpHandle& handle) : _pri_queue(new CPriorityQueue), _handle(handle) {
     memset(_inc_id, 0, sizeof(_inc_id));

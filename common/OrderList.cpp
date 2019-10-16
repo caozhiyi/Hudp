@@ -1,9 +1,8 @@
 #include <cstring>		//for memset
 #include "OrderList.h"
 #include "NetMsgPool.h"
+#include "HudpConfig.h"
 using namespace hudp;
-
-static const uint16_t __msx_cache_msg_num = 100;
 
 CRecvList::CRecvList() {
     

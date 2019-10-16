@@ -7,6 +7,8 @@
 
 #include "CommonType.h"
 #include "CommonFlag.h"
+#include "HudpConfig.h"
+
 namespace hudp {
 
     class Head {
@@ -36,8 +38,7 @@ namespace hudp {
         }
     };
     
-    // this size better less than mtu
-    static const uint16_t __body_size = __mtu;
+
 
     class CBitStream;
     class CSocket;
@@ -45,7 +46,7 @@ namespace hudp {
     public:
         // only head and body will be serialized
         Head        _head;                     // head msg. set by hudp
-        char        _body[__body_size];        // body msg. set by user
+        char        _body[__msg_body_size];    // body msg. set by user
 
         // other 
         std::string   _ip_port;
@@ -64,7 +65,7 @@ namespace hudp {
                    _re_send(false),
                    _flag(false),
                    _use(true) {
-            memset(_body, 0, __body_size);
+            memset(_body, 0, __msg_body_size);
         }
 
         virtual ~NetMsg() {}
@@ -74,7 +75,7 @@ namespace hudp {
             _flag = false;
             _ip_port.clear();
             _head.Clear();
-            memset(_body, 0, __body_size);
+            memset(_body, 0, __msg_body_size);
             _socket.reset();
             _bit_stream = nullptr;
             _use = false;

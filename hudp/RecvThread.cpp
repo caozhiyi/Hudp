@@ -5,10 +5,9 @@
 #include "OsNet.h"
 #include "Log.h"
 #include "HudpImpl.h"
+#include "HudpConfig.h"
 
 using namespace hudp;
-
-static const uint16_t __recv_buf_size = 2048;
 
 CRecvThread::CRecvThread() : _recv_socket(0) {
 
@@ -32,7 +31,7 @@ void CRecvThread::Run() {
         return;
     }
 
-    char buf[__recv_buf_size] = {0};
+    char buf[__recv_buf_size];
     std::string ip;
     uint16_t port = 0;
     int ret = 0;

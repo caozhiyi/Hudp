@@ -14,12 +14,13 @@
 namespace hudp {
 
     class NetMsg;
+
     class CHudpImpl : public base::CSingle<CHudpImpl> {
     public:
         CHudpImpl();
         ~CHudpImpl();
         // init library
-        void Init(bool log = false);
+        void Init();
         // start thread and recv
         bool Start(uint16_t port, const recv_back& func);
         bool Start(const std::string& ip, uint16_t port, const recv_back& func);

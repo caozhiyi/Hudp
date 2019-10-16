@@ -9,8 +9,6 @@
 #include "Serializes.h"
 #include "Log.h"
 
-static const uint16_t __two_msl_time = 30000; // 15s
-
 using namespace hudp;
 
 CCloseManager::CCloseManager() {

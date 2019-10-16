@@ -1,4 +1,5 @@
 #include "BitStreamPool.h"
+#include "HudpConfig.h"
 using namespace hudp;
 
 CBitStreamPool::CBitStreamPool() {
@@ -16,7 +17,7 @@ CBitStreamPool::~CBitStreamPool() {
 
 void CBitStreamPool::ExpendFree() {
     CBitStream* bit_stream;
-    for (size_t i = 0; i < __expand_pool_size; i++) {
+    for (size_t i = 0; i < _stream_pool_expand_size; i++) {
         bit_stream = new CBitStream();
         _free_queue.Push(bit_stream);
     }

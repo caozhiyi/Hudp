@@ -47,8 +47,5 @@ namespace hudp {
         // close ack
         HPF_CLOSE_ACK                  = 0x2000,
     };
-
-    const uint16_t __mtu = 400;
-
 }
 #endif

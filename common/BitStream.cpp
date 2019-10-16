@@ -3,6 +3,7 @@
 #include "NetMsg.h"
 #include "CommonFlag.h"
 #include "Log.h"
+#include "HudpConfig.h"
 
 using namespace hudp;
 

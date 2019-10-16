@@ -6,7 +6,7 @@
 namespace hudp {
 
     // init library
-    void Init(bool log = false);
+    void Init();
     
     // start thread and recv with port and
     // the first IP on a network card that is not a loopback

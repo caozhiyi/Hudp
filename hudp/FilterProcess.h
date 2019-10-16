@@ -9,6 +9,7 @@ namespace hudp {
 
     class NetMsg;
     class CFilterInterface;
+
     class CFilterProcess : public base::CSingle<CFilterProcess> {
     public:
         CFilterProcess() {}

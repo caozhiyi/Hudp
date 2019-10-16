@@ -2,6 +2,7 @@
 #include "CommonFlag.h"
 #include "Log.h"
 #include "NetMsgPool.h"
+#include "HudpConfig.h"
 using namespace hudp;
 
 CPriorityQueue::CPriorityQueue() : _size(0),

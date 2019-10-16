@@ -4,6 +4,7 @@
 #include "CommonType.h"
 
 namespace hudp {
+
     class CBitStreamWriter;
     class CBitStreamReader;
     class NetMsg;

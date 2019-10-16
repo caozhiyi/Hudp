@@ -6,10 +6,8 @@
 #include <string.h> // for memset
 #include "CommonType.h"
 #include "Single.h"
-namespace hudp {
 
-    static const bool     __must_less_mtu  = false;
-    static const uint16_t __max_length     = (uint16_t)0xFFFF;
+namespace hudp {
 
     // only can read or write
     class CBitStream {

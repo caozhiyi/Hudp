@@ -13,8 +13,6 @@ namespace hudp {
     
     // we have four priority level
     static const uint16_t __pri_queue_size = 4;
-    // send __pri_surplus high-level packages and one low-level package when busy
-    static const uint8_t  __pri_surplus    = 2;
 
     static const uint16_t __pri_low        = 3;
     static const uint16_t __pri_normal     = 2;

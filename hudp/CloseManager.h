@@ -8,6 +8,7 @@ namespace hudp {
 
     class CSocket;
     class NetMsg;
+
     class CCloseManager : public base::CSingle<CCloseManager> {
     public:
         CCloseManager();

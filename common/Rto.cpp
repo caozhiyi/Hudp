@@ -1,12 +1,10 @@
 #include "Rto.h"
 #include "Log.h"
+#include "HudpConfig.h"
 using namespace hudp;
 
 #define G(x) ((x)>>3)   // 1/8
 #define H(x) ((x)>>2)   // 1/4
-
-static const uint32_t __init_mdev_max = 15;     // 15ms. so min rto = 60ms
-static const uint32_t __init_cur_rto  = 1000;   // 1000ms.
 
 CRto::CRto() : _srtt(0),
                _mdev(__init_mdev_max),

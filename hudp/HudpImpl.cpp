@@ -7,6 +7,7 @@
 #include "Socket.h"
 #include "FilterProcess.h"
 #include "CloseManager.h"
+#include "HudpConfig.h"
 
 using namespace hudp;
 
@@ -23,16 +24,16 @@ CHudpImpl::~CHudpImpl() {
     CTimer::Instance().Stop();
 }
 
-void CHudpImpl::Init(bool log) {
+void CHudpImpl::Init() {
     static bool init_once = true; 
     if (init_once) {
         COsNet::Init();
 
         CFilterProcess::Instance().Init();
 
-        if (log) {
-            base::CLog::Instance().SetLogName("hudp.log");
-            base::CLog::Instance().SetLogLevel(base::LOG_DEBUG_LEVEL);
+        if (__open_log) {
+            base::CLog::Instance().SetLogName(__log_file_name);
+            base::CLog::Instance().SetLogLevel(__log_level);
             base::CLog::Instance().Start();
         }
         
@@ -80,7 +81,7 @@ void CHudpImpl::SendTo(const HudpHandle& handle, uint16_t flag, const std::strin
 }
 
 void CHudpImpl::SendTo(const HudpHandle& handle, uint16_t flag, const char* msg, uint16_t len) {
-    if (len > __body_size) {
+    if (len > __msg_body_size) {
         base::LOG_ERROR("msg size is bigger than msg bosy size.");
         return;
     }

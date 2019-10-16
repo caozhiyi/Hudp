@@ -3,12 +3,12 @@
 
 #include <string>
 #include <vector>
-
 #include "CommonFlag.h"
 
 namespace hudp {
 
     class NetMsg;
+
     class CFilterInterface {
     public:
         CFilterInterface(uint8_t phase);

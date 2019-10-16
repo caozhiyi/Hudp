@@ -11,7 +11,7 @@ void RecvFunc(const hudp::HudpHandle& handlle, const char* msg, uint16_t len) {
 }
 
 void UtestHudpServer() {
-    hudp::Init(true);
+    hudp::Init();
     hudp::Start("127.0.0.1", 8012, RecvFunc);
 
     //base::CRunnable::Sleep(3000);

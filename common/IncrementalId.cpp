@@ -1,5 +1,8 @@
 #include "IncrementalId.h"
+#include "HudpConfig.h"
 using namespace hudp;
+
+static const uint16_t __max_id = (uint16_t)0xFFFF;
 
 CIncrementalId::CIncrementalId() : _cur_id(0){
 
