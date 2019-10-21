@@ -144,7 +144,7 @@ std::string COsNet::GetOsIp(bool is_ipv4) {
     sinp6 = (struct sockaddr_in6 *)into_list->ai_addr;
     for (int i = 0; i < 16; i++) {
         if (((i - 1) % 2) && (i > 0)) {
-            sprintf(ipv6 + cur_len, ":", sinp6->sin6_addr.u.Byte[i]);
+            sprintf(ipv6 + cur_len, ":%02x", sinp6->sin6_addr.u.Byte[i]);
             cur_len++;
         }
 

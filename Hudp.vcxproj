@@ -126,11 +126,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="base\BlockMemoryPool.cpp" />
     <ClCompile Include="base\Buffer.cpp" />
     <ClCompile Include="base\config.cpp" />
     <ClCompile Include="base\Log.cpp" />
     <ClCompile Include="base\LoopBuffer.cpp" />
-    <ClCompile Include="base\MemaryPool.cpp" />
+    <ClCompile Include="base\MemoryPool.cpp" />
     <ClCompile Include="base\TimeTool.cpp" />
     <ClCompile Include="common\BitStream.cpp" />
     <ClCompile Include="common\BitStreamPool.cpp" />
@@ -170,11 +171,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="base\Any.h" />
+    <ClInclude Include="base\BlockMemoryPool.h" />
     <ClInclude Include="base\Buffer.h" />
     <ClInclude Include="base\config.h" />
     <ClInclude Include="base\Log.h" />
     <ClInclude Include="base\LoopBuffer.h" />
-    <ClInclude Include="base\MemaryPool.h" />
+    <ClInclude Include="base\MemoryPool.h" />
     <ClInclude Include="base\PoolSharedPtr.h" />
     <ClInclude Include="base\Runnable.h" />
     <ClInclude Include="base\RunnableAloneTaskList.h" />

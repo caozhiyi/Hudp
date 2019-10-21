@@ -68,7 +68,7 @@ SendTo接口发送消息到对端，HudpHandle实际上是ip+port的字符串表
 
 ## 实例
 
-请看[HudpClient](/HudpClient/HudpClient.cpp)和[HudpServer](/HudpServer/HudpServer.cpp)。   
+请看[HudpClient](/test/example/HudpClient.cpp)和[HudpServer](/test/example/HudpServer.cpp)。   
 但不要误解server和client的名字，其实对于Hudp来讲两端相同，只要调用了Start接口就有了接收消息的能力。
 
 ## 编译(Windows)

@@ -45,9 +45,6 @@
     <ClCompile Include="base\LoopBuffer.cpp">
       <Filter>base</Filter>
     </ClCompile>
-    <ClCompile Include="base\MemaryPool.cpp">
-      <Filter>base</Filter>
-    </ClCompile>
     <ClCompile Include="base\TimeTool.cpp">
       <Filter>base</Filter>
     </ClCompile>
@@ -153,6 +150,12 @@
     <ClCompile Include="hudp\CloseMageger.cpp">
       <Filter>hudp</Filter>
     </ClCompile>
+    <ClCompile Include="base\MemoryPool.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
+    <ClCompile Include="base\BlockMemoryPool.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="base\Any.h">
@@ -168,9 +171,6 @@
       <Filter>base</Filter>
     </ClInclude>
     <ClInclude Include="base\LoopBuffer.h">
-      <Filter>base</Filter>
-    </ClInclude>
-    <ClInclude Include="base\MemaryPool.h">
       <Filter>base</Filter>
     </ClInclude>
     <ClInclude Include="base\PoolSharedPtr.h">
@@ -301,6 +301,12 @@
     </ClInclude>
     <ClInclude Include="hudp\CloseManager.h">
       <Filter>hudp</Filter>
+    </ClInclude>
+    <ClInclude Include="base\MemoryPool.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="base\BlockMemoryPool.h">
+      <Filter>base</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

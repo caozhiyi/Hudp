@@ -70,7 +70,7 @@ The SendTo interface sends messages to the remote. Flag parameters can control t
 
 ## Example
 
-See [HudpClient](/HudpClient/HudpClient.cpp) and [HudpServer](/HudpServer/HudpServer.cpp).   
+See [HudpClient](/test/example/HudpClient.cpp) and [HudpServer](/test/example/HudpServer.cpp).   
 But don't misunderstand the names of server and client. In fact, for Hudp, the two ends are the same, as long as the Start interface is called, it has the ability to receive messages.   
 
 ## Build(Windows)
