@@ -156,6 +156,9 @@
     <ClCompile Include="base\BlockMemoryPool.cpp">
       <Filter>base</Filter>
     </ClCompile>
+    <ClCompile Include="common\NetHeader.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="base\Any.h">
@@ -307,6 +310,9 @@
     </ClInclude>
     <ClInclude Include="base\BlockMemoryPool.h">
       <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="common\NetHeader.h">
+      <Filter>common</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

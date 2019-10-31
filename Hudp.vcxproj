@@ -137,6 +137,7 @@
     <ClCompile Include="common\BitStreamPool.cpp" />
     <ClCompile Include="common\CommonFunc.cpp" />
     <ClCompile Include="common\IncrementalId.cpp" />
+    <ClCompile Include="common\NetHeader.cpp" />
     <ClCompile Include="common\OrderList.cpp" />
     <ClCompile Include="common\PendAck.cpp" />
     <ClCompile Include="common\PriorityQueue.cpp" />
@@ -191,6 +192,7 @@
     <ClInclude Include="common\CommonFlag.h" />
     <ClInclude Include="common\CommonType.h" />
     <ClInclude Include="common\IncrementalId.h" />
+    <ClInclude Include="common\NetHeader.h" />
     <ClInclude Include="common\NetMsg.h" />
     <ClInclude Include="common\OrderList.h" />
     <ClInclude Include="common\OrderListSolt.h" />

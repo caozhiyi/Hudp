@@ -8,9 +8,6 @@ namespace hudp {
     // init library
     void Init();
     
-    // start thread and recv with port and
-    // the first IP on a network card that is not a loopback
-    bool Start(uint16_t port, const recv_back& func);
     // start thread and recv with ip and port
     bool Start(const std::string& ip,uint16_t port, const recv_back& func);
 

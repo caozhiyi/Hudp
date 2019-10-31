@@ -30,6 +30,8 @@ namespace hudp {
         // bag has body.
         HPF_WITH_BODY                  = 0x0008,
 
+        // 0x0010 ~ 0x0080 is priority
+
         // reliable ack info is a range
         HPF_RELIABLE_ACK_RANGE         = 0x0100,
         // reliable orderly ack info is a range
@@ -39,8 +41,6 @@ namespace hudp {
         HPF_NEED_ACK                   = 0x0400,
         // is orderly
         HPF_IS_ORDERLY                 = 0x0800,
-
-        // 0x0010 ~ 0x0080 is priority
 
         // to close connection
         HPF_CLOSE                      = 0x1000,

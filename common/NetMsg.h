@@ -37,8 +37,6 @@ namespace hudp {
             _ack_vec.clear();
         }
     };
-    
-
 
     class CBitStream;
     class CSocket;
@@ -54,6 +52,7 @@ namespace hudp {
         uint8_t       _phase;       // phase in process
         std::weak_ptr<CSocket> _socket;
 
+        uint64_t      _push_send_time;  // when user send the msg to hudp.
         uint16_t      _backoff_factor;  // timer out resend backoff factor, every time resend it will * 2
         bool          _re_send;// is resend?
         bool          _flag;   // head may be changed, should serialize again. set true
@@ -61,7 +60,8 @@ namespace hudp {
 
         bool          _use;    // check msg is used
 
-        NetMsg() : _backoff_factor(1),
+        NetMsg() : _push_send_time(0),
+                   _backoff_factor(1),
                    _re_send(false),
                    _flag(false),
                    _use(true) {
@@ -80,6 +80,7 @@ namespace hudp {
             _bit_stream = nullptr;
             _use = false;
             _backoff_factor = 1;
+            _push_send_time = 0;
         }
 
         void ClearAck() {
