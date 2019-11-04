@@ -28,6 +28,9 @@
     <Filter Include="include">
       <UniqueIdentifier>{b1ad3157-80a9-49e7-924b-58235a58a3fe}</UniqueIdentifier>
     </Filter>
+    <Filter Include="interface">
+      <UniqueIdentifier>{9bde2fc8-1f19-4a1d-b519-1a37c12303a3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="utest\common\Ut_BitStream.cpp">
@@ -313,6 +316,36 @@
     </ClInclude>
     <ClInclude Include="common\NetHeader.h">
       <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="interface\MSg.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="interface\SocketManager.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="interface\Socket.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="interface\Filter.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="interface\MsgFactory.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="interface\NetIO.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="interface\SendWnd.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="interface\SendWndSolt.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="interface\OrderList.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="interface\OrderListSolt.h">
+      <Filter>interface</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

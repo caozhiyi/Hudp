@@ -218,6 +218,16 @@
     <ClInclude Include="hudp\UpperThread.h" />
     <ClInclude Include="include\Hudp.h" />
     <ClInclude Include="include\HudpFlag.h" />
+    <ClInclude Include="interface\Filter.h" />
+    <ClInclude Include="interface\MsgFactory.h" />
+    <ClInclude Include="interface\NetIO.h" />
+    <ClInclude Include="interface\OrderList.h" />
+    <ClInclude Include="interface\OrderListSolt.h" />
+    <ClInclude Include="interface\SendWnd.h" />
+    <ClInclude Include="interface\SendWndSolt.h" />
+    <ClInclude Include="interface\Socket.h" />
+    <ClInclude Include="interface\SocketManager.h" />
+    <ClInclude Include="interface\MSg.h" />
     <ClInclude Include="net\Socket.h" />
     <ClInclude Include="net\OsNet.h" />
     <ClInclude Include="net\SocketManager.h" />
