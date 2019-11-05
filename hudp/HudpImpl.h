@@ -1,19 +1,19 @@
 #ifndef HEADER_HUDP_HUDPIMPL
 #define HEADER_HUDP_HUDPIMPL
 
-#include <functional>
+#include <vector>
 #include "Single.h"
 #include "CommonType.h"
-#include "CommonFlag.h"
-#include "ProcessThread.h"
-#include "RecvThread.h"
-#include "SendThread.h"
-#include "UpperThread.h"
-#include "SocketManager.h"
+#include "HudpFlag.h"
 
 namespace hudp {
 
-    class NetMsg;
+    class CNetIO;
+    class CThread;
+    class CMsg;
+    class CMsgFactory;
+    class CFilterProcess;
+    class CSocketManager;
 
     class CHudpImpl : public base::CSingle<CHudpImpl> {
     public:
@@ -22,7 +22,6 @@ namespace hudp {
         // init library
         void Init();
         // start thread and recv
-        bool Start(uint16_t port, const recv_back& func);
         bool Start(const std::string& ip, uint16_t port, const recv_back& func);
 
         void Join();
@@ -35,24 +34,20 @@ namespace hudp {
         void Close(const HudpHandle& handle);
 
     public:
-        // send msg to send thread
-        void SendMsgToNet(NetMsg* msg);
-        // send msg to upper thread;
-        void SendMsgToUpper(NetMsg* msg);
-        // send msg to recv process thread
-        void SendMsgToRecvProcessThread(NetMsg* msg);
-        // send msg to send process thread
-        void SendMsgToSendProcessThread(NetMsg* msg);
+        void AfterSendProcess(CMsg* msg);
+        void AfterRecvProcess(CMsg* msg);
 
         // make public flag to private flag of hudp
-        void TranslateFlag(NetMsg* msg);
+        //void TranslateFlag(NetMsg* msg);
 
     private:
-        CRecvProcessThread      _recv_process_thread;
-        CSendProcessThread      _send_process_thread;
-        CRecvThread             _recv_thread;
-        CSendThread             _send_thread;
-        CUpperThread            _upper_thread;
+        std::vector<std::shared_ptr<CThread>>      _thread_vec;
+        std::shared_ptr<CNetIO>                    _net_io;
+        std::shared_ptr<CMsgFactory>               _msg_factory;
+        std::shared_ptr<CFilterProcess>            _filter_process;
+        std::shared_ptr<CSocketManager>            _socket_mananger;
+        recv_back                                  _recv_call_back;
+        uint64_t                                   _listen_socket;
     };
 
 }
