@@ -1,116 +1,122 @@
 #include "PriorityQueue.h"
 #include "CommonFlag.h"
 #include "Log.h"
-#include "NetMsgPool.h"
 #include "HudpConfig.h"
 using namespace hudp;
 
-CPriorityQueue::CPriorityQueue() : _size(0),
-                                   _pri_normal_count(__pri_surplus),
-                                   _pri_heig_count(__pri_surplus),
-                                   _pri_heighest_count(__pri_surplus) {
+CPriorityQueueImpl::CPriorityQueueImpl() : _pri_normal_count(__pri_surplus),
+                                           _pri_high_count(__pri_surplus),
+                                           _pri_highest_count(__pri_surplus) {
 
 }
 
-CPriorityQueue::~CPriorityQueue() {
+CPriorityQueueImpl::~CPriorityQueueImpl() {
     Clear();
 }
 
-void CPriorityQueue::Push(NetMsg* msg) {
-    if (msg->_head._flag & HPF_LOW_PRI) {
-        _queue_arr[__pri_low].Push(msg);
+void CPriorityQueueImpl::Push(CMsg* msg) {
+    uint16_t flag = msg->GetFlag();
+    if (flag & HPF_LOW_PRI) {
+        _queue_arr[__pri_low].push(msg);
 
-    } else if (msg->_head._flag & HPF_NROMAL_PRI) {
-        _queue_arr[__pri_normal].Push(msg);
+    } else if (flag & HPF_NROMAL_PRI) {
+        _queue_arr[__pri_normal].push(msg);
 
-    } else if (msg->_head._flag & HPF_HIGH_PRI) {
-        _queue_arr[__pri_heig].Push(msg);
+    } else if (flag & HPF_HIGH_PRI) {
+        _queue_arr[__pri_high].push(msg);
 
-    } else if (msg->_head._flag & HPF_HIGHEST_PRI) {
-        _queue_arr[__pri_heighest].Push(msg);
-
+    } else if (flag & HPF_HIGHEST_PRI) {
+        _queue_arr[__pri_highest].push(msg);
     }
-    _size++;
-    _notify.notify_all();
 }
 
-NetMsg* CPriorityQueue::Pop() {
-    {
-        std::unique_lock<std::mutex> lock(_mutex);
-        _notify.wait(_mutex, [this]() {return this->_size.load() != 0; });
-    }
-
-    _size--;
-    NetMsg* msg;
-    if (_pri_heighest_count > 0) {
-        if (_queue_arr[__pri_heighest].Pop(msg)) {
-            _pri_heighest_count--;
+CMsg* CPriorityQueueImpl::Pop() {
+    CMsg* msg;
+    if (_pri_highest_count > 0) {
+        if (!_queue_arr[__pri_highest].empty()) {
+            msg = _queue_arr[__pri_highest].front();
+            _queue_arr[__pri_highest].pop();
+            _pri_highest_count--;
             return msg;
         }
     }
-    if (_pri_heig_count > 0) {
-        if (_queue_arr[__pri_heig].Pop(msg)) {
-            _pri_heig_count--;
-            _pri_heighest_count = __pri_surplus;
+    if (_pri_high_count > 0) {
+        if (!_queue_arr[__pri_high].empty()) {
+            msg = _queue_arr[__pri_high].front();
+            _queue_arr[__pri_high].pop();
+            _pri_highest_count = __pri_surplus;
+            _pri_high_count--;
             return msg;
         }
     }
     if (_pri_normal_count > 0) {
-        if (_queue_arr[__pri_normal].Pop(msg)) {
+        if (!_queue_arr[__pri_normal].empty()) {
+            msg = _queue_arr[__pri_normal].front();
+            _queue_arr[__pri_normal].pop();
+            _pri_high_count = __pri_surplus;
+            _pri_highest_count = __pri_surplus;
             _pri_normal_count--;
-            _pri_heig_count = __pri_surplus;
-            _pri_heighest_count = __pri_surplus;
             return msg;
         }
     }
 
     _pri_normal_count = __pri_surplus;
-    _pri_heig_count = __pri_surplus;
-    _pri_heighest_count = __pri_surplus;
+    _pri_high_count = __pri_surplus;
+    _pri_highest_count = __pri_surplus;
 
-    if (_queue_arr[__pri_low].Pop(msg)) {
+    if (_queue_arr[__pri_low].empty()) {
+        msg = _queue_arr[__pri_low].front();
+        _queue_arr[__pri_low].pop();
         return msg;
 
     // if don't have pri low
     } else {
-
-        if (_pri_heighest_count > 0) {
-            if (_queue_arr[__pri_heighest].Pop(msg)) {
-                _pri_heighest_count--;
+        if (_pri_highest_count > 0) {
+            if (!_queue_arr[__pri_highest].empty()) {
+                msg = _queue_arr[__pri_highest].front();
+                _queue_arr[__pri_highest].pop();
+                _pri_highest_count--;
                 return msg;
             }
         }
-        if (_pri_heig_count > 0) {
-            if (_queue_arr[__pri_heig].Pop(msg)) {
-                _pri_heig_count--;
-                _pri_heighest_count = __pri_surplus;
+        if (_pri_high_count > 0) {
+            if (!_queue_arr[__pri_high].empty()) {
+                msg = _queue_arr[__pri_high].front();
+                _queue_arr[__pri_high].pop();
+                _pri_highest_count = __pri_surplus;
+                _pri_high_count--;
                 return msg;
             }
         }
         if (_pri_normal_count > 0) {
-            if (_queue_arr[__pri_normal].Pop(msg)) {
+            if (!_queue_arr[__pri_normal].empty()) {
+                msg = _queue_arr[__pri_normal].front();
+                _queue_arr[__pri_normal].pop();
+                _pri_high_count = __pri_surplus;
+                _pri_highest_count = __pri_surplus;
                 _pri_normal_count--;
-                _pri_heig_count = __pri_surplus;
-                _pri_heighest_count = __pri_surplus;
                 return msg;
             }
         }
     }
 
-    base::LOG_ERROR("can't get message from _queue_arr. shouldn't be here.");
     return nullptr;
 }
 
-uint64_t CPriorityQueue::Size() {
-    return _size.load();
+uint64_t CPriorityQueueImpl::Size() {
+    uint64_t ret = 0;
+    for (auto i = 0; i < __pri_queue_size; i++) {
+        ret += _queue_arr[i].size();
+    }
+    return ret;
 }
 
-void CPriorityQueue::Clear() {
+void CPriorityQueueImpl::Clear() {
     for (size_t i = 0; i < __pri_queue_size; i++) {
-        NetMsg* msg = nullptr;
-        while (_queue_arr[i].Pop(msg)) {
+        CMsg* msg = nullptr;
+        while (!_queue_arr[i].empty()) {
             // return to msg pool
-            CNetMsgPool::Instance().FreeMsg(msg);
+            // CNetMsgPool::Instance().FreeMsg(msg);
         }
     }
 }

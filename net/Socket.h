@@ -1,13 +1,9 @@
 #ifndef HEADER_NET_SOCKET
 #define HEADER_NET_SOCKET
 
-#include <atomic>
-#include <vector>
 #include <memory>       // for enable shared from this
 #include "CommonType.h"
-#include "TimerSolt.h"
-#include "HudpFlag.h"
-#include "Rto.h"
+#include "Socket.h"
 
 namespace hudp {
 
@@ -20,17 +16,32 @@ namespace hudp {
     };
 
     class CSendWnd;
-    class CRecvList;
+    class COrderList;
     class CPriorityQueue;
     class CIncrementalId;
-    class NetMsg;
-    class CSenderRelialeOrderlyNetMsg;
+    class CMsg;
     class CPendAck;
+    class CRto;
 
-    class CSocket : public CTimerSolt, public std::enable_shared_from_this<CSocket> {
+    class CSocketImpl : public CSocket, public std::enable_shared_from_this<CSocketImpl> {
     public:
-        CSocket(const HudpHandle& handle);
-        ~CSocket();
+        CSocketImpl(const Handle& handle);
+        ~CSocketImpl();
+
+        Handle GetHandle();
+
+        void SendMessage(CMsg* msg);
+
+        void RecvMessage(CMsg* msg);
+
+        // called back by order list when msg recv to upper.
+        void ToRecv(CMsg* msg);
+        // called back by send window t when send a bag to net.
+        void ToSend(CMsg* msg);
+        // called back by send window t when recv a ack.
+        void AckDone(CMsg* msg);
+        // called back by timer t when timer out.
+        void TimerOut(CMsg* msg);
 
         // get msg from pri queue. 
         // not blocked. return null if empty.
@@ -73,21 +84,18 @@ namespace hudp {
 
     private:
         // reliable correlation
-        CIncrementalId* _inc_id[__wnd_size];
-        CSendWnd*       _send_wnd[__wnd_size];
-        CRecvList*      _recv_list[__wnd_size];
-        CPendAck*       _pend_ack[__wnd_size];
-
+        CSendWnd*            _send_wnd[__wnd_size];
+        CIncrementalId*      _incremental_id[__wnd_size];
+        CRecvList*           _recv_list[__wnd_size];
+        CPendAck*            _pend_ack[__wnd_size];
         // msg priority queue
-        CPriorityQueue* _pri_queue;
-
+        CPriorityQueue*      _pri_queue;
         // about pend ack timer
-        std::atomic<bool>     _is_in_timer;
+        std::atomic<bool>    _is_in_timer;
         // rto
-        CRto            _rto;
+        CRto*                _rto;
         // socket handle
-        HudpHandle      _handle;
-        
+        Handle               _handle;
     };
 }
 

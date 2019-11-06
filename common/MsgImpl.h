@@ -10,18 +10,27 @@ namespace hudp {
     class CSocket;
     class CMsgImpl : public CMsg {
     public:
-        CMsgImpl(uint16_t flag);
+        CMsgImpl();
         ~CMsgImpl();
-
-        void TranslateFlag();
-        void SetHandle(const Handle& handle);
-        const Handle& GetHandle();
 
         void Clear();
 
         void ClearAck();
 
         void SetId(const uint16_t& id);
+        uint16_t GetId();
+
+        void TranslateFlag();
+        void SetFlag(uint16_t flag);
+        uint16_t GetFlag();
+
+        void SetHandle(const Handle& handle);
+        const Handle& GetHandle();
+
+        void SetBody(const std::string& body);
+        std::string& GetBody();
+
+        bool GetSerializeBuffer(char* buf, uint16_t& len);
 
     private:
         // only head and body will be serialized

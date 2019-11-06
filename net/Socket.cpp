@@ -5,17 +5,11 @@
 #include "OrderList.h"
 #include "PriorityQueue.h"
 #include "IncrementalId.h"
-#include "NetMsg.h"
-#include "FunctionNetMsg.h"
+#include "IMsg.h"
 #include "HudpImpl.h"
 #include "Timer.h"
 #include "PendAck.h"
-#include "NetMsgPool.h"
-#include "BitStreamPool.h"
-#include "SocketManager.h"
 #include "Log.h"
-#include "FunctionNetMsg.h"
-#include "Serializes.h"
 #include "HudpConfig.h"
 
 using namespace hudp;
@@ -23,21 +17,22 @@ using namespace hudp;
 // this size may be a dynamic algorithm control
 static const uint16_t __send_wnd_size = 5;
 
-CSocket::CSocket(const HudpHandle& handle) : _pri_queue(new CPriorityQueue), _handle(handle) {
-    memset(_inc_id, 0, sizeof(_inc_id));
+CSocketImpl::CSocketImpl(const Handle& handle) : _pri_queue(new CPriorityQueue), 
+                                                 _handle(handle) {
+    memset(_incremental_id, 0, sizeof(_incremental_id));
     memset(_send_wnd, 0, sizeof(_send_wnd));
     memset(_recv_list, 0, sizeof(_recv_list));
     memset(_pend_ack, 0, sizeof(_pend_ack));
     _is_in_timer = false;
 }
 
-CSocket::~CSocket() {
+CSocketImpl::~CSocketImpl() {
     for (uint16_t i = 0; i < __wnd_size; i++) {
-        if (_inc_id[i]) {
-            delete _inc_id[i];
+        if (_incremental_id[i]) {
+            delete _incremental_id[i];
         }
         if (_send_wnd[i]) {
-            
+
             delete _send_wnd[i];
         }
         if (_recv_list[i]) {
@@ -50,17 +45,40 @@ CSocket::~CSocket() {
     delete _pri_queue;
 }
 
-NetMsg* CSocket::GetMsgFromPriQueue() {
-    if (_pri_queue->Size()) {
-        return _pri_queue->Pop();
-    }
-    base::LOG_WARN("socket return a null msg.");
-    return nullptr;
+Handle CSocketImpl::GetHandle() {
+    return _handle;
+}
+
+void CSocketImpl::SendMessage(CMsg* msg) {
+    _pri_queue->Push(msg);
+}
+
+void CSocketImpl::RecvMessage(CMsg* msg) {
+    
+}
+
+void CSocketImpl::ToRecv(CMsg* msg) {
+    // send ack msg to remote
+
+    base::LOG_DEBUG("[receiver] :receiver msg. id : %d", msg->GetId());
+    AddAck(this);
+    CHudpImpl::Instance().RecvMessageToUpper(_handle, msg);
+}
+
+void CSocketImpl::ToSend(CMsg* msg) {
+
+}
+
+void CSocketImpl::AckDone(CMsg* msg) {
+
+}
+
+void CSocketImpl::TimerOut(CMsg* msg) {
+
 }
 
 void CSocket::SendMsgToPriQueue(NetMsg* msg) {
-    _pri_queue->Push(msg);
-    CSocketManager::Instance().NotifyMsg(_handle);
+    
 }
 
 void CSocket::SendMsgToSendWnd(NetMsg* msg) {
@@ -227,7 +245,7 @@ void CSocket::RecvMsgToOrderList(NetMsg* msg) {
     }
 }
 
-void CSocket::AddAck(NetMsg* msg) {
+void CSocketImpl::AddAck(NetMsg* msg) {
     if (msg->_head._flag & HPF_IS_ORDERLY && msg->_head._flag & HPF_NEED_ACK) {
         if (_pend_ack[WI_RELIABLE_ORDERLY]) {
             _pend_ack[WI_RELIABLE_ORDERLY]->AddAck(msg->_head._id);

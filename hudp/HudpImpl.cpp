@@ -94,11 +94,19 @@ void CHudpImpl::Close(const HudpHandle& handle) {
     _socket_mananger->CloseSocket(handle);
 }
 
+void CHudpImpl::RecvMessageToUpper(const Handle& handle, CMsg* msg) {
+
+}
+
+void CHudpImpl::SendMessageToNet(CMsg* msg) {
+
+}
+
 void CHudpImpl::AfterSendProcess(CMsg* msg) {
     //get a socket. 
     std::shared_ptr<CSocket> socket = _socket_mananger->GetSocket(msg->GetHandle());
 
-    socket->PushMsgToPriQueue(msg);
+    socket->SendMessage(msg);
 }
 
 void CHudpImpl::AfterRecvProcess(CMsg* msg) {

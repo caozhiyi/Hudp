@@ -10,9 +10,16 @@ namespace hudp {
     public:
         CMsg() {}
         virtual ~CMsg() {}
+        // clear all member 
+        virtual void Clear() = 0;
+        // // clear member which about ack
+        virtual void ClearAck() = 0;
+
+        virtual void SetId(const uint16_t& id) = 0;
+        virtual uint16_t GetId() = 0;
+
         // translate user flag to hudp flag.
         virtual void TranslateFlag() = 0;
-        
         virtual void SetFlag(uint16_t flag) = 0;
         virtual uint16_t GetFlag() = 0;
 

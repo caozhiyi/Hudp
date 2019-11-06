@@ -54,9 +54,6 @@
     <ClCompile Include="common\BitStream.cpp">
       <Filter>common</Filter>
     </ClCompile>
-    <ClCompile Include="common\BitStreamPool.cpp">
-      <Filter>common</Filter>
-    </ClCompile>
     <ClCompile Include="common\IncrementalId.cpp">
       <Filter>common</Filter>
     </ClCompile>
@@ -76,9 +73,6 @@
       <Filter>common</Filter>
     </ClCompile>
     <ClCompile Include="hudp\FilterInterface.cpp">
-      <Filter>hudp</Filter>
-    </ClCompile>
-    <ClCompile Include="hudp\FilterProcess.cpp">
       <Filter>hudp</Filter>
     </ClCompile>
     <ClCompile Include="utest\common\Ut_IncrementalId.cpp">
@@ -132,9 +126,6 @@
     <ClCompile Include="hudp\FunctionNetMsg.cpp">
       <Filter>hudp</Filter>
     </ClCompile>
-    <ClCompile Include="hudp\NetMsgPool.cpp">
-      <Filter>hudp</Filter>
-    </ClCompile>
     <ClCompile Include="common\PendAck.cpp">
       <Filter>common</Filter>
     </ClCompile>
@@ -159,8 +150,17 @@
     <ClCompile Include="base\BlockMemoryPool.cpp">
       <Filter>base</Filter>
     </ClCompile>
-    <ClCompile Include="common\NetHeader.cpp">
+    <ClCompile Include="hudp\FilterProcessNoThread.cpp">
+      <Filter>hudp</Filter>
+    </ClCompile>
+    <ClCompile Include="common\MsgHead.cpp">
       <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="common\MsgImpl.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="hudp\MsgPoolFactory.cpp">
+      <Filter>hudp</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -209,9 +209,6 @@
     <ClInclude Include="common\BitStream.h">
       <Filter>common</Filter>
     </ClInclude>
-    <ClInclude Include="common\BitStreamPool.h">
-      <Filter>common</Filter>
-    </ClInclude>
     <ClInclude Include="common\CommonFlag.h">
       <Filter>common</Filter>
     </ClInclude>
@@ -219,9 +216,6 @@
       <Filter>common</Filter>
     </ClInclude>
     <ClInclude Include="common\IncrementalId.h">
-      <Filter>common</Filter>
-    </ClInclude>
-    <ClInclude Include="common\NetMsg.h">
       <Filter>common</Filter>
     </ClInclude>
     <ClInclude Include="common\OrderList.h">
@@ -254,9 +248,6 @@
     <ClInclude Include="hudp\FilterInterface.h">
       <Filter>hudp</Filter>
     </ClInclude>
-    <ClInclude Include="hudp\FilterProcess.h">
-      <Filter>hudp</Filter>
-    </ClInclude>
     <ClInclude Include="utest\Test.h">
       <Filter>utest</Filter>
     </ClInclude>
@@ -287,9 +278,6 @@
     <ClInclude Include="hudp\FunctionNetMsg.h">
       <Filter>hudp</Filter>
     </ClInclude>
-    <ClInclude Include="hudp\NetMsgPool.h">
-      <Filter>hudp</Filter>
-    </ClInclude>
     <ClInclude Include="common\PendAck.h">
       <Filter>common</Filter>
     </ClInclude>
@@ -314,37 +302,52 @@
     <ClInclude Include="base\BlockMemoryPool.h">
       <Filter>base</Filter>
     </ClInclude>
-    <ClInclude Include="common\NetHeader.h">
+    <ClInclude Include="hudp\FilterProcessNoThread.h">
+      <Filter>hudp</Filter>
+    </ClInclude>
+    <ClInclude Include="interface\IFilter.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="interface\IFilterProcess.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="interface\IMsg.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="interface\IMsgFactory.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="interface\INetIO.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="interface\IOrderList.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="interface\ISendWnd.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="interface\ISocket.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="interface\ISocketManager.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="interface\IThread.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="common\MsgImpl.h">
       <Filter>common</Filter>
     </ClInclude>
-    <ClInclude Include="interface\MSg.h">
+    <ClInclude Include="common\MsgHead.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="hudp\MsgPoolFactory.h">
+      <Filter>hudp</Filter>
+    </ClInclude>
+    <ClInclude Include="interface\IRto.h">
       <Filter>interface</Filter>
     </ClInclude>
-    <ClInclude Include="interface\SocketManager.h">
-      <Filter>interface</Filter>
-    </ClInclude>
-    <ClInclude Include="interface\Socket.h">
-      <Filter>interface</Filter>
-    </ClInclude>
-    <ClInclude Include="interface\Filter.h">
-      <Filter>interface</Filter>
-    </ClInclude>
-    <ClInclude Include="interface\MsgFactory.h">
-      <Filter>interface</Filter>
-    </ClInclude>
-    <ClInclude Include="interface\NetIO.h">
-      <Filter>interface</Filter>
-    </ClInclude>
-    <ClInclude Include="interface\SendWnd.h">
-      <Filter>interface</Filter>
-    </ClInclude>
-    <ClInclude Include="interface\SendWndSolt.h">
-      <Filter>interface</Filter>
-    </ClInclude>
-    <ClInclude Include="interface\OrderList.h">
-      <Filter>interface</Filter>
-    </ClInclude>
-    <ClInclude Include="interface\OrderListSolt.h">
+    <ClInclude Include="interface\IPriorityQueue.h">
       <Filter>interface</Filter>
     </ClInclude>
   </ItemGroup>

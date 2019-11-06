@@ -1,14 +1,12 @@
 #ifndef HEADER_COMMON_PRIORITYQUEUE
 #define HEADER_COMMON_PRIORITYQUEUE
 
-#include <atomic>
-#include <queue>
-#include <mutex>
-#include <condition_variable>
+#include <queue> // for queue
 
 #include "CommonType.h"
-#include "NetMsg.h"
-#include "TSQueue.h"
+#include "IMsg.h"
+#include "IPriorityQueue.h"
+
 namespace hudp {
     
     // we have four priority level
@@ -16,18 +14,18 @@ namespace hudp {
 
     static const uint16_t __pri_low        = 3;
     static const uint16_t __pri_normal     = 2;
-    static const uint16_t __pri_heig       = 1;
-    static const uint16_t __pri_heighest   = 0;
+    static const uint16_t __pri_high       = 1;
+    static const uint16_t __pri_highest    = 0;
     
-    class CPriorityQueue {
+    class CPriorityQueueImpl : public CPriorityQueue {
     public:   
-        CPriorityQueue();
-        ~CPriorityQueue();
+        CPriorityQueueImpl();
+        ~CPriorityQueueImpl();
 
-        void Push(NetMsg* msg);
+        void Push(CMsg* msg);
 
         // get a item from queue by priority
-        NetMsg* Pop();
+        CMsg* Pop();
 
         // get current number of item in queue
         uint64_t Size();
@@ -36,16 +34,11 @@ namespace hudp {
         void Clear();
         
     private:
-        base::CTSQueue<NetMsg*>     _queue_arr[__pri_queue_size];
-
-        std::mutex				    _mutex;
-        std::condition_variable_any	_notify;
-        std::atomic<uint64_t>       _size;
-
+        std::queue<CMsg*>           _queue_arr[__pri_queue_size];
         // control priority surplus
         int8_t                      _pri_normal_count;
-        int8_t                      _pri_heig_count;
-        int8_t                      _pri_heighest_count;
+        int8_t                      _pri_high_count;
+        int8_t                      _pri_highest_count;
     };
 }
 #endif

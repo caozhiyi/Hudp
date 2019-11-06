@@ -70,13 +70,13 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(SolutionDir)common;$(SolutionDir)net;$(SolutionDir)base;$(SolutionDir)hudp;$(SolutionDir)include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)common;$(SolutionDir)base;$(SolutionDir)hudp;$(SolutionDir)include;$(SolutionDir)interface;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>$(SolutionDir)common;$(SolutionDir)base;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SolutionDir)common;$(SolutionDir)net;$(SolutionDir)base;$(SolutionDir)hudp;$(SolutionDir)include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)common;$(SolutionDir)base;$(SolutionDir)hudp;$(SolutionDir)include;$(SolutionDir)interface;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -134,10 +134,10 @@
     <ClCompile Include="base\MemoryPool.cpp" />
     <ClCompile Include="base\TimeTool.cpp" />
     <ClCompile Include="common\BitStream.cpp" />
-    <ClCompile Include="common\BitStreamPool.cpp" />
     <ClCompile Include="common\CommonFunc.cpp" />
     <ClCompile Include="common\IncrementalId.cpp" />
-    <ClCompile Include="common\NetHeader.cpp" />
+    <ClCompile Include="common\MsgHead.cpp" />
+    <ClCompile Include="common\MsgImpl.cpp" />
     <ClCompile Include="common\OrderList.cpp" />
     <ClCompile Include="common\PendAck.cpp" />
     <ClCompile Include="common\PriorityQueue.cpp" />
@@ -147,11 +147,11 @@
     <ClCompile Include="common\Timer.cpp" />
     <ClCompile Include="hudp\CloseMageger.cpp" />
     <ClCompile Include="hudp\FilterInterface.cpp" />
-    <ClCompile Include="hudp\FilterProcess.cpp" />
+    <ClCompile Include="hudp\FilterProcessNoThread.cpp" />
     <ClCompile Include="hudp\FunctionNetMsg.cpp" />
     <ClCompile Include="hudp\Hudp.cpp" />
     <ClCompile Include="hudp\HudpImpl.cpp" />
-    <ClCompile Include="hudp\NetMsgPool.cpp" />
+    <ClCompile Include="hudp\MsgPoolFactory.cpp" />
     <ClCompile Include="hudp\ProcessThread.cpp" />
     <ClCompile Include="hudp\RecvThread.cpp" />
     <ClCompile Include="hudp\RelialeOrderlyFilter.cpp" />
@@ -188,12 +188,11 @@
     <ClInclude Include="base\TimeTool.h" />
     <ClInclude Include="base\TSQueue.h" />
     <ClInclude Include="common\BitStream.h" />
-    <ClInclude Include="common\BitStreamPool.h" />
     <ClInclude Include="common\CommonFlag.h" />
     <ClInclude Include="common\CommonType.h" />
     <ClInclude Include="common\IncrementalId.h" />
-    <ClInclude Include="common\NetHeader.h" />
-    <ClInclude Include="common\NetMsg.h" />
+    <ClInclude Include="common\MsgHead.h" />
+    <ClInclude Include="common\MsgImpl.h" />
     <ClInclude Include="common\OrderList.h" />
     <ClInclude Include="common\OrderListSolt.h" />
     <ClInclude Include="common\PendAck.h" />
@@ -207,10 +206,10 @@
     <ClInclude Include="common\CommonFunc.h" />
     <ClInclude Include="hudp\CloseManager.h" />
     <ClInclude Include="hudp\FilterInterface.h" />
-    <ClInclude Include="hudp\FilterProcess.h" />
+    <ClInclude Include="hudp\FilterProcessNoThread.h" />
     <ClInclude Include="hudp\FunctionNetMsg.h" />
     <ClInclude Include="hudp\HudpImpl.h" />
-    <ClInclude Include="hudp\NetMsgPool.h" />
+    <ClInclude Include="hudp\MsgPoolFactory.h" />
     <ClInclude Include="hudp\ProcessThread.h" />
     <ClInclude Include="hudp\RecvThread.h" />
     <ClInclude Include="hudp\RelialeOrderlyFilter.h" />
@@ -218,16 +217,18 @@
     <ClInclude Include="hudp\UpperThread.h" />
     <ClInclude Include="include\Hudp.h" />
     <ClInclude Include="include\HudpFlag.h" />
-    <ClInclude Include="interface\Filter.h" />
-    <ClInclude Include="interface\MsgFactory.h" />
-    <ClInclude Include="interface\NetIO.h" />
-    <ClInclude Include="interface\OrderList.h" />
-    <ClInclude Include="interface\OrderListSolt.h" />
-    <ClInclude Include="interface\SendWnd.h" />
-    <ClInclude Include="interface\SendWndSolt.h" />
-    <ClInclude Include="interface\Socket.h" />
-    <ClInclude Include="interface\SocketManager.h" />
-    <ClInclude Include="interface\MSg.h" />
+    <ClInclude Include="interface\IFilter.h" />
+    <ClInclude Include="interface\IFilterProcess.h" />
+    <ClInclude Include="interface\IMsg.h" />
+    <ClInclude Include="interface\IMsgFactory.h" />
+    <ClInclude Include="interface\INetIO.h" />
+    <ClInclude Include="interface\IOrderList.h" />
+    <ClInclude Include="interface\IPriorityQueue.h" />
+    <ClInclude Include="interface\IRto.h" />
+    <ClInclude Include="interface\ISendWnd.h" />
+    <ClInclude Include="interface\ISocket.h" />
+    <ClInclude Include="interface\ISocketManager.h" />
+    <ClInclude Include="interface\IThread.h" />
     <ClInclude Include="net\Socket.h" />
     <ClInclude Include="net\OsNet.h" />
     <ClInclude Include="net\SocketManager.h" />

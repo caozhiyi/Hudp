@@ -34,6 +34,12 @@ namespace hudp {
         void Close(const HudpHandle& handle);
 
     public:
+        // notify aupper recv a message.
+        void RecvMessageToUpper(const Handle& handle, CMsg* msg);
+        // send message to net
+        void SendMessageToNet(CMsg* msg);
+
+    public:
         void AfterSendProcess(CMsg* msg);
         void AfterRecvProcess(CMsg* msg);
 
