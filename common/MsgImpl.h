@@ -38,7 +38,7 @@ namespace hudp {
         std::string     _body;      // body msg. set by user
         // other 
         std::string     _ip_port;
-        bool            _flag;      // head may be changed, should serialize again. set true
+        int16_t         _flag;      // head may be changed, should serialize again. set true
                                     // in recv msg. if send to upper set true
 
         std::weak_ptr<CSocket> _socket;

@@ -11,6 +11,7 @@
 #include "PendAck.h"
 #include "Log.h"
 #include "HudpConfig.h"
+#include "CommonFlag.h"
 
 using namespace hudp;
 
@@ -23,7 +24,6 @@ CSocketImpl::CSocketImpl(const Handle& handle) : _pri_queue(new CPriorityQueue),
     memset(_send_wnd, 0, sizeof(_send_wnd));
     memset(_recv_list, 0, sizeof(_recv_list));
     memset(_pend_ack, 0, sizeof(_pend_ack));
-    _is_in_timer = false;
 }
 
 CSocketImpl::~CSocketImpl() {
@@ -49,37 +49,156 @@ Handle CSocketImpl::GetHandle() {
     return _handle;
 }
 
+void CSocketImpl::AddAckToMsg(CMsg* msg) {
+    // clear prv ack info
+    msg->ClearAck();
+
+    if (_pend_ack[WI_RELIABLE_ORDERLY] && _pend_ack[WI_RELIABLE_ORDERLY]->HasAck()) {
+        bool continuity = false;
+        std::vector<uint16_t> ack_vec;
+        msg->SetAck(HPF_RELIABLE_ORDERLY_ACK_RANGE, ack_vec, continuity);
+    }
+
+    if (_pend_ack[WI_RELIABLE] && _pend_ack[WI_RELIABLE]->HasAck()) {
+        bool continuity = false;
+        std::vector<uint16_t> ack_vec;
+        msg->SetAck(HPF_WITH_RELIABLE_ACK, ack_vec, continuity);
+    }
+}
+
+void CSocketImpl::GetAckToSendWnd(CMsg* msg) {
+    if (msg->GetHeaderFlag() & HPF_WITH_RELIABLE_ORDERLY_ACK) {
+        auto time_stap = CTimer::Instance().GetTimeStamp();
+        std::vector<uint16_t> vec;
+        msg->GetAck(HPF_WITH_RELIABLE_ORDERLY_ACK, vec);
+        for (uint16_t index = vec[0], i = 0; i < vec.size(); index++, i++) {
+            _send_wnd[WI_RELIABLE_ORDERLY]->AcceptAck(index);
+            // TODO
+            // set rtt sample
+            //_rto.SetAckTime(index, time_stap);
+        }
+    }
+
+    if (msg->GetHeaderFlag() & HPF_WITH_RELIABLE_ACK) {
+        auto time_stap = CTimer::Instance().GetTimeStamp();
+        std::vector<uint16_t> vec;
+        msg->GetAck(HPF_WITH_RELIABLE_ACK, vec);
+        for (uint16_t index = vec[0], i = 0; i < vec.size(); index++, i++) {
+            _send_wnd[WI_RELIABLE_ORDERLY]->AcceptAck(index);
+            // TODO
+            // set rtt sample
+            //_rto.SetAckTime(index, time_stap);
+        }
+    }
+}
+
+void CSocketImpl::CreateRecvList(WndIndex index) {
+    if (_recv_list[index] == nullptr) {
+        if (index == WI_ORDERLY) {
+            _recv_list[index] = new COrderlyList();
+
+        }
+        else if (index == WI_RELIABLE) {
+            _recv_list[index] = new CReliableList();
+
+        }
+        else if (index == WI_RELIABLE_ORDERLY) {
+            _recv_list[index] = new CReliableOrderlyList();
+        }
+    }
+}
+
 void CSocketImpl::SendMessage(CMsg* msg) {
     _pri_queue->Push(msg);
 }
 
 void CSocketImpl::RecvMessage(CMsg* msg) {
-    
+    // get ack info
+    GetAckToSendWnd(msg);
+    // recv msg to orderlist
+    bool done = false;
+    uint16_t ret = 0;
+
+    auto flag = msg->GetHeaderFlag();
+    // reliable and orderly
+    if (flag & HPF_IS_ORDERLY && flag & HPF_NEED_ACK) {
+        if (_recv_list[WI_RELIABLE_ORDERLY]) {
+            ret = _recv_list[WI_RELIABLE_ORDERLY]->Insert(msg);
+
+        }
+        else {
+            CreateRecvList(WI_RELIABLE_ORDERLY);
+            ret = _recv_list[WI_RELIABLE_ORDERLY]->Insert(msg);
+        }
+        done = true;
+
+    // only orderly
+    } else if (flag & HPF_IS_ORDERLY) {
+        if (_recv_list[WI_ORDERLY]) {
+            ret = _recv_list[WI_ORDERLY]->Insert(msg);
+
+        } else {
+            CreateRecvList(WI_ORDERLY);
+            ret = _recv_list[WI_ORDERLY]->Insert(msg);
+        }
+        done = true;
+
+    // only reliable
+    } else if (flag & HPF_NEED_ACK) {
+        if (_recv_list[WI_RELIABLE]) {
+            ret = _recv_list[WI_RELIABLE]->Insert(msg);
+
+        } else {
+            CreateRecvList(WI_RELIABLE);
+            ret = _recv_list[WI_RELIABLE]->Insert(msg);
+        }
+        done = true;
+    }
+
+    // get a repeat msg
+    if (ret == 1) {
+        AddAck(msg);
+        return;
+    }
+
+    // normal udp. 
+    if (!done) {
+        CHudpImpl::Instance().RecvMessageToUpper(_handle, msg);
+    }
 }
 
 void CSocketImpl::ToRecv(CMsg* msg) {
     // send ack msg to remote
-
     base::LOG_DEBUG("[receiver] :receiver msg. id : %d", msg->GetId());
     AddAck(this);
     CHudpImpl::Instance().RecvMessageToUpper(_handle, msg);
 }
 
 void CSocketImpl::ToSend(CMsg* msg) {
+    // add to timer
+    if (msg->GetHeaderFlag() & HPF_NEED_ACK) {
+        // TODO
+    }
 
+    CHudpImpl::Instance().SendMessageToNet(msg);
 }
 
 void CSocketImpl::AckDone(CMsg* msg) {
-
+    // release msg here
+    CHudpImpl::Instance().ReleaseMessage(msg);
 }
 
 void CSocketImpl::TimerOut(CMsg* msg) {
+    if (!(msg->GetFlag() & msg_is_only_ack)) {
+        msg->AddSendDelay();
+    }
 
+    // add ack 
+    AddAckToMsg(msg);
+    // send to net
+    CHudpImpl::Instance().SendMessageToNet(msg);
 }
 
-void CSocket::SendMsgToPriQueue(NetMsg* msg) {
-    
-}
 
 void CSocket::SendMsgToSendWnd(NetMsg* msg) {
     if (msg->_head._flag & HPF_NEED_ACK && msg->_head._flag & HPF_IS_ORDERLY) {

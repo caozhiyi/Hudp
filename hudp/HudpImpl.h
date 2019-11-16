@@ -38,6 +38,8 @@ namespace hudp {
         void RecvMessageToUpper(const Handle& handle, CMsg* msg);
         // send message to net
         void SendMessageToNet(CMsg* msg);
+        // release send message
+        void ReleaseMessage(CMsg* msg);
 
     public:
         void AfterSendProcess(CMsg* msg);

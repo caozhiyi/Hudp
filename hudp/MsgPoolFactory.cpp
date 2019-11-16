@@ -26,7 +26,7 @@ CMsg* CMsgPoolFactory::CreateMsg(uint16_t flag) {
     }
 
     if (net_msg) {
-        net_msg->SetFlag(flag);
+        net_msg->SetHeaderFlag(flag);
         return net_msg;
     }
     return nullptr;

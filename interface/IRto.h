@@ -11,7 +11,8 @@ namespace hudp {
         CRto() {}
         virtual ~CRto() {}
         // get rto
-        uint32_t GetRto();
+        virtual uint32_t GetRto() = 0;
+
     };
 }
 #endif

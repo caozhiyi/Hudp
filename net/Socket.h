@@ -77,6 +77,11 @@ namespace hudp {
         HudpHandle GetHandle();
 
     private:
+        void AddAckToMsg(CMsg* msg);
+        void GetAckToSendWnd(CMsg* msg);
+        void CreateRecvList(WndIndex index);
+
+    private:
         // Instantiating corresponding classes.
         void CreateSendWnd(WndIndex index);
         void CreateRecvList(WndIndex index);

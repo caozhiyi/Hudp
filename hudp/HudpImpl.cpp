@@ -95,11 +95,17 @@ void CHudpImpl::Close(const HudpHandle& handle) {
 }
 
 void CHudpImpl::RecvMessageToUpper(const Handle& handle, CMsg* msg) {
-
+    _filter_process->PushRecvMsg(msg);
 }
 
 void CHudpImpl::SendMessageToNet(CMsg* msg) {
+    // get send buffer
+    std::string net_msg = msg->GetSerializeBuffer();
+    _net_io->SendTo(_listen_socket, net_msg.c_str(), net_msg.length(), msg->GetHandle());
+}
 
+void CHudpImpl::ReleaseMessage(CMsg* msg) {
+    _msg_factory->DeleteMsg(msg);
 }
 
 void CHudpImpl::AfterSendProcess(CMsg* msg) {
