@@ -21,6 +21,9 @@ namespace hudp {
         // change send window size
         virtual void ChangeSendWndSize(uint16_t size) = 0;
 
+        // msg window not full
+        virtual bool CanSendNow() = 0;
+
         // remove all msg
         virtual void Clear() = 0;
     };

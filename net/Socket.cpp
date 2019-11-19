@@ -56,12 +56,16 @@ void CSocketImpl::AddAckToMsg(CMsg* msg) {
     if (_pend_ack[WI_RELIABLE_ORDERLY] && _pend_ack[WI_RELIABLE_ORDERLY]->HasAck()) {
         bool continuity = false;
         std::vector<uint16_t> ack_vec;
+        // get acl from pend ack
+        // TODO
         msg->SetAck(HPF_RELIABLE_ORDERLY_ACK_RANGE, ack_vec, continuity);
     }
 
     if (_pend_ack[WI_RELIABLE] && _pend_ack[WI_RELIABLE]->HasAck()) {
         bool continuity = false;
         std::vector<uint16_t> ack_vec;
+        // get acl from pend ack
+        // TODO
         msg->SetAck(HPF_WITH_RELIABLE_ACK, ack_vec, continuity);
     }
 }
@@ -92,24 +96,32 @@ void CSocketImpl::GetAckToSendWnd(CMsg* msg) {
     }
 }
 
-void CSocketImpl::CreateRecvList(WndIndex index) {
-    if (_recv_list[index] == nullptr) {
-        if (index == WI_ORDERLY) {
-            _recv_list[index] = new COrderlyList();
-
-        }
-        else if (index == WI_RELIABLE) {
-            _recv_list[index] = new CReliableList();
-
-        }
-        else if (index == WI_RELIABLE_ORDERLY) {
-            _recv_list[index] = new CReliableOrderlyList();
-        }
-    }
-}
-
 void CSocketImpl::SendMessage(CMsg* msg) {
-    _pri_queue->Push(msg);
+    auto header_flag = msg->GetHeaderFlag();
+    if (header_flag & HTF_ORDERLY) {
+        if (_send_wnd[WI_ORDERLY]->CanSendNow()) {
+            _send_wnd[WI_ORDERLY]->PushBack(msg);
+        } else {
+            _pri_queue->Push(msg);
+        }
+
+    } else if (header_flag & HTF_RELIABLE) {
+        if (_send_wnd[WI_RELIABLE]->CanSendNow()) {
+            _send_wnd[WI_RELIABLE]->PushBack(msg);
+        } else {
+            _pri_queue->Push(msg);
+        }
+
+    } else if (header_flag & HTF_RELIABLE_ORDERLY) {
+        if (_send_wnd[WI_RELIABLE_ORDERLY]->CanSendNow()) {
+            _send_wnd[WI_RELIABLE_ORDERLY]->PushBack(msg);
+        } else {
+            _pri_queue->Push(msg);
+        }
+
+    } else{
+        CHudpImpl::Instance().SendMessageToNet(msg);
+    }
 }
 
 void CSocketImpl::RecvMessage(CMsg* msg) {
@@ -121,19 +133,18 @@ void CSocketImpl::RecvMessage(CMsg* msg) {
 
     auto flag = msg->GetHeaderFlag();
     // reliable and orderly
-    if (flag & HPF_IS_ORDERLY && flag & HPF_NEED_ACK) {
+    if (flag & HTF_RELIABLE_ORDERLY) {
         if (_recv_list[WI_RELIABLE_ORDERLY]) {
             ret = _recv_list[WI_RELIABLE_ORDERLY]->Insert(msg);
 
-        }
-        else {
+        } else {
             CreateRecvList(WI_RELIABLE_ORDERLY);
             ret = _recv_list[WI_RELIABLE_ORDERLY]->Insert(msg);
         }
         done = true;
 
     // only orderly
-    } else if (flag & HPF_IS_ORDERLY) {
+    } else if (flag & HTF_ORDERLY) {
         if (_recv_list[WI_ORDERLY]) {
             ret = _recv_list[WI_ORDERLY]->Insert(msg);
 
@@ -144,7 +155,7 @@ void CSocketImpl::RecvMessage(CMsg* msg) {
         done = true;
 
     // only reliable
-    } else if (flag & HPF_NEED_ACK) {
+    } else if (flag & HTF_RELIABLE) {
         if (_recv_list[WI_RELIABLE]) {
             ret = _recv_list[WI_RELIABLE]->Insert(msg);
 
@@ -170,17 +181,20 @@ void CSocketImpl::RecvMessage(CMsg* msg) {
 void CSocketImpl::ToRecv(CMsg* msg) {
     // send ack msg to remote
     base::LOG_DEBUG("[receiver] :receiver msg. id : %d", msg->GetId());
-    AddAck(this);
+    AddAck(msg);
     CHudpImpl::Instance().RecvMessageToUpper(_handle, msg);
 }
 
-void CSocketImpl::ToSend(CMsg* msg) {
+void CSocketImpl::ToSend(CMsg* msg, CSendWnd* send_wnd) {
     // add to timer
     if (msg->GetHeaderFlag() & HPF_NEED_ACK) {
         // TODO
     }
 
     CHudpImpl::Instance().SendMessageToNet(msg);
+
+    
+    send_wnd->PushBack();
 }
 
 void CSocketImpl::AckDone(CMsg* msg) {
@@ -197,72 +211,6 @@ void CSocketImpl::TimerOut(CMsg* msg) {
     AddAckToMsg(msg);
     // send to net
     CHudpImpl::Instance().SendMessageToNet(msg);
-}
-
-
-void CSocket::SendMsgToSendWnd(NetMsg* msg) {
-    if (msg->_head._flag & HPF_NEED_ACK && msg->_head._flag & HPF_IS_ORDERLY) {
-        if (_send_wnd[WI_RELIABLE_ORDERLY]) {
-            msg->SetId(_inc_id[WI_RELIABLE_ORDERLY]->GetNextId());
-            _send_wnd[WI_RELIABLE_ORDERLY]->PushBack(msg->_head._id, dynamic_cast<CSenderRelialeOrderlyNetMsg*>(msg));
-
-        } else {
-            CreateSendWnd(WI_RELIABLE_ORDERLY);
-            msg->SetId(_inc_id[WI_RELIABLE_ORDERLY]->GetNextId());
-            _send_wnd[WI_RELIABLE_ORDERLY]->PushBack(msg->_head._id, dynamic_cast<CSenderRelialeOrderlyNetMsg*>(msg));
-        }
-
-    } else if (msg->_head._flag & HPF_IS_ORDERLY) {
-        if (_send_wnd[WI_ORDERLY]) {
-            msg->SetId(_inc_id[WI_ORDERLY]->GetNextId());
-            _send_wnd[WI_ORDERLY]->PushBack(msg->_head._id, dynamic_cast<CSenderOrderlyNetMsg*>(msg));
-        
-        } else {
-            CreateSendWnd(WI_ORDERLY);
-            msg->SetId(_inc_id[WI_ORDERLY]->GetNextId());
-            _send_wnd[WI_ORDERLY]->PushBack(msg->_head._id, dynamic_cast<CSenderOrderlyNetMsg*>(msg));
-        }
-    
-    } else if (msg->_head._flag & HPF_NEED_ACK) {
-        if (_send_wnd[WI_RELIABLE]) {
-            msg->SetId(_inc_id[WI_RELIABLE]->GetNextId());
-            _send_wnd[WI_RELIABLE]->PushBack(msg->_head._id, dynamic_cast<CSenderRelialeOrderlyNetMsg*>(msg));
-
-        } else {
-            CreateSendWnd(WI_RELIABLE);
-            msg->SetId(_inc_id[WI_RELIABLE]->GetNextId());
-            _send_wnd[WI_RELIABLE]->PushBack(msg->_head._id, dynamic_cast<CSenderRelialeOrderlyNetMsg*>(msg));
-        }
-
-    // normal udp msg. send to net
-    } else {
-        msg->_phase += 1;
-    }
-}
-
-void CSocket::SendMsgToNet(NetMsg* msg) {
-    // add ack info to msg
-    AttachPendAck(msg);
-
-    // serializes
-    Serializes(msg);
-    
-    // add to timer
-    if (msg->_head._flag & HPF_NEED_ACK) {
-        auto socket = msg->_socket.lock();
-        if (socket) {
-            uint64_t time_stamp = socket->AddToTimer(dynamic_cast<CSenderRelialeOrderlyNetMsg*>(msg));
-            if (!msg->_re_send) {
-                // set rtt sample
-                _rto.SetIdTime(msg->_head._id, time_stamp);
-
-            } else {
-                _rto.RemoveIdTime(msg->_head._id);
-            }
-        } 
-    }
-    
-    CHudpImpl::Instance().SendMsgToNet(msg);
 }
 
 void CSocket::RecvAck(NetMsg* msg) {
@@ -364,73 +312,21 @@ void CSocket::RecvMsgToOrderList(NetMsg* msg) {
     }
 }
 
-void CSocketImpl::AddAck(NetMsg* msg) {
-    if (msg->_head._flag & HPF_IS_ORDERLY && msg->_head._flag & HPF_NEED_ACK) {
-        if (_pend_ack[WI_RELIABLE_ORDERLY]) {
-            _pend_ack[WI_RELIABLE_ORDERLY]->AddAck(msg->_head._id);
+void CSocketImpl::AddAck(CMsg* msg) {
+    auto header_flag = msg->GetHeaderFlag();
+    if (header_flag & HTF_RELIABLE_ORDERLY) {
+        AddToPendAck(WI_RELIABLE_ORDERLY, msg);
 
-        } else {
-            CreatePendAck(WI_RELIABLE_ORDERLY);
-            _pend_ack[WI_RELIABLE_ORDERLY]->AddAck(msg->_head._id);
-        }
-
-    } else if (msg->_head._flag & HPF_NEED_ACK) {
-        if (_pend_ack[WI_RELIABLE]) {
-            _pend_ack[WI_RELIABLE]->AddAck(msg->_head._id);
-
-        } else {
-            CreatePendAck(WI_RELIABLE);
-            _pend_ack[WI_RELIABLE]->AddAck(msg->_head._id);
-        }
+    } else if (header_flag & HTF_RELIABLE) {
+        AddToPendAck(WI_RELIABLE, msg);
     }
 
     // add to timer
     if (!_is_in_timer) {
-        Attach(__pend_ack_send);
+        // add to timer
+        // TODO
         _is_in_timer = true;
     }
-}
-
-bool CSocket::AttachPendAck(NetMsg* msg) {
-    // clear prv ack info
-    msg->ClearAck();
-
-    if (_pend_ack[WI_RELIABLE_ORDERLY] && _pend_ack[WI_RELIABLE_ORDERLY]->HasAck()) {
-        bool continuity = false;
-        bool ret = _pend_ack[WI_RELIABLE_ORDERLY]->GetAllAck(msg->_head._ack_vec, continuity);
-        if (ret && continuity) {
-            msg->_head._flag |= HPF_RELIABLE_ORDERLY_ACK_RANGE;
-        }
-        msg->_head._ack_reliable_orderly_len = msg->_head._ack_vec.size();
-        msg->_head._flag |= HPF_WITH_RELIABLE_ORDERLY_ACK;
-        msg->_flag = true;
-    }
-
-    if (_pend_ack[WI_RELIABLE] && _pend_ack[WI_RELIABLE]->HasAck()) {
-        bool continuity = false;
-        bool ret = _pend_ack[WI_RELIABLE]->GetAllAck(msg->_head._ack_vec, continuity);
-        if (ret && continuity) {
-            msg->_head._flag |= HPF_RELIABLE_ACK_RANGE;
-        }
-        msg->_head._ack_reliable_len = msg->_head._ack_vec.size() - msg->_head._ack_reliable_orderly_len;
-        msg->_head._flag |= HPF_WITH_RELIABLE_ACK;
-        msg->_flag = true;
-    }
-    return msg->_flag;
-}
-
-void CSocket::OnTimer() {
-    // create a ack msg and send to remote.
-    if ((_pend_ack[WI_RELIABLE] && _pend_ack[WI_RELIABLE]->HasAck())
-       || (_pend_ack[WI_RELIABLE_ORDERLY] && _pend_ack[WI_RELIABLE_ORDERLY]->HasAck())) {
-        // ack may added to net msg already, check pendack
-        NetMsg* msg = CNetMsgPool::Instance().GetNormalMsg();
-        msg->_socket = shared_from_this();
-        msg->_ip_port = _handle;
-        SendMsgToNet(msg);
-    }
-
-    _is_in_timer = false;
 }
 
 uint64_t CSocket::AddToTimer(CSenderRelialeOrderlyNetMsg* msg) {
@@ -440,76 +336,38 @@ uint64_t CSocket::AddToTimer(CSenderRelialeOrderlyNetMsg* msg) {
     return msg->Attach(time);
 }
 
-void CSocket::CreateSendWnd(WndIndex index) {
-    if (_send_wnd[index] == nullptr) {
-        _send_wnd[index] = new CSendWnd(__send_wnd_size);
+void CSocketImpl::AddToSendWnd(WndIndex index, CMsg* msg) {
+    if (!_send_wnd[index]) {
+        _send_wnd[index] = new CSendWnd();
     }
-
-    if (_inc_id[index] == nullptr) {
-        _inc_id[index] = new CIncrementalId();
-    }
+    _send_wnd[index]->PushBack(msg);
 }
 
-void CSocket::CreateRecvList(WndIndex index) {
-    if (_recv_list[index] == nullptr) {
+void CSocketImpl::AddToRecvList(WndIndex index, CMsg* msg) {
+    if (!_recv_list[index]) {
         if (index == WI_ORDERLY) {
             _recv_list[index] = new COrderlyList();
-        
+
         } else if (index == WI_RELIABLE) {
             _recv_list[index] = new CReliableList();
-        
+
         } else if (index == WI_RELIABLE_ORDERLY) {
             _recv_list[index] = new CReliableOrderlyList();
         }
     }
+    _recv_list[index]->Insert(msg);
 }
 
-void CSocket::CreatePendAck(WndIndex index) {
-    if (_pend_ack[index] == nullptr) {
+void CSocketImpl::AddToPendAck(WndIndex index, CMsg* msg) {
+    if (!_pend_ack[index]) {
         _pend_ack[index] = new CPendAck();
     }
+    _pend_ack[index]->AddAck(msg->GetId());
 }
 
-bool CSocket::Serializes(NetMsg* msg) {
-    if (msg->_bit_stream) {
-        if (msg->_flag) {
-            msg->_bit_stream->Clear();
-            CBitStreamWriter* temp_bit_stream = static_cast<CBitStreamWriter*>(msg->_bit_stream);
-            if (CSerializes::Serializes(*msg, *temp_bit_stream)) {
-                msg->_bit_stream = temp_bit_stream;
-                return true;            
-
-            } else {
-                base::LOG_ERROR("serializes msg to stream failed. id : %d, handle : %s", msg->_head._id, msg->_ip_port.c_str());
-                return false;
-            }
-        } 
-
-    } else {
-        CBitStreamWriter* temp_bit_stream = static_cast<CBitStreamWriter*>(CBitStreamPool::Instance().GetBitStream());
-
-        if (CSerializes::Serializes(*msg, *temp_bit_stream)) {
-            msg->_bit_stream = temp_bit_stream;
-
-        } else {
-            base::LOG_ERROR("serializes msg to stream failed. id : %d, handle : %s", msg->_head._id, msg->_ip_port.c_str());
-            return false;
-        }
+void CSocketImpl::AddToPriorityQueue(WndIndex index, CMsg* msg) {
+    if (!_pri_queue[index]) {
+        _pri_queue[index] = new CPriorityQueue();
     }
-   
-    return true;
-}
-
-bool CSocket::Deseriali(NetMsg* msg) {
-    CBitStreamReader* temp_bit_stream = static_cast<CBitStreamReader*>(msg->_bit_stream);
-    msg->_socket = shared_from_this();
-    if (!CSerializes::Deseriali(*temp_bit_stream, *msg)) {
-        base::LOG_ERROR("deserialize stream to msg failed. id : %d, handle : %s", msg->_head._id, msg->_ip_port.c_str());
-        return false;
-    }
-    return true;
-}
-
-HudpHandle CSocket::GetHandle() {
-    return _handle;
+    _pri_queue[index]->PushBack(msg);
 }

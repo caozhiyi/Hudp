@@ -12,7 +12,7 @@ namespace hudp {
         CPriorityQueue() {}
         virtual ~CPriorityQueue() {}
 
-        virtual void Push(CMsg* msg) = 0;
+        virtual void PushBack(CMsg* msg) = 0;
 
         // get a item from queue by priority
         virtual CMsg* Pop() = 0;

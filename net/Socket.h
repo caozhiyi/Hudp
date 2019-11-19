@@ -37,7 +37,7 @@ namespace hudp {
         // called back by order list when msg recv to upper.
         void ToRecv(CMsg* msg);
         // called back by send window t when send a bag to net.
-        void ToSend(CMsg* msg);
+        void ToSend(CMsg* msg, CSendWnd* send_wnd);
         // called back by send window t when recv a ack.
         void AckDone(CMsg* msg);
         // called back by timer t when timer out.
@@ -69,9 +69,6 @@ namespace hudp {
         // add a msg to timer. return cur time stamp.
         uint64_t AddToTimer(CSenderRelialeOrderlyNetMsg* msg);
 
-        // about serializes
-        bool Serializes(NetMsg* msg);
-        bool Deseriali(NetMsg* msg);
 
         // get ip port handle
         HudpHandle GetHandle();
@@ -79,22 +76,19 @@ namespace hudp {
     private:
         void AddAckToMsg(CMsg* msg);
         void GetAckToSendWnd(CMsg* msg);
-        void CreateRecvList(WndIndex index);
-
     private:
-        // Instantiating corresponding classes.
-        void CreateSendWnd(WndIndex index);
-        void CreateRecvList(WndIndex index);
-        void CreatePendAck(WndIndex index);
+        void AddToSendWnd(WndIndex index, CMsg* msg);
+        void AddToRecvList(WndIndex index, CMsg* msg);
+        void AddToPendAck(WndIndex index, CMsg* msg);
+        void AddToPriorityQueue(WndIndex index, CMsg* msg);
 
     private:
         // reliable correlation
         CSendWnd*            _send_wnd[__wnd_size];
-        CIncrementalId*      _incremental_id[__wnd_size];
         CRecvList*           _recv_list[__wnd_size];
         CPendAck*            _pend_ack[__wnd_size];
         // msg priority queue
-        CPriorityQueue*      _pri_queue;
+        CPriorityQueue*      _pri_queue[__wnd_size];
         // about pend ack timer
         std::atomic<bool>    _is_in_timer;
         // rto
