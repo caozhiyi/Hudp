@@ -13,3 +13,5 @@
 *.db
 *.vscode
 *.pro*
+*.suo
+*.sdf

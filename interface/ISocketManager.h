@@ -13,13 +13,13 @@ namespace hudp {
         CSocketManager() {}
         virtual ~CSocketManager() {}
 
-        virtual bool IsSocketExist(const Handle& handle) = 0;
+        virtual bool IsSocketExist(const HudpHandle& handle) = 0;
         // return a socket, create one if not exist.
-        virtual std::shared_ptr<CSocket> GetSocket(const Handle& handle) = 0;
+        virtual std::shared_ptr<CSocket> GetSocket(const HudpHandle& handle) = 0;
         // remove a socket directly
-        virtual void DeleteSocket(const Handle& handle) = 0;
+        virtual void DeleteSocket(const HudpHandle& handle) = 0;
         // send close msg to remote
-        virtual void CloseSocket(const Handle& handle) = 0;
+        virtual void CloseSocket(const HudpHandle& handle) = 0;
     };
 }
 #endif

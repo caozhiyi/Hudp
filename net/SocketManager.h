@@ -9,24 +9,24 @@
 
 #include "CommonType.h"
 #include "CommonFlag.h"
-#include "Single.h"
+#include "ISocketManager.h"
 
 namespace hudp {
 
     class CSocket;
-    class NetMsg;
-    class CSocketManager : public base::CSingle<CSocketManager> {
+    // not thread safe
+    class CSocketManagerImpl : public CSocketManager {
     public:
-        CSocketManager();
-        ~CSocketManager();
+        CSocketManagerImpl();
+        ~CSocketManagerImpl();
     
-        // get a msg from priority queue.
-        // all socket take msg out in turn.
-        // if it's empty, it's blocked.
-        NetMsg* GetMsg();
-
-        // notify msg arrive 
-        void NotifyMsg(const HudpHandle& handle);
+        bool IsSocketExist(const HudpHandle& handle);
+        // return a socket, create one if not exist.
+        std::shared_ptr<CSocket> GetSocket(const HudpHandle& handle);
+        // remove a socket directly
+        void DeleteSocket(const HudpHandle& handle);
+        // send close msg to remote
+        void CloseSocket(const HudpHandle& handle);
 
         // get a socket.
         // if there isn't a socket, just create it.
@@ -44,11 +44,7 @@ namespace hudp {
         std::shared_ptr<CSocket> GetSocket(const HudpHandle& handle);
 
     private:
-       std::unordered_map<HudpHandle, std::shared_ptr<CSocket>> _socket_map;
-
-       std::mutex                   _mutex;
-       std::condition_variable_any	_notify;
-       std::list<HudpHandle>        _have_msg_socket;
+        std::unordered_map<HudpHandle, std::shared_ptr<CSocket>> _socket_map;
     };
 }
 

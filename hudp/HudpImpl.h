@@ -45,8 +45,6 @@ namespace hudp {
         void AfterSendProcess(CMsg* msg);
         void AfterRecvProcess(CMsg* msg);
 
-        // make public flag to private flag of hudp
-        //void TranslateFlag(NetMsg* msg);
 
     private:
         std::vector<std::shared_ptr<CThread>>      _thread_vec;
