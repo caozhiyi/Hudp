@@ -3,6 +3,7 @@
 
 #include <thread>
 #include <atomic>
+#include <functional>
 
 namespace base {
     class CRunnable
