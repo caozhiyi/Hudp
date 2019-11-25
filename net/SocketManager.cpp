@@ -35,7 +35,8 @@ void CSocketManagerImpl::DeleteSocket(const HudpHandle& handle) {
 }
 
 void CSocketManagerImpl::CloseSocket(const HudpHandle& handle) {
-
+    // send close msg to remote here
+    // TODO
 }
 
 std::shared_ptr<CSocket> CSocketManagerImpl::GetSocket(const HudpHandle& handle) {

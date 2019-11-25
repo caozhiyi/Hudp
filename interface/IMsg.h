@@ -1,6 +1,7 @@
 #ifndef HEADER_INTERFACE_MSG
 #define HEADER_INTERFACE_MSG
 
+#include <memory>
 #include "CommonType.h"
 
 namespace hudp {
@@ -52,6 +53,11 @@ namespace hudp {
         // next point about
         virtual void SetNext(CMsg* msg) = 0;
         virtual CMsg* GetNext() = 0;
+
+        virtual void SetPrev(CMsg* msg) = 0;
+        virtual CMsg* GetPrev() = 0;
+
+        virtual std::shared_ptr<CSocket> GetSocket() = 0;
     };
 }
 #endif
