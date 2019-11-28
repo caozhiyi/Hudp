@@ -9,6 +9,7 @@ namespace hudp {
         msg_has_changed   = 0x0001,   // message has be change, need serialize again
         msg_is_in_timer   = 0x0002,   // message has be setted in timer
         msg_is_only_ack   = 0x0004,   // message is only with ack
+        msg_with_out_id   = 0X0008    // message don't have id
     };
 
     // msg base class.

@@ -4,7 +4,7 @@
 using namespace hudp;
 CMsgImpl::CMsgImpl() : _push_send_time(0),
                        _backoff_factor(1),
-                       _flag(false) {
+                       _flag(msg_with_out_id) {
 }
 
 CMsgImpl::~CMsgImpl() {
@@ -12,7 +12,7 @@ CMsgImpl::~CMsgImpl() {
 }
 
 void CMsgImpl::Clear() {
-    _flag = false;
+    _flag = msg_with_out_id;
     _ip_port.clear();
     _head.Clear();
     _socket.reset();
@@ -25,6 +25,7 @@ void CMsgImpl::ClearAck() {
 }
 
 void CMsgImpl::SetId(const uint16_t& id) {
+    _flag |= ~msg_with_out_id;
     _head.SetId(id);
 }
 

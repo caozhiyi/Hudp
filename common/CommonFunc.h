@@ -2,6 +2,7 @@
 #define HEADER_COMMON_COMMONFUNC
 
 #include <string>
+#include "CommonType.h"
 
 namespace hudp {
     // split ip port string. ip port like "127.0.0.1:8080"

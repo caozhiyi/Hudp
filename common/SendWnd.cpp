@@ -2,66 +2,49 @@
 #include "Log.h"
 #include "IMsg.h"
 #include "ISocket.h"
+#include "IncrementalId.h"
+#include "IPriorityQueue.h"
 
 using namespace hudp;
 
 CSendWndImpl::CSendWndImpl(uint16_t send_wnd_size) : _end(nullptr),
-                                             _send_wnd_size(send_wnd_size),
-                                             _cur_send_size(0) {
+                                                     _send_wnd_size(send_wnd_size),
+                                                     _cur_send_size(0) {
     _start = _end;
     _cur = _end;
+    _priority_queue = nullptr; // TODO
+    _incremental_id = new CIncrementalId;
 }
 
 CSendWndImpl::~CSendWndImpl() {
     Clear();
 }
 
-void CSendWndImpl::PushBack(uint16_t id, CMsg* msg) {
+void CSendWndImpl::PushBack(CMsg* msg) {
     if (msg == nullptr) {
-        base::LOG_WARN("send a nullptr to send wnd. id : %d", id);
+        base::LOG_WARN("send a nullptr to send wnd.");
         return;
     }
 
-    // repeat msg
-    if (_id_map.find(id) != _id_map.end()) {
-        base::LOG_WARN("send a repeat mag to send wnd. id : %d", id);
+    if (!(msg->GetFlag() & msg_with_out_id)) {
+        base::LOG_WARN("send a repeat mag to send wnd. id : %d", msg->GetId());
         return;
     }
+    // can send now, push to priority queue.
+    if (_cur_send_size >= _send_wnd_size) {
+        _priority_queue->PushBack(msg);
 
-    _id_map[id] = msg;
-    msg->SetNext(nullptr);
-    msg->SetPrev(nullptr);
-
-    if (_end) {
-        _end->SetNext(msg);
-        msg->SetPrev(_end);
-        _end = msg;
+    } else {
+        PushBackToSendWnd(msg);
     }
-
-    if (_cur == nullptr) {
-        _cur = _end;
-    }
-
-    if (_start == nullptr) {
-        _start = msg;
-        _end = msg;
-    }
-
-    if (_cur_send_size < _send_wnd_size) {
-        _send_queue.push_back(msg);
-        _cur_send_size++;
-        _cur = nullptr;
-    }
-
-    SendAndAck();
 }
 // receive a ack
 void CSendWndImpl::AcceptAck(uint16_t id) {
 
     base::LOG_DEBUG("send wnd recv a ack. id : %d", id);
     std::unique_lock<std::mutex> lock(_mutex);
-    auto iter = _id_map.find(id);
-    if (iter == _id_map.end()) {
+    auto iter = _id_msg_map.find(id);
+    if (iter == _id_msg_map.end()) {
         return;
     }
 
@@ -87,12 +70,12 @@ void CSendWndImpl::AcceptAck(uint16_t id) {
         _cur = iter->second->GetNext();
     }
 
-    _ack_queue.push_back(iter->second);
+    _ack_queue.push(iter->second);
     _cur_send_size--;
     // send next bag
     SendNext();
 
-    _id_map.erase(iter);
+    _id_msg_map.erase(iter);
  
     SendAndAck();
 }
@@ -125,55 +108,74 @@ void CSendWndImpl::ChangeSendWndSize(uint16_t size) {
 
 // remove all msg
 void CSendWndImpl::Clear() {
-    for (auto iter = _id_map.begin(); iter != _id_map.end(); ++iter) {
+    for (auto iter = _id_msg_map.begin(); iter != _id_msg_map.end(); ++iter) {
         auto sock = iter->second->GetSocket();
         if (sock) {
             sock->AckDone(iter->second);
         }
     }
-    _id_map.clear();
+    _id_msg_map.clear();
 }
-
-
-void CSendWndImpl::SetIndexResend(uint16_t id) {
-    CMsg* msg = nullptr;
-    {
-        std::unique_lock<std::mutex> lock(_mutex);
-        auto iter = _id_map.find(id);
-        if (iter == _id_map.end()) {
-            return;
-        }
-        msg = iter->second;
-    }
-    
-    if (msg) {
-        auto sock = msg->GetSocket();
-        if (sock) {
-            sock->ToSend(msg);
-        }
-    }
-}
-
 
 void CSendWndImpl::SendAndAck() {
-    /*CMsg* item = nullptr;
+    CMsg* item = nullptr;
 
-    while (_send_queue.Pop(item)) {
-        item->ToSend();
+    while (_send_queue.empty()) {
+        item = _send_queue.front();
+        _send_queue.pop();
+        auto sock = item->GetSocket();
+        sock->ToSend(item);
     }
-    _send_queue.Clear();
-    while (_ack_queue.Pop(item)) {
-        item->AckDone();   
+
+    while (_ack_queue.empty()) {
+        item = _ack_queue.front();
+        _ack_queue.pop();
+        auto sock = item->GetSocket();
+        sock->AckDone(item);
     }
-    _ack_queue.Clear();*/
 }
 
 void CSendWndImpl::SendNext() {
     // send next bag
     if (_cur_send_size < _send_wnd_size && _cur) {
-        _send_queue.push_back(_cur);
+        CMsg* temp = _priority_queue->Pop();    
+        if (temp) {
+            PushBackToSendWnd(temp);
+        }
+
+        _send_queue.push(_cur);
         _cur_send_size++;
         _cur = _cur->GetNext();
-    
     } 
+}
+
+void CSendWndImpl::PushBackToSendWnd(CMsg* msg) {
+    uint16_t id = _incremental_id->GetNextId();
+    msg->SetId(id);
+    _id_msg_map[id] = msg;
+    msg->SetNext(nullptr);
+    msg->SetPrev(nullptr);
+
+    if (_end) {
+        _end->SetNext(msg);
+        msg->SetPrev(_end);
+        _end = msg;
+    }
+
+    if (_cur == nullptr) {
+        _cur = _end;
+    }
+
+    if (_start == nullptr) {
+        _start = msg;
+        _end = msg;
+    }
+
+    if (_cur_send_size < _send_wnd_size) {
+        _send_queue.push(msg);
+        _cur_send_size++;
+        _cur = nullptr;
+    }
+
+    SendAndAck();
 }

@@ -32,12 +32,6 @@ namespace hudp {
         // if there isn't a socket, just create it.
         void GetSocket(const HudpHandle& handle, std::shared_ptr<CSocket>& socket);
 
-        // destroy resource of socket and send destroy msg to remote.
-        void Destroy(const HudpHandle& handle);
-
-        // check socket exist
-        bool Exist(const HudpHandle& handle);
-
     private:
         // get a socket from _socket_map. 
         // if there isn't a socket, just create it. 

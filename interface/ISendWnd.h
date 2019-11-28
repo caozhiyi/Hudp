@@ -12,7 +12,7 @@ namespace hudp {
         CSendWnd() {}
         virtual ~CSendWnd() {}
 
-        virtual void PushBack(uint16_t id, CMsg* msg) = 0;
+        virtual void PushBack(CMsg* msg) = 0;
         // receive a ack
         virtual void AcceptAck(uint16_t id) = 0;
         virtual void AcceptAck(uint16_t start_id, uint16_t len) = 0;
