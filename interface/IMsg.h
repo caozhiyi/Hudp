@@ -49,7 +49,7 @@ namespace hudp {
 
         // get buffer that is serialized
         virtual std::string GetSerializeBuffer() = 0;
-        virtual bool InitWithBuffer() = 0;
+        virtual bool InitWithBuffer(std::string&) = 0;
 
         // next point about
         virtual void SetNext(CMsg* msg) = 0;

@@ -36,6 +36,7 @@ namespace hudp {
         bool GetReliableAck(std::vector<uint16_t>& ack_vec);
     private:
         friend class CMsgImpl;
+        friend class CSerializes;
         uint16_t _flag;
         uint16_t _id;
         uint16_t _body_len;

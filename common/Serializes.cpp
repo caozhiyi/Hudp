@@ -1,13 +1,14 @@
 #include "Serializes.h"
 #include "Log.h"
 #include "CommonFlag.h"
-#include "NetMsg.h"
+#include "MsgImpl.h"
+#include "MsgHead.h"
 #include "BitStream.h"
 
 using namespace hudp;
 
-bool CSerializes::Serializes(NetMsg& msg, CBitStreamWriter& bit_stream) {
-    return Serializes(msg._head, msg._body, msg._head._body_len, bit_stream);
+bool CSerializes::Serializes(CMsgImpl& msg, CBitStreamWriter& bit_stream) {
+    return Serializes(msg._head, msg._body.c_str(), msg._body.length(), bit_stream);
 }
 
 bool CSerializes::Serializes(const Head& head, CBitStreamWriter& bit_stream) {
@@ -27,11 +28,11 @@ bool CSerializes::Serializes(const Head& head, CBitStreamWriter& bit_stream) {
         if (head._ack_reliable_orderly_len > 0) {
             CHECK_RET(bit_stream.Write(head._ack_reliable_orderly_len));
             if (head._flag & HPF_RELIABLE_ORDERLY_ACK_RANGE) {
-                CHECK_RET(bit_stream.Write(head._ack_vec[0]));
+                CHECK_RET(bit_stream.Write(head._ack_reliable_orderly_vec[0]));
 
             } else {
                 for (uint16_t i = 0; i < head._ack_reliable_orderly_len; i++) {
-                    CHECK_RET(bit_stream.Write(head._ack_vec[i]));
+                    CHECK_RET(bit_stream.Write(head._ack_reliable_orderly_vec[i]));
                 }
             }
         }
@@ -40,11 +41,11 @@ bool CSerializes::Serializes(const Head& head, CBitStreamWriter& bit_stream) {
         if (head._ack_reliable_len > 0) {
             CHECK_RET(bit_stream.Write(head._ack_reliable_len));
             if (head._flag & HPF_RELIABLE_ACK_RANGE) {
-                CHECK_RET(bit_stream.Write(head._ack_vec[head._ack_reliable_orderly_len]));
+                CHECK_RET(bit_stream.Write(head._ack_reliable_vec[head._ack_reliable_orderly_len]));
 
             } else {
                 for (uint16_t i = head._ack_reliable_orderly_len; i < head._ack_reliable_len; i++) {
-                    CHECK_RET(bit_stream.Write(head._ack_vec[i]));
+                    CHECK_RET(bit_stream.Write(head._ack_reliable_vec[i]));
                 }
             }
         }
@@ -59,7 +60,6 @@ bool CSerializes::Serializes(const Head& head, CBitStreamWriter& bit_stream) {
 bool CSerializes::Serializes(Head& head, const char* body, uint16_t len, CBitStreamWriter& bit_stream) {
     if (len > 0) {
         head._body_len = len;
-        head._flag |= HPF_WITH_BODY;
     }
     if (!Serializes(head, bit_stream)) {
         return false;
@@ -68,8 +68,8 @@ bool CSerializes::Serializes(Head& head, const char* body, uint16_t len, CBitStr
     return bit_stream.Write(body, len);
 }
 
-bool CSerializes::Deseriali(CBitStreamReader& bit_stream, NetMsg& msg) {
-    return Deseriali(bit_stream, msg._head, msg._body, msg._head._body_len);
+bool CSerializes::Deseriali(CBitStreamReader& bit_stream, CMsgImpl& msg) {
+    return Deseriali(bit_stream, msg._head, msg._body);
 }
 
 bool CSerializes::Deseriali(CBitStreamReader& bit_stream, Head& head) {
@@ -84,12 +84,12 @@ bool CSerializes::Deseriali(CBitStreamReader& bit_stream, Head& head) {
         uint16_t tmp = 0;
         if (head._flag & HPF_RELIABLE_ORDERLY_ACK_RANGE) {
             CHECK_RET(bit_stream.Read(tmp));
-            head._ack_vec.push_back(tmp);
+            head._ack_reliable_orderly_vec.push_back(tmp);
 
         } else {
             for (uint16_t i = 0; i < head._ack_reliable_orderly_len; i++) {
                 CHECK_RET(bit_stream.Read(tmp));
-                head._ack_vec.push_back(tmp);
+                head._ack_reliable_orderly_vec.push_back(tmp);
             }
         }
     }
@@ -98,12 +98,12 @@ bool CSerializes::Deseriali(CBitStreamReader& bit_stream, Head& head) {
         uint16_t tmp = 0;
         if (head._flag & HPF_RELIABLE_ACK_RANGE) {
             CHECK_RET(bit_stream.Read(tmp));
-            head._ack_vec.push_back(tmp);
+            head._ack_reliable_vec.push_back(tmp);
 
         } else {
             for (uint16_t i = head._ack_reliable_orderly_len; i < head._ack_reliable_len; i++) {
                 CHECK_RET(bit_stream.Read(tmp));
-                head._ack_vec.push_back(tmp);
+                head._ack_reliable_vec.push_back(tmp);
             }
         }
     }
@@ -114,11 +114,10 @@ bool CSerializes::Deseriali(CBitStreamReader& bit_stream, Head& head) {
     return true;
 }
   
-bool CSerializes::Deseriali(CBitStreamReader& bit_stream, Head& head, char* body, uint16_t& len) {
+bool CSerializes::Deseriali(CBitStreamReader& bit_stream, Head& head, std::string& body) {
     if (!Deseriali(bit_stream, head)) {
         return false;
     }
     CHECK_RET(bit_stream.Read(body, head._body_len));
-    len = head._body_len;
     return true;
 }
