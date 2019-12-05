@@ -14,18 +14,18 @@ using namespace hudp;
 
 static WSADATA __wsa_data;
 
-bool COsNet::Init() {
+bool COsNetImpl::Init() {
     if (WSAStartup(MAKEWORD(2, 2), &__wsa_data) != 0) {
         return false;
     }
     return true;
 }
 
-void COsNet::Destroy() {
+void COsNetImpl::Destroy() {
     WSACleanup();
 }
 
-bool COsNet::Bind(uint64_t socket, const std::string& ip, uint16_t port) {
+bool COsNetImpl::Bind(uint64_t socket, const std::string& ip, uint16_t port) {
     if (port <= 0 || ip.empty()) {
         base::LOG_ERROR("bind socket failed. ip is error. ip : %s", ip.c_str());
         return false;
@@ -43,7 +43,7 @@ bool COsNet::Bind(uint64_t socket, const std::string& ip, uint16_t port) {
     return true;
 }
 
-int COsNet::SendTo(uint64_t socket, const char * buf, int len, const std::string& ip, uint16_t port) {
+int COsNetImpl::SendTo(uint64_t socket, const char * buf, int len, const std::string& ip, uint16_t port) {
     SOCKADDR_IN addr_cli;
     addr_cli.sin_family = AF_INET;
     addr_cli.sin_port = htons(port);
@@ -55,12 +55,12 @@ int COsNet::SendTo(uint64_t socket, const char * buf, int len, const std::string
     return ret;
 }
 
-int COsNet::SendTo(uint64_t socket, const char * buf, int len, const std::string& ip_port) {
+int COsNetImpl::SendTo(uint64_t socket, const char * buf, int len, const std::string& ip_port) {
     auto ret = SplitIpPort(ip_port);
     return SendTo(socket, buf, len, ret.second, ret.first);
 }
 
-int COsNet::SendTo(uint64_t socket, const char * buf, int len) {
+int COsNetImpl::SendTo(uint64_t socket, const char * buf, int len) {
     int ret = send(socket, buf, len, 0);
     if (ret <= 0) {
         base::LOG_ERROR("send to failed. errno : %d", WSAGetLastError());
@@ -68,7 +68,7 @@ int COsNet::SendTo(uint64_t socket, const char * buf, int len) {
     return ret;
 }
 
-int COsNet::RecvFrom(uint64_t sockfd, char *buf, size_t len, std::string& ip, uint16_t& port) {
+int COsNetImpl::RecvFrom(uint64_t sockfd, char *buf, size_t len, std::string& ip, uint16_t& port) {
     SOCKADDR_IN addr_cli;
     int fromlen = sizeof(SOCKADDR);
     int ret = recvfrom(sockfd, buf, len, 0, (SOCKADDR*)&addr_cli, &fromlen);
@@ -83,7 +83,7 @@ int COsNet::RecvFrom(uint64_t sockfd, char *buf, size_t len, std::string& ip, ui
     return ret;
 }
 
-uint64_t COsNet::UdpSocket() {
+uint64_t COsNetImpl::UdpSocket() {
     auto ret = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 
     // ignore recvfrom 10054 error
@@ -98,7 +98,7 @@ uint64_t COsNet::UdpSocket() {
     return ret;
 }
 
-std::string COsNet::GetOsIp(bool is_ipv4) {
+std::string COsNetImpl::GetOsIp(bool is_ipv4) {
 
     char hostname[255] = { 0 };
     // get ipv4 
@@ -154,7 +154,7 @@ std::string COsNet::GetOsIp(bool is_ipv4) {
     return std::string(ipv6);
 }
 
-bool COsNet::Close(uint64_t socket) {
+bool COsNetImpl::Close(uint64_t socket) {
     if (closesocket(socket) == SOCKET_ERROR) {
         base::LOG_ERROR("close socket failed. errno %d : ", WSAGetLastError());
         return false;

@@ -1,7 +1,7 @@
 #include <cstring>		//for memset
 #include "OrderList.h"
-#include "NetMsgPool.h"
 #include "HudpConfig.h"
+#include "IMsg.h"
 using namespace hudp;
 
 CRecvList::CRecvList() {
@@ -30,14 +30,15 @@ CReliableOrderlyList::~CReliableOrderlyList() {
     }
 }
 
-uint16_t CReliableOrderlyList::Insert(uint16_t id, COrderListSolt* ol) {
+uint16_t CReliableOrderlyList::Insert(CMsg* msg) {
+	auto id = msg->GetId();
     uint16_t index = HashFunc(id);
     
     {
         std::unique_lock<std::mutex> lock(_mutex);
 
         if (id == _expect_id) {
-            _order_list[index] = ol;
+			_order_list[index] = msg;
             while (_order_list[index]) {
                 _expect_id++;
                 _recv_list.Push(_order_list[index]);
@@ -55,17 +56,18 @@ uint16_t CReliableOrderlyList::Insert(uint16_t id, COrderListSolt* ol) {
             if (_order_list[index]) {
                 return 1;
             } else {
-                _order_list[index] = ol;
+				_order_list[index] = msg;
             }
             
         }
     }
     
     if (_recv_list.Size() > 0) {
-        COrderListSolt* item = nullptr;
+		CMsg* item = nullptr;
 
         while (_recv_list.Pop(item)) {
-            item->ToRecv();
+			auto sock = item->GetSocket();
+			sock->ToRecv(item);
         }
         _recv_list.Clear();
     }
@@ -80,7 +82,8 @@ CReliableList::~CReliableList() {
     
 }
    
-uint16_t CReliableList::Insert(uint16_t id, COrderListSolt* ol) {
+uint16_t CReliableList::Insert(CMsg* msg) {
+	auto id = msg->GetId();
     uint16_t index = HashFunc(id);
     {
         std::unique_lock<std::mutex> lock(_mutex);
@@ -102,7 +105,8 @@ uint16_t CReliableList::Insert(uint16_t id, COrderListSolt* ol) {
             }
         }
     }
-    ol->ToRecv();
+	auto sock = msg->GetSocket();
+	sock->ToRecv(msg);
     return 0;
 }
 
@@ -114,13 +118,14 @@ COrderlyList::~COrderlyList() {
 
 }
 
-uint16_t COrderlyList::Insert(uint16_t id, COrderListSolt* ol) {
-    
+uint16_t COrderlyList::Insert(CMsg* msg) {
+	auto id = msg->GetId();
     if (id < _expect_id) {
         return 0;
     }
 
     _expect_id = id;
-    ol->ToRecv();
+	auto sock = msg->GetSocket();
+    sock->ToRecv(msg);
     return 0;
 }

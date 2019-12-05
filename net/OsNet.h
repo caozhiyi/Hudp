@@ -3,34 +3,35 @@
 
 #include <iostream>
 #include "CommonType.h"
+#include "INetIO.h"
 
 namespace hudp {
-    class COsNet {
+	class COsNetImpl : public CNetIO {
         public:
 
         // net library init 
-        static bool Init();
-        static void Destroy();
+        bool Init();
+        void Destroy();
 
         // bind a socket to ip port
-        static bool Bind(uint64_t socket, const std::string& ip, uint16_t port);
+        bool Bind(uint64_t socket, const std::string& ip, uint16_t port);
 
         // send a msg to client
-        static int SendTo(uint64_t socket, const char * buf, int len, const std::string& ip, uint16_t port);
-        static int SendTo(uint64_t socket, const char * buf, int len, const std::string& ip_port);
-        static int SendTo(uint64_t socket, const char * buf, int len);
+        int SendTo(uint64_t socket, const char * buf, int len, const std::string& ip, uint16_t port);
+        int SendTo(uint64_t socket, const char * buf, int len, const std::string& ip_port);
+        int SendTo(uint64_t socket, const char * buf, int len);
 
         // receiver msg from socket
-        static int RecvFrom(uint64_t sockfd, char *buf, size_t len, std::string& ip, uint16_t& port);
+        int RecvFrom(uint64_t sockfd, char *buf, size_t len, std::string& ip, uint16_t& port);
 
         // return a udp socket if success. else return 0
-        static uint64_t UdpSocket();
+        uint64_t UdpSocket();
         
         // get local ip
-        static std::string GetOsIp(bool is_ipv4 = true);
+        std::string GetOsIp(bool is_ipv4 = true);
 
         // close socket
-        static bool Close(uint64_t socket);
+        bool Close(uint64_t socket);
     };
 }
 

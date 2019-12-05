@@ -8,7 +8,7 @@
 namespace hudp {
 
     // pool size at initialization.
-    //static const uint16_t __netmsg_init_pool_size = 200;
+    // static const uint16_t __netmsg_init_pool_size = 200;
     class CMsg;
     class CMsgPoolFactory : public CMsgFactory {
     public:
