@@ -4,7 +4,6 @@
 #include <set>
 #include <vector>
 #include <mutex>
-
 #include "CommonType.h"
 
 namespace hudp {

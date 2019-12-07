@@ -28,15 +28,6 @@ namespace hudp {
         // send close msg to remote
         void CloseSocket(const HudpHandle& handle);
 
-        // get a socket.
-        // if there isn't a socket, just create it.
-        void GetSocket(const HudpHandle& handle, std::shared_ptr<CSocket>& socket);
-
-    private:
-        // get a socket from _socket_map. 
-        // if there isn't a socket, just create it. 
-        std::shared_ptr<CSocket> GetSocket(const HudpHandle& handle);
-
     private:
         std::unordered_map<HudpHandle, std::shared_ptr<CSocket>> _socket_map;
     };

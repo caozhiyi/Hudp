@@ -1,6 +1,6 @@
 #include <cstring>		//for memset
 
-#include "Socket.h"
+#include "SocketImpl.h"
 #include "SendWnd.h"
 #include "OrderList.h"
 #include "PriorityQueue.h"
@@ -18,7 +18,7 @@ using namespace hudp;
 // this size may be a dynamic algorithm control
 static const uint16_t __send_wnd_size = 5;
 
-CSocketImpl::CSocketImpl(const Handle& handle) : _handle(handle) {
+CSocketImpl::CSocketImpl(const HudpHandle& handle) : _handle(handle) {
     memset(_send_wnd, 0, sizeof(_send_wnd));
     memset(_recv_list, 0, sizeof(_recv_list));
     memset(_pend_ack, 0, sizeof(_pend_ack));
@@ -39,7 +39,7 @@ CSocketImpl::~CSocketImpl() {
     }
 }
 
-Handle CSocketImpl::GetHandle() {
+HudpHandle CSocketImpl::GetHandle() {
     return _handle;
 }
 
@@ -96,7 +96,7 @@ void CSocketImpl::ToRecv(CMsg* msg) {
     CHudpImpl::Instance().RecvMessageToUpper(_handle, msg);
 }
 
-void CSocketImpl::ToSend(CMsg* msg, CSendWnd* send_wnd) {
+void CSocketImpl::ToSend(CMsg* msg) {
     // add to timer
     if (msg->GetHeaderFlag() & HTF_RELIABLE_ORDERLY || msg->GetHeaderFlag() & HTF_RELIABLE) {
         // TODO
@@ -161,7 +161,7 @@ void CSocketImpl::AddAckToMsg(CMsg* msg) {
 
 void CSocketImpl::GetAckToSendWnd(CMsg* msg) {
     if (msg->GetHeaderFlag() & HPF_WITH_RELIABLE_ORDERLY_ACK) {
-        auto time_stap = CTimer::Instance().GetTimeStamp();
+        //auto time_stap = CTimer::Instance().GetTimeStamp();
         std::vector<uint16_t> vec;
         msg->GetAck(HPF_WITH_RELIABLE_ORDERLY_ACK, vec);
         for (uint16_t index = vec[0], i = 0; i < vec.size(); index++, i++) {
@@ -173,7 +173,7 @@ void CSocketImpl::GetAckToSendWnd(CMsg* msg) {
     }
 
     if (msg->GetHeaderFlag() & HPF_WITH_RELIABLE_ACK) {
-        auto time_stap = CTimer::Instance().GetTimeStamp();
+        //auto time_stap = CTimer::Instance().GetTimeStamp();
         std::vector<uint16_t> vec;
         msg->GetAck(HPF_WITH_RELIABLE_ACK, vec);
         for (uint16_t index = vec[0], i = 0; i < vec.size(); index++, i++) {

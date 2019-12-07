@@ -10,6 +10,7 @@
 namespace hudp {
 
     class CFilter;
+    class CMsg;
     class CFilterProcessNoThread: public CFilterProcess {
     public:
         CFilterProcessNoThread() {}

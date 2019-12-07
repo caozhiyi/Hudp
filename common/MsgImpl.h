@@ -14,26 +14,6 @@ namespace hudp {
         ~CMsgImpl();
 
         void Clear();
-
-        void ClearAck();
-
-        void SetId(const uint16_t& id);
-        uint16_t GetId();
-
-        void TranslateFlag();
-        void SetFlag(uint16_t flag);
-        uint16_t GetFlag();
-
-        void SetHandle(const Handle& handle);
-        const Handle& GetHandle();
-
-        void SetBody(const std::string& body);
-        std::string& GetBody();
-
-        bool GetSerializeBuffer(char* buf, uint16_t& len);
-        bool InitBuffer(char* buf, uint16_t len);
-
-        void Clear();
         // clear member which about ack
         void ClearAck();
 
@@ -51,8 +31,8 @@ namespace hudp {
         void SetFlag(uint16_t flag);
         uint16_t GetFlag();
 
-        void SetHandle(const Handle& handle);
-        const Handle& GetHandle();
+        void SetHandle(const HudpHandle& HudpHandle);
+        const HudpHandle& GetHandle();
 
         void SetBody(const std::string& body);
         std::string& GetBody();

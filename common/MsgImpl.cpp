@@ -77,11 +77,11 @@ uint16_t CMsgImpl::GetFlag() {
     return _head._flag;
 }
 
-void CMsgImpl::SetHandle(const Handle& handle) {
+void CMsgImpl::SetHandle(const HudpHandle& handle) {
     _ip_port = handle;
 }
 
-const Handle& CMsgImpl::GetHandle() {
+const HudpHandle& CMsgImpl::GetHandle() {
     return _ip_port;
 }
 

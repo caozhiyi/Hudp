@@ -11,7 +11,7 @@ namespace hudp {
         CSocket() {}
         virtual ~CSocket() {}
 
-        virtual Handle GetHandle() = 0;
+        virtual HudpHandle GetHandle() = 0;
 
         virtual void SendMessage(CMsg* msg) = 0;
 

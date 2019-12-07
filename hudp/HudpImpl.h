@@ -28,14 +28,14 @@ namespace hudp {
 
         // send msg
         void SendTo(const HudpHandle& handle, uint16_t flag, const std::string& msg);
-        void SendTo(const HudpHandle& handle, uint16_t flag, const char* msg, uint16_t len);
+        void SendTo(const HudpHandle& Hhandle, uint16_t flag, const char* msg, uint16_t len);
 
         // destory socket. release resources
         void Close(const HudpHandle& handle);
 
     public:
         // notify aupper recv a message.
-        void RecvMessageToUpper(const Handle& handle, CMsg* msg);
+        void RecvMessageToUpper(const HudpHandle& handle, CMsg* msg);
         // send message to net
         void SendMessageToNet(CMsg* msg);
         // release send message

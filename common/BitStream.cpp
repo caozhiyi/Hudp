@@ -1,6 +1,5 @@
 #include <memory.h> // for memset memcpy
 #include "BitStream.h"
-#include "NetMsg.h"
 #include "CommonFlag.h"
 #include "Log.h"
 #include "HudpConfig.h"

@@ -20,7 +20,7 @@ CHudpImpl::~CHudpImpl() {
     for (auto iter = _thread_vec.begin(); iter != _thread_vec.end(); ++iter) {
         (*iter)->Stop();
     }
-    CTimer::Instance().Stop();
+    //CTimer::Instance().Stop();
     _net_io->Close(_listen_socket);
 }
 
@@ -58,7 +58,7 @@ bool CHudpImpl::Start(const std::string& ip, uint16_t port, const recv_back& fun
         (*iter)->Start();
     }
     
-    CTimer::Instance().Start();
+    //CTimer::Instance().Start();
 
     return true;
 }
@@ -68,7 +68,7 @@ void CHudpImpl::Join() {
         (*iter)->Join();
     }
 
-    CTimer::Instance().Join();
+    //CTimer::Instance().Join();
 }
 
 void CHudpImpl::SendTo(const HudpHandle& handle, uint16_t flag, const std::string& msg) {
@@ -94,7 +94,7 @@ void CHudpImpl::Close(const HudpHandle& handle) {
     _socket_mananger->CloseSocket(handle);
 }
 
-void CHudpImpl::RecvMessageToUpper(const Handle& handle, CMsg* msg) {
+void CHudpImpl::RecvMessageToUpper(const HudpHandle& HudpHandle, CMsg* msg) {
     _filter_process->PushRecvMsg(msg);
 }
 

@@ -6,6 +6,7 @@
 
 namespace hudp {
     class CFilter;
+    class CMsg;
     class CFilterProcess
     {
     public:

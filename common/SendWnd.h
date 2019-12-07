@@ -2,6 +2,7 @@
 #define HEADER_COMMON_SENDWND
 
 #include <queue>
+#include <mutex>
 #include <unordered_map>
 #include "CommonType.h"
 #include "ISendWnd.h"

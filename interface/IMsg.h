@@ -1,6 +1,7 @@
 #ifndef HEADER_INTERFACE_MSG
 #define HEADER_INTERFACE_MSG
 
+#include <vector>
 #include <memory>
 #include "CommonType.h"
 
@@ -12,6 +13,7 @@ namespace hudp {
         msg_with_out_id   = 0X0008    // message don't have id
     };
 
+    class CSocket;
     // msg base class.
     class CMsg
     {
@@ -37,8 +39,8 @@ namespace hudp {
         virtual void SetFlag(uint16_t flag) = 0;
         virtual uint16_t GetFlag() = 0;
 
-        virtual void SetHandle(const Handle& handle) = 0;
-        virtual const Handle& GetHandle() = 0;
+        virtual void SetHandle(const HudpHandle& handle) = 0;
+        virtual const HudpHandle& GetHandle() = 0;
         
         virtual void SetBody(const std::string& body) = 0;
         virtual std::string& GetBody() = 0;

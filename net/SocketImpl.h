@@ -1,9 +1,11 @@
-#ifndef HEADER_NET_SOCKET
-#define HEADER_NET_SOCKET
+#ifndef HEADER_NET_SOCKETIMPL
+#define HEADER_NET_SOCKETIMPL
 
+#include <atomic>
 #include <memory>       // for enable shared from this
 #include "CommonType.h"
-#include "Socket.h"
+#include "ISocket.h"
+#include "HudpFlag.h"
 
 namespace hudp {
 
@@ -37,7 +39,7 @@ namespace hudp {
         // called back by order list when msg recv to upper.
         void ToRecv(CMsg* msg);
         // called back by send window t when send a bag to net.
-        void ToSend(CMsg* msg, CSendWnd* send_wnd);
+        void ToSend(CMsg* msg);
         // called back by send window t when recv a ack.
         void AckDone(CMsg* msg);
         // called back by timer t when timer out.
@@ -56,7 +58,7 @@ namespace hudp {
     private:
         // reliable correlation
         CSendWnd*            _send_wnd[__wnd_size];
-        CRecvList*           _recv_list[__wnd_size];
+        COrderList*          _recv_list[__wnd_size];
         CPendAck*            _pend_ack[__wnd_size];
  
         // about pend ack timer
