@@ -1,14 +1,14 @@
-#ifndef HEADER_NET_OSNET_INTERFACE
-#define HEADER_NET_OSNET_INTERFACE
+#ifndef HEADER_NET_OSNET_IMPL
+#define HEADER_NET_OSNET_IMPL
 
 #include <iostream>
 #include "CommonType.h"
 #include "INetIO.h"
 
 namespace hudp {
+
 	class COsNetImpl : public CNetIO {
         public:
-
         // net library init 
         bool Init();
         void Destroy();

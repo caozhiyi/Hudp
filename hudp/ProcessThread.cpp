@@ -1,48 +1,43 @@
-//#include "ProcessThread.h"
-//#include "FilterProcess.h"
-//#include "HudpImpl.h"
-//#include "Log.h"
-//using namespace hudp;
-//
-//CRecvProcessThread::CRecvProcessThread() {
-//
-//}
-//
-//CRecvProcessThread::~CRecvProcessThread() {
-//    Stop();
-//    Push(nullptr);
-//    Join();
-//}
-//
-//void CRecvProcessThread::Run() {
-//    while (!_stop) {
-//        auto pt = _Pop();
-//        if (pt) {
-//            CFilterProcess::Instance().RecvProcess((NetMsg*)pt);
-//        } else {
-//            base::LOG_WARN("recv process thread get a null msg.");
-//        }
-//    }
-//}
-//
-//CSendProcessThread::CSendProcessThread() {
-//
-//}
-//
-//CSendProcessThread::~CSendProcessThread() {
-//    Stop();
-//    Push(nullptr);
-//    Join();
-//}
-//
-//void CSendProcessThread::Run() {
-//    while (!_stop) {
-//        auto pt = CSocketManager::Instance().GetMsg();
-//        if (pt) {
-//            CFilterProcess::Instance().SendProcess((NetMsg*)pt);
-//
-//        } else {
-//            base::LOG_WARN("send process thread get a null msg.");
-//        }
-//    }
-//}
+#include "ProcessThread.h"
+#include "Log.h"
+#include "IMsg.h"
+#include "ISocket.h"
+#include "HudpImpl.h"
+#include "IFilterProcess.h"
+
+using namespace hudp;
+
+CProcessThread::CProcessThread() {
+
+}
+
+CProcessThread::~CProcessThread() {
+    Stop();
+    Push(nullptr);
+    Join();
+}
+
+void CProcessThread::Start(std::shared_ptr<CFilterProcess>& filter_process) {
+    _filter_process = filter_process;
+    CRunnable::Start();
+}
+
+void CProcessThread::Run() {
+    while (!_stop) {
+        auto msg = static_cast<CMsg*>(_Pop());
+        // msg not free to pool
+        if (msg) {
+            auto flag = msg->GetFlag();
+            if (flag & msg_recv) {
+                auto sock = msg->GetSocket();
+                sock->RecvMessage(msg);
+
+            } else {
+                _filter_process->PushSendMsg(msg);
+            }
+
+        } else {
+            base::LOG_WARN("send thread get a null msg.");
+        }
+    }
+}

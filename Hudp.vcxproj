@@ -39,7 +39,7 @@
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
@@ -70,13 +70,17 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(SolutionDir)common;$(SolutionDir)base;$(SolutionDir)hudp;$(SolutionDir)include;$(SolutionDir)interface;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)common;$(SolutionDir)base;$(SolutionDir)hudp;$(SolutionDir)include;$(SolutionDir)interface;$(SolutionDir)third\absl\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(SolutionDir)common;$(SolutionDir)base;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)common;$(SolutionDir)base;$(SolutionDir)third\absl\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SolutionDir)common;$(SolutionDir)base;$(SolutionDir)hudp;$(SolutionDir)include;$(SolutionDir)interface;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)common;$(SolutionDir)base;$(SolutionDir)hudp;$(SolutionDir)include;$(SolutionDir)interface;$(SolutionDir)third\absl\include;$(SolutionDir)third\gtest\include;$(SolutionDir)net;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)third\gtest\win64\lib;$(SolutionDir)third\absl\win64-debug;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>$(SolutionDir)third\absl\include;$(SolutionDir)third\gtest\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -94,6 +98,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -138,7 +143,7 @@
     <ClCompile Include="common\IncrementalId.cpp" />
     <ClCompile Include="common\MsgHead.cpp" />
     <ClCompile Include="common\MsgImpl.cpp" />
-    <ClCompile Include="common\OrderList.cpp" />
+    <ClCompile Include="common\OrderListImpl.cpp" />
     <ClCompile Include="common\PendAck.cpp" />
     <ClCompile Include="common\PriorityQueue.cpp" />
     <ClCompile Include="common\Rto.cpp" />
@@ -146,18 +151,13 @@
     <ClCompile Include="common\Serializes.cpp" />
     <ClCompile Include="common\Timer.cpp" />
     <ClCompile Include="hudp\CloseMageger.cpp" />
-    <ClCompile Include="hudp\FilterInterface.cpp" />
     <ClCompile Include="hudp\FilterProcessNoThread.cpp" />
-    <ClCompile Include="hudp\FunctionNetMsg.cpp" />
     <ClCompile Include="hudp\Hudp.cpp" />
     <ClCompile Include="hudp\HudpImpl.cpp" />
     <ClCompile Include="hudp\MsgPoolFactory.cpp" />
-    <ClCompile Include="hudp\ProcessThread.cpp" />
     <ClCompile Include="hudp\RecvThread.cpp" />
-    <ClCompile Include="hudp\RelialeOrderlyFilter.cpp" />
-    <ClCompile Include="hudp\SendThread.cpp" />
-    <ClCompile Include="hudp\UpperThread.cpp" />
-    <ClCompile Include="net\Socket.cpp" />
+    <ClCompile Include="hudp\ProcessThread.cpp" />
+    <ClCompile Include="net\SocketImpl.cpp" />
     <ClCompile Include="net\SocketManager.cpp" />
     <ClCompile Include="net\win\OsNet.cpp" />
     <ClCompile Include="utest\common\Ut_BitStream.cpp" />
@@ -169,6 +169,7 @@
     <ClCompile Include="utest\common\Ut_Serializes.cpp" />
     <ClCompile Include="utest\common\Ut_Timer.cpp" />
     <ClCompile Include="utest\net\Ut_OsNet.cpp" />
+    <ClCompile Include="utest\Test.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="base\Any.h" />
@@ -193,28 +194,21 @@
     <ClInclude Include="common\IncrementalId.h" />
     <ClInclude Include="common\MsgHead.h" />
     <ClInclude Include="common\MsgImpl.h" />
-    <ClInclude Include="common\OrderList.h" />
-    <ClInclude Include="common\OrderListSolt.h" />
+    <ClInclude Include="common\OrderListImpl.h" />
     <ClInclude Include="common\PendAck.h" />
     <ClInclude Include="common\PriorityQueue.h" />
     <ClInclude Include="common\Rto.h" />
     <ClInclude Include="common\SendWnd.h" />
-    <ClInclude Include="common\SendWndSolt.h" />
     <ClInclude Include="common\Serializes.h" />
     <ClInclude Include="common\Timer.h" />
-    <ClInclude Include="common\TimerSolt.h" />
     <ClInclude Include="common\CommonFunc.h" />
     <ClInclude Include="hudp\CloseManager.h" />
-    <ClInclude Include="hudp\FilterInterface.h" />
     <ClInclude Include="hudp\FilterProcessNoThread.h" />
-    <ClInclude Include="hudp\FunctionNetMsg.h" />
+    <ClInclude Include="hudp\HudpConfig.h" />
     <ClInclude Include="hudp\HudpImpl.h" />
     <ClInclude Include="hudp\MsgPoolFactory.h" />
-    <ClInclude Include="hudp\ProcessThread.h" />
     <ClInclude Include="hudp\RecvThread.h" />
-    <ClInclude Include="hudp\RelialeOrderlyFilter.h" />
-    <ClInclude Include="hudp\SendThread.h" />
-    <ClInclude Include="hudp\UpperThread.h" />
+    <ClInclude Include="hudp\ProcessThread.h" />
     <ClInclude Include="include\Hudp.h" />
     <ClInclude Include="include\HudpFlag.h" />
     <ClInclude Include="interface\IFilter.h" />
@@ -228,11 +222,48 @@
     <ClInclude Include="interface\ISendWnd.h" />
     <ClInclude Include="interface\ISocket.h" />
     <ClInclude Include="interface\ISocketManager.h" />
-    <ClInclude Include="interface\IThread.h" />
-    <ClInclude Include="net\Socket.h" />
+    <ClInclude Include="net\SocketImpl.h" />
     <ClInclude Include="net\OsNet.h" />
     <ClInclude Include="net\SocketManager.h" />
-    <ClInclude Include="utest\Test.h" />
+    <ClInclude Include="third\absl\include\absl\strings\ascii.h" />
+    <ClInclude Include="third\absl\include\absl\strings\charconv.h" />
+    <ClInclude Include="third\absl\include\absl\strings\escaping.h" />
+    <ClInclude Include="third\absl\include\absl\strings\match.h" />
+    <ClInclude Include="third\absl\include\absl\strings\numbers.h" />
+    <ClInclude Include="third\absl\include\absl\strings\string_view.h" />
+    <ClInclude Include="third\absl\include\absl\strings\strip.h" />
+    <ClInclude Include="third\absl\include\absl\strings\str_cat.h" />
+    <ClInclude Include="third\absl\include\absl\strings\str_format.h" />
+    <ClInclude Include="third\absl\include\absl\strings\str_join.h" />
+    <ClInclude Include="third\absl\include\absl\strings\str_replace.h" />
+    <ClInclude Include="third\absl\include\absl\strings\str_split.h" />
+    <ClInclude Include="third\absl\include\absl\strings\substitute.h" />
+    <ClInclude Include="third\gtest\include\gmock\gmock-actions.h" />
+    <ClInclude Include="third\gtest\include\gmock\gmock-cardinalities.h" />
+    <ClInclude Include="third\gtest\include\gmock\gmock-function-mocker.h" />
+    <ClInclude Include="third\gtest\include\gmock\gmock-generated-actions.h" />
+    <ClInclude Include="third\gtest\include\gmock\gmock-generated-function-mockers.h" />
+    <ClInclude Include="third\gtest\include\gmock\gmock-generated-matchers.h" />
+    <ClInclude Include="third\gtest\include\gmock\gmock-matchers.h" />
+    <ClInclude Include="third\gtest\include\gmock\gmock-more-actions.h" />
+    <ClInclude Include="third\gtest\include\gmock\gmock-more-matchers.h" />
+    <ClInclude Include="third\gtest\include\gmock\gmock-nice-strict.h" />
+    <ClInclude Include="third\gtest\include\gmock\gmock-spec-builders.h" />
+    <ClInclude Include="third\gtest\include\gmock\gmock.h" />
+    <ClInclude Include="third\gtest\include\gtest\gtest-death-test.h" />
+    <ClInclude Include="third\gtest\include\gtest\gtest-matchers.h" />
+    <ClInclude Include="third\gtest\include\gtest\gtest-message.h" />
+    <ClInclude Include="third\gtest\include\gtest\gtest-param-test.h" />
+    <ClInclude Include="third\gtest\include\gtest\gtest-printers.h" />
+    <ClInclude Include="third\gtest\include\gtest\gtest-spi.h" />
+    <ClInclude Include="third\gtest\include\gtest\gtest-test-part.h" />
+    <ClInclude Include="third\gtest\include\gtest\gtest-typed-test.h" />
+    <ClInclude Include="third\gtest\include\gtest\gtest.h" />
+    <ClInclude Include="third\gtest\include\gtest\gtest_pred_impl.h" />
+    <ClInclude Include="third\gtest\include\gtest\gtest_prod.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="third\gtest\include\gmock\gmock-generated-function-mockers.h.pump" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

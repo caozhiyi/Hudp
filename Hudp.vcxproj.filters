@@ -31,6 +31,18 @@
     <Filter Include="interface">
       <UniqueIdentifier>{9bde2fc8-1f19-4a1d-b519-1a37c12303a3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="third">
+      <UniqueIdentifier>{1e85c499-0795-4e57-82e6-2e80abc9ce08}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="third\absl">
+      <UniqueIdentifier>{a182bfdb-faeb-42c1-81b8-ae65ed12bb5e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="third\gtest">
+      <UniqueIdentifier>{af8d04c5-0bce-40f0-b26b-9d47be8d4edd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="third\absl\strings">
+      <UniqueIdentifier>{c56c5cec-f417-45f9-bf2d-7b8fd6c4c265}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="utest\common\Ut_BitStream.cpp">
@@ -57,9 +69,6 @@
     <ClCompile Include="common\IncrementalId.cpp">
       <Filter>common</Filter>
     </ClCompile>
-    <ClCompile Include="common\OrderList.cpp">
-      <Filter>common</Filter>
-    </ClCompile>
     <ClCompile Include="common\PriorityQueue.cpp">
       <Filter>common</Filter>
     </ClCompile>
@@ -71,9 +80,6 @@
     </ClCompile>
     <ClCompile Include="common\Timer.cpp">
       <Filter>common</Filter>
-    </ClCompile>
-    <ClCompile Include="hudp\FilterInterface.cpp">
-      <Filter>hudp</Filter>
     </ClCompile>
     <ClCompile Include="utest\common\Ut_IncrementalId.cpp">
       <Filter>utest\common</Filter>
@@ -93,9 +99,6 @@
     <ClCompile Include="net\win\OsNet.cpp">
       <Filter>net\win</Filter>
     </ClCompile>
-    <ClCompile Include="net\Socket.cpp">
-      <Filter>net</Filter>
-    </ClCompile>
     <ClCompile Include="utest\net\Ut_OsNet.cpp">
       <Filter>utest\net</Filter>
     </ClCompile>
@@ -108,22 +111,7 @@
     <ClCompile Include="net\SocketManager.cpp">
       <Filter>net</Filter>
     </ClCompile>
-    <ClCompile Include="hudp\RelialeOrderlyFilter.cpp">
-      <Filter>hudp</Filter>
-    </ClCompile>
-    <ClCompile Include="hudp\ProcessThread.cpp">
-      <Filter>hudp</Filter>
-    </ClCompile>
     <ClCompile Include="hudp\RecvThread.cpp">
-      <Filter>hudp</Filter>
-    </ClCompile>
-    <ClCompile Include="hudp\SendThread.cpp">
-      <Filter>hudp</Filter>
-    </ClCompile>
-    <ClCompile Include="hudp\UpperThread.cpp">
-      <Filter>hudp</Filter>
-    </ClCompile>
-    <ClCompile Include="hudp\FunctionNetMsg.cpp">
       <Filter>hudp</Filter>
     </ClCompile>
     <ClCompile Include="common\PendAck.cpp">
@@ -161,6 +149,18 @@
     </ClCompile>
     <ClCompile Include="hudp\MsgPoolFactory.cpp">
       <Filter>hudp</Filter>
+    </ClCompile>
+    <ClCompile Include="net\SocketImpl.cpp">
+      <Filter>net</Filter>
+    </ClCompile>
+    <ClCompile Include="common\OrderListImpl.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="hudp\ProcessThread.cpp">
+      <Filter>hudp</Filter>
+    </ClCompile>
+    <ClCompile Include="utest\Test.cpp">
+      <Filter>utest</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -218,19 +218,10 @@
     <ClInclude Include="common\IncrementalId.h">
       <Filter>common</Filter>
     </ClInclude>
-    <ClInclude Include="common\OrderList.h">
-      <Filter>common</Filter>
-    </ClInclude>
-    <ClInclude Include="common\OrderListSolt.h">
-      <Filter>common</Filter>
-    </ClInclude>
     <ClInclude Include="common\PriorityQueue.h">
       <Filter>common</Filter>
     </ClInclude>
     <ClInclude Include="common\SendWnd.h">
-      <Filter>common</Filter>
-    </ClInclude>
-    <ClInclude Include="common\SendWndSolt.h">
       <Filter>common</Filter>
     </ClInclude>
     <ClInclude Include="common\Serializes.h">
@@ -239,19 +230,7 @@
     <ClInclude Include="common\Timer.h">
       <Filter>common</Filter>
     </ClInclude>
-    <ClInclude Include="common\TimerSolt.h">
-      <Filter>common</Filter>
-    </ClInclude>
     <ClInclude Include="net\OsNet.h">
-      <Filter>net</Filter>
-    </ClInclude>
-    <ClInclude Include="hudp\FilterInterface.h">
-      <Filter>hudp</Filter>
-    </ClInclude>
-    <ClInclude Include="utest\Test.h">
-      <Filter>utest</Filter>
-    </ClInclude>
-    <ClInclude Include="net\Socket.h">
       <Filter>net</Filter>
     </ClInclude>
     <ClInclude Include="common\CommonFunc.h">
@@ -260,22 +239,7 @@
     <ClInclude Include="net\SocketManager.h">
       <Filter>net</Filter>
     </ClInclude>
-    <ClInclude Include="hudp\RelialeOrderlyFilter.h">
-      <Filter>hudp</Filter>
-    </ClInclude>
-    <ClInclude Include="hudp\ProcessThread.h">
-      <Filter>hudp</Filter>
-    </ClInclude>
     <ClInclude Include="hudp\RecvThread.h">
-      <Filter>hudp</Filter>
-    </ClInclude>
-    <ClInclude Include="hudp\SendThread.h">
-      <Filter>hudp</Filter>
-    </ClInclude>
-    <ClInclude Include="hudp\UpperThread.h">
-      <Filter>hudp</Filter>
-    </ClInclude>
-    <ClInclude Include="hudp\FunctionNetMsg.h">
       <Filter>hudp</Filter>
     </ClInclude>
     <ClInclude Include="common\PendAck.h">
@@ -332,9 +296,6 @@
     <ClInclude Include="interface\ISocketManager.h">
       <Filter>interface</Filter>
     </ClInclude>
-    <ClInclude Include="interface\IThread.h">
-      <Filter>interface</Filter>
-    </ClInclude>
     <ClInclude Include="common\MsgImpl.h">
       <Filter>common</Filter>
     </ClInclude>
@@ -350,5 +311,130 @@
     <ClInclude Include="interface\IPriorityQueue.h">
       <Filter>interface</Filter>
     </ClInclude>
+    <ClInclude Include="third\absl\include\absl\strings\ascii.h">
+      <Filter>third\absl\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="third\absl\include\absl\strings\charconv.h">
+      <Filter>third\absl\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="third\absl\include\absl\strings\escaping.h">
+      <Filter>third\absl\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="third\absl\include\absl\strings\match.h">
+      <Filter>third\absl\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="third\absl\include\absl\strings\numbers.h">
+      <Filter>third\absl\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="third\absl\include\absl\strings\str_cat.h">
+      <Filter>third\absl\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="third\absl\include\absl\strings\str_format.h">
+      <Filter>third\absl\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="third\absl\include\absl\strings\str_join.h">
+      <Filter>third\absl\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="third\absl\include\absl\strings\str_replace.h">
+      <Filter>third\absl\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="third\absl\include\absl\strings\str_split.h">
+      <Filter>third\absl\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="third\absl\include\absl\strings\string_view.h">
+      <Filter>third\absl\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="third\absl\include\absl\strings\strip.h">
+      <Filter>third\absl\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="third\absl\include\absl\strings\substitute.h">
+      <Filter>third\absl\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="third\gtest\include\gtest\gtest.h">
+      <Filter>third\gtest</Filter>
+    </ClInclude>
+    <ClInclude Include="third\gtest\include\gtest\gtest_pred_impl.h">
+      <Filter>third\gtest</Filter>
+    </ClInclude>
+    <ClInclude Include="third\gtest\include\gtest\gtest_prod.h">
+      <Filter>third\gtest</Filter>
+    </ClInclude>
+    <ClInclude Include="third\gtest\include\gtest\gtest-death-test.h">
+      <Filter>third\gtest</Filter>
+    </ClInclude>
+    <ClInclude Include="third\gtest\include\gtest\gtest-matchers.h">
+      <Filter>third\gtest</Filter>
+    </ClInclude>
+    <ClInclude Include="third\gtest\include\gtest\gtest-message.h">
+      <Filter>third\gtest</Filter>
+    </ClInclude>
+    <ClInclude Include="third\gtest\include\gtest\gtest-param-test.h">
+      <Filter>third\gtest</Filter>
+    </ClInclude>
+    <ClInclude Include="third\gtest\include\gtest\gtest-printers.h">
+      <Filter>third\gtest</Filter>
+    </ClInclude>
+    <ClInclude Include="third\gtest\include\gtest\gtest-spi.h">
+      <Filter>third\gtest</Filter>
+    </ClInclude>
+    <ClInclude Include="third\gtest\include\gtest\gtest-test-part.h">
+      <Filter>third\gtest</Filter>
+    </ClInclude>
+    <ClInclude Include="third\gtest\include\gtest\gtest-typed-test.h">
+      <Filter>third\gtest</Filter>
+    </ClInclude>
+    <ClInclude Include="net\SocketImpl.h">
+      <Filter>net</Filter>
+    </ClInclude>
+    <ClInclude Include="common\OrderListImpl.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="third\gtest\include\gmock\gmock.h">
+      <Filter>third\gtest</Filter>
+    </ClInclude>
+    <ClInclude Include="third\gtest\include\gmock\gmock-actions.h">
+      <Filter>third\gtest</Filter>
+    </ClInclude>
+    <ClInclude Include="third\gtest\include\gmock\gmock-cardinalities.h">
+      <Filter>third\gtest</Filter>
+    </ClInclude>
+    <ClInclude Include="third\gtest\include\gmock\gmock-function-mocker.h">
+      <Filter>third\gtest</Filter>
+    </ClInclude>
+    <ClInclude Include="third\gtest\include\gmock\gmock-generated-actions.h">
+      <Filter>third\gtest</Filter>
+    </ClInclude>
+    <ClInclude Include="third\gtest\include\gmock\gmock-generated-function-mockers.h">
+      <Filter>third\gtest</Filter>
+    </ClInclude>
+    <ClInclude Include="third\gtest\include\gmock\gmock-generated-matchers.h">
+      <Filter>third\gtest</Filter>
+    </ClInclude>
+    <ClInclude Include="third\gtest\include\gmock\gmock-matchers.h">
+      <Filter>third\gtest</Filter>
+    </ClInclude>
+    <ClInclude Include="third\gtest\include\gmock\gmock-more-actions.h">
+      <Filter>third\gtest</Filter>
+    </ClInclude>
+    <ClInclude Include="third\gtest\include\gmock\gmock-more-matchers.h">
+      <Filter>third\gtest</Filter>
+    </ClInclude>
+    <ClInclude Include="third\gtest\include\gmock\gmock-nice-strict.h">
+      <Filter>third\gtest</Filter>
+    </ClInclude>
+    <ClInclude Include="third\gtest\include\gmock\gmock-spec-builders.h">
+      <Filter>third\gtest</Filter>
+    </ClInclude>
+    <ClInclude Include="hudp\HudpConfig.h">
+      <Filter>hudp</Filter>
+    </ClInclude>
+    <ClInclude Include="hudp\ProcessThread.h">
+      <Filter>hudp</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="third\gtest\include\gmock\gmock-generated-function-mockers.h.pump">
+      <Filter>third\gtest</Filter>
+    </None>
   </ItemGroup>
 </Project>

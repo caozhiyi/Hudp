@@ -19,14 +19,13 @@ CMsgPoolFactory::~CMsgPoolFactory() {
     }
 }
 
-CMsg* CMsgPoolFactory::CreateMsg(uint16_t flag) {
+CMsg* CMsgPoolFactory::CreateMsg() {
     CMsg* net_msg;
     if (!_free_net_msg_queue.Pop(net_msg)) {
         net_msg = new CMsgImpl();
     }
 
     if (net_msg) {
-        net_msg->SetHeaderFlag(flag);
         return net_msg;
     }
     return nullptr;

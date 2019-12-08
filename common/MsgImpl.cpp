@@ -4,11 +4,11 @@
 #include "Serializes.h"
 
 using namespace hudp;
-CMsgImpl::CMsgImpl() : _push_send_time(0),
-                       _backoff_factor(1),
+CMsgImpl::CMsgImpl() : _backoff_factor(1),
                        _flag(msg_with_out_id),
                        _next(nullptr),
-                       _prev(nullptr) {
+                       _prev(nullptr),
+                       _time_id(0) {
 
 }
 
@@ -22,7 +22,7 @@ void CMsgImpl::Clear() {
     _head.Clear();
     _socket.reset();
     _backoff_factor = 1;
-    _push_send_time = 0;
+    _time_id = 0;
 }
 
 void CMsgImpl::ClearAck() {
@@ -120,7 +120,7 @@ std::string CMsgImpl::GetSerializeBuffer() {
     return std::string(bit_stream.GetDataPoint(), bit_stream.GetCurrentLength());
 }
 
-bool CMsgImpl::InitWithBuffer(std::string& msg) {
+bool CMsgImpl::InitWithBuffer(const std::string& msg) {
     CBitStreamReader bit_stream;
     bit_stream.Init(msg.c_str(), msg.length());
     if (!CSerializes::Deseriali(bit_stream, *this)) {
@@ -145,6 +145,18 @@ CMsg* CMsgImpl::GetPrev() {
     return _prev;
 }
 
+void CMsgImpl::SetTimerId(uint64_t id) {
+    _time_id = id;
+}
+
+uint64_t CMsgImpl::GetTimerId() {
+    return _time_id;
+}
+
 std::shared_ptr<CSocket> CMsgImpl::GetSocket() {
     return _socket.lock();
+}
+
+void CMsgImpl::SetSocket(std::shared_ptr<CSocket>& sock) {
+    _socket = sock;
 }

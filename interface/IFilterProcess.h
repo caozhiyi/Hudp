@@ -19,11 +19,11 @@ namespace hudp {
         // push message to send process
         virtual void PushSendMsg(CMsg* msg) = 0;
         // set send message call back
-        virtual void SetSendFunc(const std::function<void(std::string&)>& func) = 0;
+        virtual void SetSendFunc(const std::function<void(CMsg*)>& func) = 0;
         // push message to recv process
         virtual void PushRecvMsg(CMsg* msg) = 0;
         // set recv message call back
-        virtual void SetRecvFunc(const std::function<void(std::string&)>& func) = 0;
+        virtual void SetRecvFunc(const std::function<void(CMsg*)>& func) = 0;
     };
 }
 #endif

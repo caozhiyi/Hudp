@@ -43,7 +43,7 @@ namespace hudp {
 
         // get buffer that is serialized
         std::string GetSerializeBuffer();
-        bool InitWithBuffer(std::string& msg);
+        bool InitWithBuffer(const std::string& msg);
 
         // next point about
         void SetNext(CMsg* msg);
@@ -52,7 +52,11 @@ namespace hudp {
         void SetPrev(CMsg* msg);
         CMsg* GetPrev();
 
+        void SetTimerId(uint64_t id);
+        uint64_t GetTimerId();
+
         std::shared_ptr<CSocket> GetSocket();
+        void SetSocket(std::shared_ptr<CSocket>& sock);
 
     private:
         friend class CSerializes;
@@ -67,9 +71,10 @@ namespace hudp {
         CMsg*           _next;
         CMsg*           _prev;
 
-        std::weak_ptr<CSocket> _socket;
-        uint64_t       _push_send_time;  // when user send the msg to hudp.
+        uint64_t       _time_id;
         uint16_t       _backoff_factor;  // timer out resend backoff factor, every time resend it will * 2
+
+        std::weak_ptr<CSocket> _socket;
     };
 }
 #endif

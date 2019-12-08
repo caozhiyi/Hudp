@@ -22,6 +22,7 @@ namespace hudp {
     private:
         std::mutex  _mutex;
         // all ack id cache
+        uint16_t    _start;
         std::set<uint16_t> _ack_set;
     };
 }

@@ -13,6 +13,9 @@ CPendAck::~CPendAck() {
 void CPendAck::AddAck(uint16_t ack_id) {
     base::LOG_DEBUG("[ACK] : pend ack add a msg. id : %d", ack_id);
     std::unique_lock<std::mutex> lock(_mutex);
+    if (_ack_set.empty()) {
+        _start = ack_id;
+    }
     _ack_set.insert(ack_id);
 }
 
@@ -24,16 +27,25 @@ bool CPendAck::GetAllAck(std::vector<uint16_t>& ack_vec, bool& continuity) {
 
     continuity = true;
 
-    auto iter = _ack_set.begin();
-    uint16_t tmp = *iter;
-
+    uint16_t len = _ack_set.size();
+    auto iter = _ack_set.find(_start);
     ack_vec.push_back(*iter);
-    ++iter;
-    for (; iter != _ack_set.end(); ++iter) {
-        if (tmp != *iter - 1) {
+    uint16_t prev_tmp = *iter;
+    while (1) {
+        iter++;
+        len--;
+        if (len == 0) {
+            break;
+        }
+
+        if (iter == _ack_set.end()) {
+            iter = _ack_set.begin();
+        }
+
+        if (prev_tmp != (uint16_t)(*iter - 1)) {
             continuity = false;
         }
-        tmp = *iter;
+        prev_tmp = *iter;
         
         ack_vec.push_back(*iter);
     }

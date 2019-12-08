@@ -1,11 +1,33 @@
-//#include "SendWndSolt.h"
+//#include "gtest/gtest.h"
 //#include "SendWnd.h"
-//#include "../Test.h"
+//#include "IOrderList.h"
+//#include "OrderListImpl.h"
+//#include "MsgImpl.h"
+//#include "SocketImpl.h"
 //
 //using namespace hudp;
 //
 //CSendWnd __send_wnd(2);
 //static bool __run = true;
+//
+//uint64_t global_id = 0;
+//
+//class CTestSocket : public CSocketImpl {
+//public:
+//    CTestSocket() : CSocketImpl("") {}
+//    ~CTestSocket() {}
+//    void ToRecv(CMsg* msg) {
+//        global_id = msg->GetId();
+//    }
+//};
+//
+//std::shared_ptr<CSocket> sock(new CTestSocket());
+//
+//std::shared_ptr<CMsg> msg1(new CMsgImpl());
+//std::shared_ptr<CMsg> msg2(new CMsgImpl());
+//std::shared_ptr<CMsg> msg3(new CMsgImpl());
+//std::shared_ptr<CMsg> msg4(new CMsgImpl());
+//std::shared_ptr<CMsg> msg5(new CMsgImpl());
 //
 //class CWndMsg : public CSendWndSolt {
 //public:
@@ -34,7 +56,7 @@
 //    CWndMsg msg3(3);
 //    CWndMsg msg4(4);
 //    CWndMsg msg5(5);
-//    
+//
 //    __send_wnd.PushBack(msg1.Id(), &msg1);
 //    __send_wnd.PushBack(msg2.Id(), &msg2);
 //    __send_wnd.PushBack(msg3.Id(), &msg3);
@@ -61,5 +83,5 @@
 //
 //    __send_wnd.PushBack(msg3.Id(), &msg3);
 //    __send_wnd.AcceptAck(msg3.Id());
-//    
+//
 //}

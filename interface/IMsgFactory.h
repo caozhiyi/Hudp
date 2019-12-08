@@ -11,7 +11,7 @@ namespace hudp {
         CMsgFactory() {}
         virtual ~CMsgFactory() {}
 
-        virtual CMsg* CreateMsg(uint16_t flag) = 0;
+        virtual CMsg* CreateMsg() = 0;
 
         virtual void DeleteMsg(CMsg* msg) = 0;
     };

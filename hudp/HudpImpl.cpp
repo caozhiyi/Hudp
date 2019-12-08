@@ -1,26 +1,29 @@
 #include "HudpImpl.h"
-#include "INetIO.h"
-#include "IThread.h"
-#include "IMsgFactory.h"
 #include "HudpConfig.h"
-#include "ISocketManager.h"
-#include "ISocket.h"
 #include "IMSg.h"
-#include "IFilterProcess.h"
 #include "Timer.h"
 #include "Log.h"
+#include "RecvThread.h"
+#include "ProcessThread.h"
+#include "OsNet.h"
+#include "MsgPoolFactory.h"
+#include "FilterProcessNoThread.h"
+#include "SocketManager.h"
+#include "ISocket.h"
 
 using namespace hudp;
 
 CHudpImpl::CHudpImpl() {
-
+    _net_io = std::make_shared<COsNetImpl>();
+    _msg_factory = std::make_shared<CMsgPoolFactory>();
+    _filter_process = std::make_shared<CFilterProcessNoThread>();
+    _socket_mananger = std::make_shared<CSocketManagerImpl>();
+    _process_thread = std::make_shared<CProcessThread>();
+    _recv_thread = std::make_shared<CRecvThread>();
 }
 
 CHudpImpl::~CHudpImpl() {
-    for (auto iter = _thread_vec.begin(); iter != _thread_vec.end(); ++iter) {
-        (*iter)->Stop();
-    }
-    //CTimer::Instance().Stop();
+    CTimer::Instance().Stop();
     _net_io->Close(_listen_socket);
 }
 
@@ -54,21 +57,17 @@ bool CHudpImpl::Start(const std::string& ip, uint16_t port, const recv_back& fun
         return false;
     }
 
-    for (auto iter = _thread_vec.begin(); iter != _thread_vec.end(); ++iter) {
-        (*iter)->Start();
-    }
-    
-    //CTimer::Instance().Start();
+    _process_thread->Start(_filter_process);
+    _recv_thread->Start(_listen_socket, _msg_factory, _net_io);
+    CTimer::Instance().Start();
 
     return true;
 }
 
 void CHudpImpl::Join() {
-    for (auto iter = _thread_vec.begin(); iter != _thread_vec.end(); ++iter) {
-        (*iter)->Join();
-    }
-
-    //CTimer::Instance().Join();
+    _process_thread->Join();
+    _recv_thread->Join();
+    CTimer::Instance().Join();
 }
 
 void CHudpImpl::SendTo(const HudpHandle& handle, uint16_t flag, const std::string& msg) {
@@ -81,12 +80,25 @@ void CHudpImpl::SendTo(const HudpHandle& handle, uint16_t flag, const char* msg,
         return;
     }
 
-    CMsg* net_msg = _msg_factory->CreateMsg(flag);
-    net_msg->TranslateFlag();
+    CMsg* net_msg = _msg_factory->CreateMsg();
+    net_msg->SetFlag(msg_send);
+    net_msg->SetHeaderFlag(flag);
     net_msg->SetHandle(handle);
     net_msg->SetBody(std::string(msg, len));
 
-    _filter_process->PushSendMsg(net_msg);
+    // push msg to process thread
+    _process_thread->Push(net_msg);
+}
+
+void CHudpImpl::RecvMsg(const HudpHandle& handle, const std::string& msg) {
+    CMsg* net_msg = _msg_factory->CreateMsg();
+    if (!net_msg->InitWithBuffer(msg)) {
+        base::LOG_ERROR("parser msg error.");
+        _msg_factory->DeleteMsg(net_msg);
+    }
+    net_msg->SetFlag(msg_recv);
+    // push msg to process thread
+    _process_thread->Push(net_msg);
 }
 
 void CHudpImpl::Close(const HudpHandle& handle) {
@@ -100,6 +112,7 @@ void CHudpImpl::RecvMessageToUpper(const HudpHandle& HudpHandle, CMsg* msg) {
 
 void CHudpImpl::SendMessageToNet(CMsg* msg) {
     // get send buffer
+    msg->TranslateFlag();
     std::string net_msg = msg->GetSerializeBuffer();
     _net_io->SendTo(_listen_socket, net_msg.c_str(), net_msg.length(), msg->GetHandle());
 }
@@ -110,9 +123,9 @@ void CHudpImpl::ReleaseMessage(CMsg* msg) {
 
 void CHudpImpl::AfterSendProcess(CMsg* msg) {
     //get a socket. 
-    std::shared_ptr<CSocket> socket = _socket_mananger->GetSocket(msg->GetHandle());
+    std::shared_ptr<CSocket> sock = _socket_mananger->GetSocket(msg->GetHandle());
 
-    socket->SendMessage(msg);
+    sock->SendMessage(msg);
 }
 
 void CHudpImpl::AfterRecvProcess(CMsg* msg) {

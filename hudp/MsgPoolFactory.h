@@ -15,7 +15,7 @@ namespace hudp {
         CMsgPoolFactory();
         ~CMsgPoolFactory();
 
-        CMsg* CreateMsg(uint16_t flag);
+        CMsg* CreateMsg();
 
         void DeleteMsg(CMsg* msg);
     private:
