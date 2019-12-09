@@ -44,6 +44,8 @@ namespace hudp {
         void SendMessageToNet(CMsg* msg);
         // release send message
         void ReleaseMessage(CMsg* msg);
+        // create a msg
+        CMsg* CreateMessage();
 
     public:
         void AfterSendProcess(CMsg* msg);

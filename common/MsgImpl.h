@@ -22,6 +22,7 @@ namespace hudp {
 
         // add send delay time
         void AddSendDelay();
+        uint16_t GetReSendTime();
 
         // translate user flag to hudp flag.
         void TranslateFlag();

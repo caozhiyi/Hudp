@@ -14,8 +14,9 @@ INCLUDES = -I.          \
            -I./hudp     \
            -I./include  \
 		   -I./os/unix  \
+           -I./interface  \
 # NET_LOSS_TEST add packet loss -D NET_LOSS_TEST
-CCFLAGS = -lpthread -fPIC -m64 -std=c++11 -lstdc++
+CCFLAGS = -lpthread -fPIC -m64 -std=c++11 -lstdc++ -g
 
 TARGET = libhudp.a
 

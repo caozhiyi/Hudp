@@ -12,11 +12,10 @@ namespace hudp {
         CRecvThread();
         ~CRecvThread();
 
-        virtual void Start(uint64_t sock, std::shared_ptr<CMsgFactory>& msg_factory, std::shared_ptr<CNetIO>& net_io);
+        virtual void Start(uint64_t sock, std::shared_ptr<CNetIO>& net_io);
         virtual void Run();
     private:
         uint64_t                        _recv_socket;
-        std::shared_ptr<CMsgFactory>    _msg_factory;
         std::shared_ptr<CNetIO>         _net_io;
     };
 

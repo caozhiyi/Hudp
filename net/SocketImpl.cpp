@@ -4,7 +4,6 @@
 #include "SendWnd.h"
 #include "OrderListImpl.h"
 #include "PriorityQueue.h"
-#include "IncrementalId.h"
 #include "IMsg.h"
 #include "HudpImpl.h"
 #include "Timer.h"
@@ -99,7 +98,7 @@ void CSocketImpl::ToRecv(CMsg* msg) {
 void CSocketImpl::ToSend(CMsg* msg) {
     // add to timer
     if (msg->GetHeaderFlag() & HTF_RELIABLE_ORDERLY || msg->GetHeaderFlag() & HTF_RELIABLE) {
-        // TODO
+        CTimer::Instance().AddTimer(msg->GetReSendTime(), msg);
     }
 
     CHudpImpl::Instance().SendMessageToNet(msg);
@@ -132,8 +131,9 @@ void CSocketImpl::AddAck(CMsg* msg) {
 
     // add to timer
     if (!_is_in_timer) {
-        // add to timer
-        // TODO
+        CMsg* msg = CHudpImpl::Instance().CreateMessage();
+        msg->SetFlag(msg_is_only_ack);
+        CTimer::Instance().AddTimer(__pend_ack_send, msg);
         _is_in_timer = true;
     }
 }
@@ -145,16 +145,14 @@ void CSocketImpl::AddAckToMsg(CMsg* msg) {
     if (_pend_ack[WI_RELIABLE_ORDERLY] && _pend_ack[WI_RELIABLE_ORDERLY]->HasAck()) {
         bool continuity = false;
         std::vector<uint16_t> ack_vec;
-        // get acl from pend ack
-        // TODO
+        _pend_ack[WI_RELIABLE_ORDERLY]->GetAllAck(ack_vec, continuity);
         msg->SetAck(HPF_RELIABLE_ORDERLY_ACK_RANGE, ack_vec, continuity);
     }
 
     if (_pend_ack[WI_RELIABLE] && _pend_ack[WI_RELIABLE]->HasAck()) {
         bool continuity = false;
         std::vector<uint16_t> ack_vec;
-        // get acl from pend ack
-        // TODO
+        _pend_ack[WI_RELIABLE]->GetAllAck(ack_vec, continuity);
         msg->SetAck(HPF_WITH_RELIABLE_ACK, ack_vec, continuity);
     }
 }
@@ -168,7 +166,7 @@ void CSocketImpl::GetAckToSendWnd(CMsg* msg) {
             _send_wnd[WI_RELIABLE_ORDERLY]->AcceptAck(index);
             // TODO
             // set rtt sample
-            //_rto.SetAckTime(index, time_stap);
+            // _rto.SetAckTime(index, time_stap);
         }
     }
 
@@ -187,7 +185,7 @@ void CSocketImpl::GetAckToSendWnd(CMsg* msg) {
 
 void CSocketImpl::AddToSendWnd(WndIndex index, CMsg* msg) {
     if (!_send_wnd[index]) {
-        //_send_wnd[index] = new CSendWnd();
+        _send_wnd[index] = new CSendWndImpl(__init_send_wnd_size);
     }
     _send_wnd[index]->PushBack(msg);
 }

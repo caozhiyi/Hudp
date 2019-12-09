@@ -2,6 +2,7 @@
 #include "CommonFlag.h"
 #include "BitStream.h"
 #include "Serializes.h"
+#include "HudpConfig.h"
 
 using namespace hudp;
 CMsgImpl::CMsgImpl() : _backoff_factor(1),
@@ -40,6 +41,10 @@ uint16_t CMsgImpl::GetId() {
 
 void CMsgImpl::AddSendDelay() {
     _backoff_factor = _backoff_factor >> 2;
+}
+
+uint16_t CMsgImpl::GetReSendTime() {
+    return __resend_time * _backoff_factor;
 }
 
 void CMsgImpl::TranslateFlag() {

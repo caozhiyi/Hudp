@@ -1,3 +1,4 @@
+#include <functional>
 #include "HudpImpl.h"
 #include "HudpConfig.h"
 #include "IMSg.h"
@@ -37,6 +38,8 @@ void CHudpImpl::Init() {
             base::CLog::Instance().SetLogLevel(__log_level);
             base::CLog::Instance().Start();
         }
+        _filter_process->SetSendFunc(std::bind(&CHudpImpl::AfterSendProcess, this, std::placeholders::_1));
+        _filter_process->SetRecvFunc(std::bind(&CHudpImpl::AfterRecvProcess, this, std::placeholders::_1));
     }
 }
 
@@ -58,7 +61,7 @@ bool CHudpImpl::Start(const std::string& ip, uint16_t port, const recv_back& fun
     }
 
     _process_thread->Start(_filter_process);
-    _recv_thread->Start(_listen_socket, _msg_factory, _net_io);
+    _recv_thread->Start(_listen_socket, _net_io);
     CTimer::Instance().Start();
 
     return true;
@@ -119,6 +122,10 @@ void CHudpImpl::SendMessageToNet(CMsg* msg) {
 
 void CHudpImpl::ReleaseMessage(CMsg* msg) {
     _msg_factory->DeleteMsg(msg);
+}
+
+CMsg* CHudpImpl::CreateMessage() {
+    return _msg_factory->CreateMsg();
 }
 
 void CHudpImpl::AfterSendProcess(CMsg* msg) {

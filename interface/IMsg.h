@@ -32,6 +32,7 @@ namespace hudp {
 
         // add send delay time
         virtual void AddSendDelay() = 0;
+        virtual uint16_t GetReSendTime() = 0;
 
         // translate user flag to hudp flag.
         virtual void TranslateFlag() = 0;

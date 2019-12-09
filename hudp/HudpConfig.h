@@ -36,16 +36,22 @@ static const uint16_t __timer_empty_wait       = 60000;
 // recvfrom receive buffer size
 static const uint16_t __recv_buf_size          = 2048;
 
+// send window size when start
+static const uint16_t __init_send_wnd_size     = 6;
+
 // pend ack timer wait time.
 static const uint16_t __pend_ack_send          = 50;     // 50ms
 
 // max rto time after retreat
 static const uint16_t __max_rto_time           = 12000;  // max rto 120s
 
+// message resend timer
+static const uint16_t __resend_time            = 30;     // 30ms
+
 // 15ms. so min rto = 60ms
-static const uint32_t __init_mdev_max = 15;
+static const uint32_t __init_mdev_max          = 15;
 // 1000ms.
-static const uint32_t __init_cur_rto  = 1000;
+static const uint32_t __init_cur_rto           = 1000;
 
 
 // about log setting
