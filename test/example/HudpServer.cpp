@@ -21,7 +21,7 @@ void UtestHudpServer() {
         index++;
         std::string msg = "a test msg. id : " + std::to_string(index);
         
-        base::CRunnable::Sleep(1000);
+        base::CRunnable::Sleep(3000);
         if (index == 10) {
             hudp::Close("127.0.0.1:8012");
         } else if (index < 10) {

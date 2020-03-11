@@ -1,7 +1,10 @@
-#include "PriorityQueue.h"
-#include "CommonFlag.h"
 #include "Log.h"
+#include "IMsg.h"
+#include "HudpImpl.h"
+#include "CommonFlag.h"
 #include "HudpConfig.h"
+#include "PriorityQueue.h"
+
 using namespace hudp;
 
 CPriorityQueueImpl::CPriorityQueueImpl() : _pri_normal_count(__pri_surplus),
@@ -14,7 +17,7 @@ CPriorityQueueImpl::~CPriorityQueueImpl() {
     Clear();
 }
 
-void CPriorityQueueImpl::Push(CMsg* msg) {
+void CPriorityQueueImpl::PushBack(CMsg* msg) {
     uint16_t flag = msg->GetFlag();
     if (flag & HPF_LOW_PRI) {
         _queue_arr[__pri_low].push(msg);
@@ -116,7 +119,9 @@ void CPriorityQueueImpl::Clear() {
         CMsg* msg = nullptr;
         while (!_queue_arr[i].empty()) {
             // return to msg pool
-            // CNetMsgPool::Instance().FreeMsg(msg);
+            msg = _queue_arr[i].front();
+            _queue_arr[i].pop();
+            CHudpImpl::Instance().ReleaseMessage(msg);
         }
     }
 }

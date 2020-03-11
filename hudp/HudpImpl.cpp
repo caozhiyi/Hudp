@@ -1,16 +1,18 @@
 #include <functional>
+
+#include "Log.h"
+#include "IMSg.h"
+#include "OsNet.h"
+#include "Timer.h"
+#include "ISocket.h"
 #include "HudpImpl.h"
 #include "HudpConfig.h"
-#include "IMSg.h"
-#include "Timer.h"
-#include "Log.h"
 #include "RecvThread.h"
+#include "PriorityQueue.h"
+#include "SocketManager.h"
 #include "ProcessThread.h"
-#include "OsNet.h"
 #include "MsgPoolFactory.h"
 #include "FilterProcessNoThread.h"
-#include "SocketManager.h"
-#include "ISocket.h"
 
 using namespace hudp;
 
@@ -100,6 +102,10 @@ void CHudpImpl::RecvMsg(const HudpHandle& handle, const std::string& msg) {
         _msg_factory->DeleteMsg(net_msg);
     }
     net_msg->SetFlag(msg_recv);
+    net_msg->SetHandle(handle);
+    //get a socket. 
+    std::shared_ptr<CSocket> sock = _socket_mananger->GetSocket(handle);
+    net_msg->SetSocket(sock);
     // push msg to process thread
     _process_thread->Push(net_msg);
 }
@@ -128,9 +134,14 @@ CMsg* CHudpImpl::CreateMessage() {
     return _msg_factory->CreateMsg();
 }
 
+CPriorityQueue* CHudpImpl::CreatePriorityQueue() {
+    return new CPriorityQueueImpl();
+}
+
 void CHudpImpl::AfterSendProcess(CMsg* msg) {
     //get a socket. 
     std::shared_ptr<CSocket> sock = _socket_mananger->GetSocket(msg->GetHandle());
+    msg->SetSocket(sock);
 
     sock->SendMessage(msg);
 }

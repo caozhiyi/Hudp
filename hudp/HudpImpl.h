@@ -2,9 +2,10 @@
 #define HEADER_HUDP_HUDPIMPL
 
 #include <memory>
+
 #include "Single.h"
-#include "CommonType.h"
 #include "HudpFlag.h"
+#include "CommonType.h"
 
 namespace hudp {
 
@@ -15,6 +16,7 @@ namespace hudp {
     class CSocketManager;
     class CProcessThread;
     class CRecvThread;
+    class CPriorityQueue;
 
     class CHudpImpl : public base::CSingle<CHudpImpl> {
     public:
@@ -34,11 +36,11 @@ namespace hudp {
         // recv msg
         void RecvMsg(const HudpHandle& handle, const std::string& msg);
 
-        // destory socket. release resources
+        // destroy socket. release resources
         void Close(const HudpHandle& handle);
 
     public:
-        // notify aupper recv a message.
+        // notify supper recv a message.
         void RecvMessageToUpper(const HudpHandle& handle, CMsg* msg);
         // send message to net
         void SendMessageToNet(CMsg* msg);
@@ -46,6 +48,8 @@ namespace hudp {
         void ReleaseMessage(CMsg* msg);
         // create a msg
         CMsg* CreateMessage();
+        // get a default priority queue instance
+        CPriorityQueue* CreatePriorityQueue();
 
     public:
         void AfterSendProcess(CMsg* msg);

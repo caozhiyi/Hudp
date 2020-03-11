@@ -7,12 +7,13 @@
 
 using namespace hudp;
 
-CSendWndImpl::CSendWndImpl(uint16_t send_wnd_size) : _end(nullptr),
+CSendWndImpl::CSendWndImpl(uint16_t send_wnd_size, CPriorityQueue* priority_queue) : 
+                                                     _end(nullptr),
                                                      _send_wnd_size(send_wnd_size),
-                                                     _cur_send_size(0) {
+                                                     _cur_send_size(0),
+                                                     _priority_queue(priority_queue) {
     _start = _end;
     _cur = _end;
-    _priority_queue = nullptr; // TODO
     _incremental_id = new CIncrementalId;
 }
 
@@ -120,14 +121,14 @@ void CSendWndImpl::Clear() {
 void CSendWndImpl::SendAndAck() {
     CMsg* item = nullptr;
 
-    while (_send_queue.empty()) {
+    while (!_send_queue.empty()) {
         item = _send_queue.front();
         _send_queue.pop();
         auto sock = item->GetSocket();
         sock->ToSend(item);
     }
 
-    while (_ack_queue.empty()) {
+    while (!_ack_queue.empty()) {
         item = _ack_queue.front();
         _ack_queue.pop();
         auto sock = item->GetSocket();

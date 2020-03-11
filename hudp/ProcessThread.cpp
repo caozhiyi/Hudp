@@ -28,6 +28,7 @@ void CProcessThread::Run() {
         // msg not free to pool
         if (msg) {
             auto flag = msg->GetFlag();
+            // get a recv msg.
             if (flag & msg_recv) {
                 auto sock = msg->GetSocket();
                 sock->RecvMessage(msg);

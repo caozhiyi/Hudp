@@ -185,7 +185,7 @@ void CSocketImpl::GetAckToSendWnd(CMsg* msg) {
 
 void CSocketImpl::AddToSendWnd(WndIndex index, CMsg* msg) {
     if (!_send_wnd[index]) {
-        _send_wnd[index] = new CSendWndImpl(__init_send_wnd_size);
+        _send_wnd[index] = new CSendWndImpl(__init_send_wnd_size, CHudpImpl::Instance().CreatePriorityQueue());
     }
     _send_wnd[index]->PushBack(msg);
 }

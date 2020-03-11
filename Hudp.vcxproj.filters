@@ -87,9 +87,6 @@
     <ClCompile Include="utest\common\Ut_OrderList.cpp">
       <Filter>utest\common</Filter>
     </ClCompile>
-    <ClCompile Include="utest\common\Ut_PriorityQueue.cpp">
-      <Filter>utest\common</Filter>
-    </ClCompile>
     <ClCompile Include="utest\common\Ut_SendWnd.cpp">
       <Filter>utest\common</Filter>
     </ClCompile>

@@ -15,7 +15,7 @@ namespace hudp {
     // send window
     class CSendWndImpl : public CSendWnd {
     public:
-        CSendWndImpl(uint16_t send_wnd_size);
+        CSendWndImpl(uint16_t send_wnd_size, CPriorityQueue* priority_queue);
         ~CSendWndImpl();
 
         void PushBack(CMsg* msg);

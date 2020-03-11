@@ -4,7 +4,6 @@
 #include <queue> // for queue
 
 #include "CommonType.h"
-#include "IMsg.h"
 #include "IPriorityQueue.h"
 
 namespace hudp {
@@ -17,12 +16,13 @@ namespace hudp {
     static const uint16_t __pri_high       = 1;
     static const uint16_t __pri_highest    = 0;
     
+    class CMsg;
     class CPriorityQueueImpl : public CPriorityQueue {
     public:   
         CPriorityQueueImpl();
         ~CPriorityQueueImpl();
 
-        void Push(CMsg* msg);
+        void PushBack(CMsg* msg);
 
         // get a item from queue by priority
         CMsg* Pop();
