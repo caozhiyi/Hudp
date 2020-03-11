@@ -67,7 +67,7 @@ void CMsgImpl::TranslateFlag() {
 }
 
 void CMsgImpl::SetHeaderFlag(uint16_t flag) {
-    _head._flag = flag;
+    _head._flag |= flag;
 }
 
 uint16_t CMsgImpl::GetHeaderFlag() {
@@ -75,11 +75,11 @@ uint16_t CMsgImpl::GetHeaderFlag() {
 }
 
 void CMsgImpl::SetFlag(uint16_t flag) {
-    _head._flag = flag;
+    _flag |= flag;
 }
 
 uint16_t CMsgImpl::GetFlag() {
-    return _head._flag;
+    return _flag;
 }
 
 void CMsgImpl::SetHandle(const HudpHandle& handle) {

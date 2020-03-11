@@ -66,8 +66,7 @@ namespace hudp {
         std::string     _body;      // body msg. set by user
         // other 
         std::string     _ip_port;
-        int16_t         _flag;      // head may be changed, should serialize again. set true
-                                    // in recv msg. if send to upper set true
+        int16_t         _flag;      // recv or send message
 
         CMsg*           _next;
         CMsg*           _prev;
