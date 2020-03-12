@@ -34,7 +34,7 @@ namespace hudp {
         void SendTo(const HudpHandle& Hhandle, uint16_t flag, const char* msg, uint16_t len);
 
         // recv msg
-        void RecvMsg(const HudpHandle& handle, const std::string& msg);
+        void RecvMsgFromNet(const HudpHandle& handle, const std::string& msg);
 
         // destroy socket. release resources
         void Close(const HudpHandle& handle);
@@ -52,8 +52,8 @@ namespace hudp {
         CPriorityQueue* CreatePriorityQueue();
 
     public:
-        void AfterSendProcess(CMsg* msg);
-        void AfterRecvProcess(CMsg* msg);
+        void AfterSendFilter(CMsg* msg);
+        void AfterRecvFilter(CMsg* msg);
 
     private:
         std::shared_ptr<CNetIO>                    _net_io;

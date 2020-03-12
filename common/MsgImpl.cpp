@@ -47,25 +47,6 @@ uint16_t CMsgImpl::GetReSendTime() {
     return __resend_time * _backoff_factor;
 }
 
-void CMsgImpl::TranslateFlag() {
-    if (_head._flag & HTF_ORDERLY) {
-        _head._flag &= ~HTF_ORDERLY;
-        _head._flag |= HPF_IS_ORDERLY;
-
-    } else if (_head._flag & HTF_RELIABLE) {
-        _head._flag &= ~HTF_RELIABLE;
-        _head._flag |= HPF_NEED_ACK;
-
-    } else if (_head._flag & HTF_RELIABLE_ORDERLY) {
-        _head._flag &= ~HTF_RELIABLE_ORDERLY;
-        _head._flag |= HPF_NEED_ACK;
-        _head._flag |= HPF_IS_ORDERLY;
-
-    } else if (_head._flag & HTF_NORMAL) {
-        _head._flag &= ~HTF_NORMAL;
-    }
-}
-
 void CMsgImpl::SetHeaderFlag(uint16_t flag) {
     _head._flag |= flag;
 }
@@ -100,19 +81,19 @@ std::string& CMsgImpl::GetBody() {
 }
 
 void CMsgImpl::SetAck(int16_t flag, std::vector<uint16_t>& ack_vec, bool continuity) {
-    if (flag & HTF_RELIABLE) {
+    if (flag & HPF_WITH_RELIABLE_ACK) {
         _head.AddReliableAck(ack_vec, continuity);
     }
-    if (flag & HTF_RELIABLE_ORDERLY) {
+    if (flag & HPF_RELIABLE_ORDERLY_ACK_RANGE) {
         _head.AddReliableOrderlyAck(ack_vec, continuity);
     }
 }
 
 void CMsgImpl::GetAck(int16_t flag, std::vector<uint16_t>& ack_vec) {
-    if (flag & HTF_RELIABLE) {
+    if (flag & HPF_WITH_RELIABLE_ACK) {
         _head.GetReliableAck(ack_vec);
     }
-    if (flag & HTF_RELIABLE_ORDERLY) {
+    if (flag & HPF_RELIABLE_ORDERLY_ACK_RANGE) {
         _head.GetReliableOrderlyAck(ack_vec);
     }
 }

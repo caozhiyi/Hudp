@@ -40,7 +40,7 @@ void CRecvThread::Run() {
         // recv msg from net
         ret = _net_io->RecvFrom(_recv_socket, buf, __recv_buf_size, ip, port);
         if (ret > 0) {
-            CHudpImpl::Instance().RecvMsg(ip + std::to_string(port), std::string(buf, ret));
+            CHudpImpl::Instance().RecvMsgFromNet(ip + ":" + std::to_string(port), std::string(buf, ret));
         }
     }
 }

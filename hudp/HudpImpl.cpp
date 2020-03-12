@@ -40,8 +40,8 @@ void CHudpImpl::Init() {
             base::CLog::Instance().SetLogLevel(__log_level);
             base::CLog::Instance().Start();
         }
-        _filter_process->SetSendFunc(std::bind(&CHudpImpl::AfterSendProcess, this, std::placeholders::_1));
-        _filter_process->SetRecvFunc(std::bind(&CHudpImpl::AfterRecvProcess, this, std::placeholders::_1));
+        _filter_process->SetSendFunc(std::bind(&CHudpImpl::AfterSendFilter, this, std::placeholders::_1));
+        _filter_process->SetRecvFunc(std::bind(&CHudpImpl::AfterRecvFilter, this, std::placeholders::_1));
     }
 }
 
@@ -95,7 +95,7 @@ void CHudpImpl::SendTo(const HudpHandle& handle, uint16_t flag, const char* msg,
     _process_thread->Push(net_msg);
 }
 
-void CHudpImpl::RecvMsg(const HudpHandle& handle, const std::string& msg) {
+void CHudpImpl::RecvMsgFromNet(const HudpHandle& handle, const std::string& msg) {
     CMsg* net_msg = _msg_factory->CreateMsg();
     if (!net_msg->InitWithBuffer(msg)) {
         base::LOG_ERROR("parser msg error.");
@@ -121,7 +121,6 @@ void CHudpImpl::RecvMessageToUpper(const HudpHandle& HudpHandle, CMsg* msg) {
 
 void CHudpImpl::SendMessageToNet(CMsg* msg) {
     // get send buffer
-    msg->TranslateFlag();
     std::string net_msg = msg->GetSerializeBuffer();
     _net_io->SendTo(_listen_socket, net_msg.c_str(), net_msg.length(), msg->GetHandle());
 }
@@ -138,7 +137,7 @@ CPriorityQueue* CHudpImpl::CreatePriorityQueue() {
     return new CPriorityQueueImpl();
 }
 
-void CHudpImpl::AfterSendProcess(CMsg* msg) {
+void CHudpImpl::AfterSendFilter(CMsg* msg) {
     //get a socket. 
     std::shared_ptr<CSocket> sock = _socket_mananger->GetSocket(msg->GetHandle());
     msg->SetSocket(sock);
@@ -146,7 +145,7 @@ void CHudpImpl::AfterSendProcess(CMsg* msg) {
     sock->SendMessage(msg);
 }
 
-void CHudpImpl::AfterRecvProcess(CMsg* msg) {
+void CHudpImpl::AfterRecvFilter(CMsg* msg) {
     std::string& body = msg->GetBody();
     _recv_call_back(msg->GetHandle(), body.c_str(), body.length());
     _msg_factory->DeleteMsg(msg);

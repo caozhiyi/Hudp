@@ -21,6 +21,7 @@ CSocketImpl::CSocketImpl(const HudpHandle& handle) : _handle(handle) {
     memset(_send_wnd, 0, sizeof(_send_wnd));
     memset(_recv_list, 0, sizeof(_recv_list));
     memset(_pend_ack, 0, sizeof(_pend_ack));
+    _is_in_timer.store(false);
 }
 
 CSocketImpl::~CSocketImpl() {
@@ -131,9 +132,12 @@ void CSocketImpl::AddAck(CMsg* msg) {
 
     // add to timer
     if (!_is_in_timer) {
-        CMsg* msg = CHudpImpl::Instance().CreateMessage();
-        msg->SetFlag(msg_is_only_ack);
-        CTimer::Instance().AddTimer(__pend_ack_send, msg);
+        CMsg* timer_msg = CHudpImpl::Instance().CreateMessage();
+        timer_msg->SetFlag(msg_is_only_ack);
+        std::shared_ptr<CSocket> sock = shared_from_this();
+        timer_msg->SetSocket(sock);
+        timer_msg->SetHandle(_handle);
+        CTimer::Instance().AddTimer(__pend_ack_send, timer_msg);
         _is_in_timer = true;
     }
 }
@@ -162,8 +166,8 @@ void CSocketImpl::GetAckToSendWnd(CMsg* msg) {
         //auto time_stap = CTimer::Instance().GetTimeStamp();
         std::vector<uint16_t> vec;
         msg->GetAck(HPF_WITH_RELIABLE_ORDERLY_ACK, vec);
-        for (uint16_t index = vec[0], i = 0; i < vec.size(); index++, i++) {
-            _send_wnd[WI_RELIABLE_ORDERLY]->AcceptAck(index);
+        for (uint16_t index = 0; index < vec.size(); index++) {
+            _send_wnd[WI_RELIABLE_ORDERLY]->AcceptAck(vec[index]);
             // TODO
             // set rtt sample
             // _rto.SetAckTime(index, time_stap);
@@ -174,8 +178,8 @@ void CSocketImpl::GetAckToSendWnd(CMsg* msg) {
         //auto time_stap = CTimer::Instance().GetTimeStamp();
         std::vector<uint16_t> vec;
         msg->GetAck(HPF_WITH_RELIABLE_ACK, vec);
-        for (uint16_t index = vec[0], i = 0; i < vec.size(); index++, i++) {
-            _send_wnd[WI_RELIABLE_ORDERLY]->AcceptAck(index);
+        for (uint16_t index = 0; index < vec.size(); index++) {
+            _send_wnd[WI_RELIABLE]->AcceptAck(vec[index]);
             // TODO
             // set rtt sample
             //_rto.SetAckTime(index, time_stap);

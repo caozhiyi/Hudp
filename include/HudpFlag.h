@@ -8,25 +8,25 @@ namespace hudp {
     // Transmission reliability control
     enum hudp_tran_flag {
         // only orderly. may lost some bag
-        HTF_ORDERLY          = 0x0001,
+        HTF_ORDERLY          = 0x01,
         // only reliable. may be disorder
-        HTF_RELIABLE         = 0x0002,
+        HTF_RELIABLE         = 0x02,
         // reliable and orderly like tcp
-        HTF_RELIABLE_ORDERLY = 0x0004,
+        HTF_RELIABLE_ORDERLY = 0x04,
         // no other contral. only udp
-        HTF_NORMAL           = 0x0008
+        HTF_NORMAL           = 0x08
     };
 
     // about priority. Send two high-level packages and one low-level package when busy
     enum hudp_pri_flag {
         // the lowest priority.
-        HPF_LOW_PRI          = 0x0010,
+        HPF_LOW_PRI          = 0x10,
         // the normal priority.
-        HPF_NROMAL_PRI       = 0x0020,
+        HPF_NROMAL_PRI       = 0x20,
         // the high priority.
-        HPF_HIGH_PRI         = 0x0040,
+        HPF_HIGH_PRI         = 0x40,
         // the highest priority.
-        HPF_HIGHEST_PRI      = 0x0080
+        HPF_HIGHEST_PRI      = 0x80
     };
 
     typedef std::string HudpHandle;

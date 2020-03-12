@@ -1,8 +1,11 @@
 #include <cstring>		//for memset
-#include "OrderListImpl.h"
-#include "HudpConfig.h"
+
 #include "IMsg.h"
 #include "ISocket.h"
+#include "HudpImpl.h"
+#include "HudpConfig.h"
+#include "OrderListImpl.h"
+
 using namespace hudp;
 
 CRecvList::CRecvList() {
@@ -26,7 +29,7 @@ CReliableOrderlyList::~CReliableOrderlyList() {
     for (size_t i = 0; i < __order_list_size; i++) {
         if (_order_list[i]) {
             // return to msg pool
-            // CNetMsgPool::Instance().FreeMsg((NetMsg*)_order_list[i], true);
+            CHudpImpl::Instance().ReleaseMessage(_order_list[i]);
         }
     }
 }
