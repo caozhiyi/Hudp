@@ -1,6 +1,6 @@
 #include <assert.h>
-#include "MemoryPool.h"
 #include "Log.h"
+#include "MemoryPool.h"
 
 using namespace base;
 
