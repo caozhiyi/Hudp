@@ -4,8 +4,9 @@
 #include <queue>
 #include <mutex>
 #include <unordered_map>
-#include "CommonType.h"
+
 #include "ISendWnd.h"
+#include "CommonType.h"
 
 namespace hudp {
 
@@ -15,7 +16,7 @@ namespace hudp {
     // send window
     class CSendWndImpl : public CSendWnd {
     public:
-        CSendWndImpl(uint16_t send_wnd_size, CPriorityQueue* priority_queue);
+        CSendWndImpl(uint16_t send_wnd_size, CPriorityQueue* priority_queue, bool always_send = false);
         ~CSendWndImpl();
 
         void PushBack(CMsg* msg);
@@ -46,6 +47,7 @@ namespace hudp {
         std::mutex      _mutex;
         uint16_t        _send_wnd_size;
         uint16_t        _cur_send_size;
+        bool            _always_send;
 
         CPriorityQueue* _priority_queue;
         CIncrementalId* _incremental_id;

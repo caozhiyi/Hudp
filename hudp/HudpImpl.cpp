@@ -101,6 +101,8 @@ void CHudpImpl::RecvMsgFromNet(const HudpHandle& handle, const std::string& msg)
         base::LOG_ERROR("parser msg error.");
         _msg_factory->DeleteMsg(net_msg);
     }
+    std::string flag_str = net_msg->DebugHeaderFlag();
+    base::LOG_DEBUG("get message flag:%s", flag_str.c_str());
     net_msg->SetFlag(msg_recv);
     net_msg->SetHandle(handle);
     //get a socket. 

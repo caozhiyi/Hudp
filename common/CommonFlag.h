@@ -5,8 +5,8 @@
 #include <string>
 #include <functional>
 
-#include "CommonType.h"
 #include "HudpFlag.h"
+#include "CommonType.h"
 
 namespace hudp {
 

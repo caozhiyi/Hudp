@@ -1,7 +1,7 @@
-#include "Timer.h"
-#include "HudpConfig.h"
 #include "IMsg.h"
+#include "Timer.h"
 #include "ISocket.h"
+#include "HudpConfig.h"
 
 using namespace hudp;
 

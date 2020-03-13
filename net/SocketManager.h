@@ -1,8 +1,8 @@
 #ifndef HEADER_NET_SOCKETMANAGER
 #define HEADER_NET_SOCKETMANAGER
 
-#include <unordered_map>
 #include <memory>
+#include <unordered_map>
 
 #include "CommonType.h"
 #include "CommonFlag.h"

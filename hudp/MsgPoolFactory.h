@@ -1,8 +1,8 @@
 #ifndef HEADER_HUDP_CNETMSGPOOL
 #define HEADER_HUDP_CNETMSGPOOL
 
-#include "CommonType.h"
 #include "TSQueue.h"
+#include "CommonType.h"
 #include "IMsgFactory.h"
 
 namespace hudp {

@@ -1,6 +1,6 @@
-#include "SocketManager.h"
-#include "SocketImpl.h"
 #include "HudpImpl.h"
+#include "SocketImpl.h"
+#include "SocketManager.h"
 
 using namespace hudp;
 

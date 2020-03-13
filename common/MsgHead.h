@@ -1,7 +1,7 @@
 #ifndef HEADER_COMMON_NETMSGHEADER
 #define HEADER_COMMON_NETMSGHEADER
-#include <vector>
 
+#include <vector>
 #include "CommonType.h"
 
 namespace hudp {
@@ -37,9 +37,9 @@ namespace hudp {
     private:
         friend class CMsgImpl;
         friend class CSerializes;
-        uint16_t _flag;
-        uint16_t _id;
-        uint16_t _body_len;
+        uint16_t _flag;     // this flag  will be send to remote
+        uint16_t _id;       // msg id
+        uint16_t _body_len; // body length if have
  
         // reliable ack
         uint16_t _ack_reliable_len;

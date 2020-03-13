@@ -1,7 +1,8 @@
 #include <memory.h> // for memset memcpy
+
+#include "Log.h"
 #include "BitStream.h"
 #include "CommonFlag.h"
-#include "Log.h"
 #include "HudpConfig.h"
 
 using namespace hudp;

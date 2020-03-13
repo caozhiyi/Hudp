@@ -1,16 +1,17 @@
-#include "SendWnd.h"
 #include "Log.h"
 #include "IMsg.h"
 #include "ISocket.h"
+#include "SendWnd.h"
 #include "IncrementalId.h"
 #include "IPriorityQueue.h"
 
 using namespace hudp;
 
-CSendWndImpl::CSendWndImpl(uint16_t send_wnd_size, CPriorityQueue* priority_queue) : 
+CSendWndImpl::CSendWndImpl(uint16_t send_wnd_size, CPriorityQueue* priority_queue, bool always_send) :
                                                      _end(nullptr),
                                                      _send_wnd_size(send_wnd_size),
                                                      _cur_send_size(0),
+                                                     _always_send(always_send),
                                                      _priority_queue(priority_queue) {
     _start = _end;
     _cur = _end;
@@ -145,7 +146,9 @@ void CSendWndImpl::SendNext() {
         }
 
         _send_queue.push(_cur);
-        _cur_send_size++;
+        if (!_always_send) {
+            _cur_send_size++;
+        }
         _cur = _cur->GetNext();
     } 
 }
@@ -174,7 +177,9 @@ void CSendWndImpl::PushBackToSendWnd(CMsg* msg) {
 
     if (_cur_send_size < _send_wnd_size) {
         _send_queue.push(msg);
-        _cur_send_size++;
+        if (!_always_send) {
+            _cur_send_size++;
+        }
         _cur = nullptr;
     }
 

@@ -1,16 +1,16 @@
 #include <cstring>		//for memset
 
-#include "SocketImpl.h"
-#include "SendWnd.h"
-#include "OrderListImpl.h"
-#include "PriorityQueue.h"
-#include "IMsg.h"
-#include "HudpImpl.h"
-#include "Timer.h"
-#include "PendAck.h"
 #include "Log.h"
+#include "IMsg.h"
+#include "Timer.h"
+#include "SendWnd.h"
+#include "PendAck.h"
+#include "HudpImpl.h"
+#include "SocketImpl.h"
 #include "HudpConfig.h"
 #include "CommonFlag.h"
+#include "OrderListImpl.h"
+#include "PriorityQueue.h"
 
 using namespace hudp;
 
@@ -72,19 +72,19 @@ void CSocketImpl::RecvMessage(CMsg* msg) {
         AddToRecvList(WI_RELIABLE_ORDERLY, msg);
         done = true;
 
-        // only orderly
+    // only orderly
     } else if (header_flag & HTF_ORDERLY) {
         AddToRecvList(WI_ORDERLY, msg);
         done = true;
 
-        // only reliable
-    } else if (header_flag & HTF_ORDERLY) {
+    // only reliable
+    } else if (header_flag & HTF_RELIABLE) {
         AddToRecvList(WI_RELIABLE, msg);
         done = true;
     }
 
     // normal udp. 
-    if (!done) {
+    if (!done && header_flag & HPF_WITH_BODY/*must have body*/) {
         CHudpImpl::Instance().RecvMessageToUpper(_handle, msg);
     }
 }
@@ -92,7 +92,6 @@ void CSocketImpl::RecvMessage(CMsg* msg) {
 void CSocketImpl::ToRecv(CMsg* msg) {
     // send ack msg to remote
     base::LOG_DEBUG("[receiver] :receiver msg. id : %d", msg->GetId());
-    AddAck(msg);
     CHudpImpl::Instance().RecvMessageToUpper(_handle, msg);
 }
 
@@ -101,7 +100,8 @@ void CSocketImpl::ToSend(CMsg* msg) {
     if (msg->GetHeaderFlag() & HTF_RELIABLE_ORDERLY || msg->GetHeaderFlag() & HTF_RELIABLE) {
         CTimer::Instance().AddTimer(msg->GetReSendTime(), msg);
     }
-
+    // add ack info incidentally
+    AddAckToMsg(msg);
     CHudpImpl::Instance().SendMessageToNet(msg);
 }
 
@@ -112,11 +112,17 @@ void CSocketImpl::AckDone(CMsg* msg) {
 
 void CSocketImpl::TimerOut(CMsg* msg) {
     if (!(msg->GetFlag() & msg_is_only_ack)) {
+        // msg resend, increase send delay
         msg->AddSendDelay();
+        _is_in_timer = false;
     }
 
     // add ack 
-    AddAckToMsg(msg);
+    bool add_ack = AddAckToMsg(msg);
+    // not need send ack msg
+    if (!add_ack && msg->GetFlag() & msg_is_only_ack) {
+        return;
+    }
     // send to net
     CHudpImpl::Instance().SendMessageToNet(msg);
 }
@@ -142,15 +148,16 @@ void CSocketImpl::AddAck(CMsg* msg) {
     }
 }
 
-void CSocketImpl::AddAckToMsg(CMsg* msg) {
+bool CSocketImpl::AddAckToMsg(CMsg* msg) {
     // clear prv ack info
     msg->ClearAck();
-
+    bool ret = false;
     if (_pend_ack[WI_RELIABLE_ORDERLY] && _pend_ack[WI_RELIABLE_ORDERLY]->HasAck()) {
         bool continuity = false;
         std::vector<uint16_t> ack_vec;
         _pend_ack[WI_RELIABLE_ORDERLY]->GetAllAck(ack_vec, continuity);
-        msg->SetAck(HPF_RELIABLE_ORDERLY_ACK_RANGE, ack_vec, continuity);
+        msg->SetAck(HPF_WITH_RELIABLE_ORDERLY_ACK, ack_vec, continuity);
+        ret = true;
     }
 
     if (_pend_ack[WI_RELIABLE] && _pend_ack[WI_RELIABLE]->HasAck()) {
@@ -158,7 +165,9 @@ void CSocketImpl::AddAckToMsg(CMsg* msg) {
         std::vector<uint16_t> ack_vec;
         _pend_ack[WI_RELIABLE]->GetAllAck(ack_vec, continuity);
         msg->SetAck(HPF_WITH_RELIABLE_ACK, ack_vec, continuity);
+        ret = true;
     }
+    return ret;
 }
 
 void CSocketImpl::GetAckToSendWnd(CMsg* msg) {
@@ -189,7 +198,8 @@ void CSocketImpl::GetAckToSendWnd(CMsg* msg) {
 
 void CSocketImpl::AddToSendWnd(WndIndex index, CMsg* msg) {
     if (!_send_wnd[index]) {
-        _send_wnd[index] = new CSendWndImpl(__init_send_wnd_size, CHudpImpl::Instance().CreatePriorityQueue());
+        _send_wnd[index] = new CSendWndImpl(__init_send_wnd_size, CHudpImpl::Instance().CreatePriorityQueue(), 
+                index == WI_ORDERLY/*if only orderly, there is no transmission limit*/);
     }
     _send_wnd[index]->PushBack(msg);
 }
@@ -206,11 +216,11 @@ void CSocketImpl::AddToRecvList(WndIndex index, CMsg* msg) {
             _recv_list[index] = new CReliableOrderlyList();
         }
     }
-    int ret = _recv_list[index]->Insert(msg);
-    // get a repeat msg
-    if (ret == 1) {
+    // should send ack to remote
+    if (index == WI_RELIABLE || index == WI_RELIABLE_ORDERLY) {
         AddAck(msg);
     }
+    _recv_list[index]->Insert(msg);
 }
 
 void CSocketImpl::AddToPendAck(WndIndex index, CMsg* msg) {

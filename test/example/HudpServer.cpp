@@ -25,7 +25,7 @@ void UtestHudpServer() {
         if (index == 10) {
             hudp::Close("127.0.0.1:8012");
         } else if (index < 10) {
-            hudp::SendTo("127.0.0.1:8012", hudp::HTF_RELIABLE_ORDERLY | hudp::HPF_HIGHEST_PRI, msg);
+            hudp::SendTo("127.0.0.1:8012", hudp::HTF_NORMAL | hudp::HPF_HIGHEST_PRI, msg);
         }
     }
 

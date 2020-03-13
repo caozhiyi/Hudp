@@ -1,8 +1,9 @@
 #include <algorithm> // for find
-#include "FilterProcessNoThread.h"
+
 #include "Log.h"
-#include "IFilter.h"
 #include "IMsg.h"
+#include "IFilter.h"
+#include "FilterProcessNoThread.h"
 
 using namespace hudp;
 

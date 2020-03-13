@@ -30,6 +30,9 @@ namespace hudp {
         void SetFlag(uint16_t flag);
         uint16_t GetFlag();
 
+        // return header flag to string
+        std::string DebugHeaderFlag();
+
         void SetHandle(const HudpHandle& HudpHandle);
         const HudpHandle& GetHandle();
 
@@ -64,7 +67,7 @@ namespace hudp {
         std::string     _body;      // body msg. set by user
         // other 
         std::string     _ip_port;
-        int16_t         _flag;      // recv or send message
+        int16_t         _flag;      // recv or send message. only use in self, won't be send
 
         CMsg*           _next;
         CMsg*           _prev;

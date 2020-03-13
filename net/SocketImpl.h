@@ -3,9 +3,10 @@
 
 #include <atomic>
 #include <memory>       // for enable shared from this
-#include "CommonType.h"
+
 #include "ISocket.h"
 #include "HudpFlag.h"
+#include "CommonType.h"
 
 namespace hudp {
 
@@ -49,7 +50,8 @@ namespace hudp {
         void AddAck(CMsg* msg);
 
     private:
-        void AddAckToMsg(CMsg* msg);
+        // return ture if add ack to msg, otherwise return false
+        bool AddAckToMsg(CMsg* msg);
         void GetAckToSendWnd(CMsg* msg);
         void AddToSendWnd(WndIndex index, CMsg* msg);
         void AddToRecvList(WndIndex index, CMsg* msg);

@@ -2,8 +2,9 @@
 #define HEADER_NET_OSNET_IMPL
 
 #include <iostream>
-#include "CommonType.h"
+
 #include "INetIO.h"
+#include "CommonType.h"
 
 namespace hudp {
 

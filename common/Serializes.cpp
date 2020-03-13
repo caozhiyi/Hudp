@@ -1,9 +1,9 @@
-#include "Serializes.h"
 #include "Log.h"
-#include "CommonFlag.h"
 #include "MsgImpl.h"
 #include "MsgHead.h"
 #include "BitStream.h"
+#include "CommonFlag.h"
+#include "Serializes.h"
 
 using namespace hudp;
 

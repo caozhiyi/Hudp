@@ -1,8 +1,8 @@
 #ifndef HEADER_HUDP_CLOSEMANAGER
 #define HEADER_HUDP_CLOSEMANAGER
 
-#include "CommonFlag.h"
 #include "Single.h"
+#include "CommonFlag.h"
 
 namespace hudp {
 

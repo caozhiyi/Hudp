@@ -1,6 +1,6 @@
-#include "MsgPoolFactory.h"
 #include "IMsg.h"
 #include "MsgImpl.h"
+#include "MsgPoolFactory.h"
 using namespace hudp;
 
 // if bigger than it, will reduce half of queue size

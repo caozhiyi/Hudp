@@ -1,5 +1,6 @@
-#include "IncrementalId.h"
 #include "HudpConfig.h"
+#include "IncrementalId.h"
+
 using namespace hudp;
 
 static const uint16_t __max_id = (uint16_t)0xFFFF;

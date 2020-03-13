@@ -4,8 +4,8 @@
 #include <ws2tcpip.h>
 #include <Mstcpip.h>
 
-#include "../OsNet.h"
 #include "Log.h"
+#include "../OsNet.h"
 #include "CommonFunc.h"
 
 #pragma comment(lib,"ws2_32.lib")

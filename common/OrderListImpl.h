@@ -2,8 +2,9 @@
 #define HEADER_COMMON_ORDERLIST
 
 #include <mutex>
-#include "CommonType.h"
+
 #include "TSQueue.h"
+#include "CommonType.h"
 #include "IOrderList.h"
 
 namespace hudp {

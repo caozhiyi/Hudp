@@ -1,8 +1,8 @@
 #include "MsgImpl.h"
-#include "CommonFlag.h"
 #include "BitStream.h"
 #include "Serializes.h"
 #include "HudpConfig.h"
+#include "CommonFlag.h"
 
 using namespace hudp;
 CMsgImpl::CMsgImpl() : _backoff_factor(1),
@@ -24,6 +24,7 @@ void CMsgImpl::Clear() {
     _socket.reset();
     _backoff_factor = 1;
     _time_id = 0;
+    _body.clear();
 }
 
 void CMsgImpl::ClearAck() {
@@ -63,6 +64,59 @@ uint16_t CMsgImpl::GetFlag() {
     return _flag;
 }
 
+std::string CMsgImpl::DebugHeaderFlag() {
+    std::string ret;
+    if (_head._flag & HTF_ORDERLY) {
+        ret.append(" HTF_ORDERLY ");
+    }
+    if (_head._flag & HTF_RELIABLE) {
+        ret.append(" HTF_RELIABLE ");
+    }
+    if (_head._flag & HTF_RELIABLE_ORDERLY) {
+        ret.append(" HTF_RELIABLE_ORDERLY ");
+    }
+    if (_head._flag & HTF_NORMAL) {
+        ret.append(" HTF_NORMAL ");
+    }
+    if (_head._flag & HPF_LOW_PRI) {
+        ret.append(" HPF_LOW_PRI ");
+    }
+    if (_head._flag & HPF_NROMAL_PRI) {
+        ret.append(" HPF_NROMAL_PRI ");
+    }
+    if (_head._flag & HPF_HIGH_PRI) {
+        ret.append(" HPF_HIGH_PRI ");
+    }
+    if (_head._flag & HPF_HIGHEST_PRI) {
+        ret.append(" HPF_HIGHEST_PRI ");
+    }
+    if (_head._flag & HPF_RELIABLE_ACK_RANGE) {
+        ret.append(" HPF_RELIABLE_ACK_RANGE ");
+    }
+    if (_head._flag & HPF_RELIABLE_ORDERLY_ACK_RANGE) {
+        ret.append(" HPF_RELIABLE_ORDERLY_ACK_RANGE ");
+    }
+    if (_head._flag & HPF_CLOSE) {
+        ret.append(" HPF_CLOSE ");
+    }
+    if (_head._flag & HPF_CLOSE_ACK) {
+        ret.append(" HPF_CLOSE_ACK ");
+    }
+    if (_head._flag & HPF_WITH_ID) {
+        ret.append(" HPF_WITH_ID ");
+    }
+    if (_head._flag & HPF_WITH_RELIABLE_ACK) {
+        ret.append(" HPF_WITH_RELIABLE_ACK ");
+    }
+    if (_head._flag & HPF_WITH_RELIABLE_ORDERLY_ACK) {
+        ret.append(" HPF_WITH_RELIABLE_ORDERLY_ACK ");
+    }
+    if (_head._flag & HPF_WITH_BODY) {
+        ret.append(" HPF_WITH_BODY ");
+    }
+    return ret;
+}
+
 void CMsgImpl::SetHandle(const HudpHandle& handle) {
     _ip_port = handle;
 }
@@ -84,16 +138,16 @@ void CMsgImpl::SetAck(int16_t flag, std::vector<uint16_t>& ack_vec, bool continu
     if (flag & HPF_WITH_RELIABLE_ACK) {
         _head.AddReliableAck(ack_vec, continuity);
     }
-    if (flag & HPF_RELIABLE_ORDERLY_ACK_RANGE) {
+    if (flag & HPF_WITH_RELIABLE_ORDERLY_ACK) {
         _head.AddReliableOrderlyAck(ack_vec, continuity);
     }
 }
 
 void CMsgImpl::GetAck(int16_t flag, std::vector<uint16_t>& ack_vec) {
-    if (flag & HPF_WITH_RELIABLE_ACK) {
+    if (_head._flag & HPF_WITH_RELIABLE_ACK) {
         _head.GetReliableAck(ack_vec);
     }
-    if (flag & HPF_RELIABLE_ORDERLY_ACK_RANGE) {
+    if (_head._flag & HPF_WITH_RELIABLE_ORDERLY_ACK) {
         _head.GetReliableOrderlyAck(ack_vec);
     }
 }

@@ -39,6 +39,9 @@ namespace hudp {
 
         virtual void SetFlag(uint16_t flag) = 0;
         virtual uint16_t GetFlag() = 0;
+        
+        // return header flag to string
+        virtual std::string DebugHeaderFlag() = 0;
 
         virtual void SetHandle(const HudpHandle& handle) = 0;
         virtual const HudpHandle& GetHandle() = 0;

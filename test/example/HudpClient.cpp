@@ -7,7 +7,7 @@ void RecvFunc(const hudp::HudpHandle& handlle, const char* msg, uint16_t len) {
     std::cout << "recv from :" << handlle << " msg : " << msg << std::endl;
 
     //base::CRunnable::Sleep(5000);
-    hudp::SendTo(handlle, hudp::HTF_ORDERLY | hudp::HPF_HIGHEST_PRI, msg, len);
+	hudp::SendTo(handlle, hudp::HTF_RELIABLE | hudp::HPF_HIGHEST_PRI, msg, len);
 }
 
 void UtestHudpServer() {
