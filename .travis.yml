@@ -12,8 +12,8 @@ script:
 - if [ $TRAVIS_OS_NAME == linux ]; then sh build.sh; fi
 
 branches:
-  only:
   - master
+  - dev
 
 notifications:
   email: false
