@@ -1,7 +1,7 @@
 #include <functional>
 
 #include "Log.h"
-#include "IMSg.h"
+#include "IMsg.h"
 #include "OsNet.h"
 #include "Timer.h"
 #include "ISocket.h"
