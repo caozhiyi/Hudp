@@ -55,6 +55,8 @@ void CSocketImpl::SendMessage(CMsg* msg) {
         AddToSendWnd(WI_RELIABLE_ORDERLY, msg);
 
     } else {
+        // add ack info incidentally
+        AddAckToMsg(msg);
         CHudpImpl::Instance().SendMessageToNet(msg);
     }
 }
@@ -114,6 +116,8 @@ void CSocketImpl::TimerOut(CMsg* msg) {
     if (!(msg->GetFlag() & msg_is_only_ack)) {
         // msg resend, increase send delay
         msg->AddSendDelay();
+
+    } else {
         _is_in_timer = false;
     }
 
