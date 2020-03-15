@@ -1,3 +1,4 @@
+#include <random>
 #include "CommonFunc.h"
 
 namespace hudp {
@@ -13,6 +14,14 @@ namespace hudp {
         ret.second = ip_port.substr(0, pos);
 
         return std::move(ret);
+    }
+
+    uint16_t GetRandomInitialValue() {
+        static std::default_random_engine __engine;
+        static uint16_t __max_id = 65535;
+        std::uniform_int_distribution<unsigned> u(0, __max_id);
+        int ret = u(__engine);
+        return ret;
     }
 
 }
