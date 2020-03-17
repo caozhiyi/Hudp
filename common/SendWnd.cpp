@@ -4,6 +4,7 @@
 #include "SendWnd.h"
 #include "IncrementalId.h"
 #include "IPriorityQueue.h"
+#include "CommonFunc.h"
 
 using namespace hudp;
 
@@ -15,7 +16,7 @@ CSendWndImpl::CSendWndImpl(uint16_t send_wnd_size, CPriorityQueue* priority_queu
                                                      _priority_queue(priority_queue) {
     _start = _end;
     _cur = _end;
-    _incremental_id = new CIncrementalId;
+    _incremental_id = new CIncrementalId(GetRandomInitialValue());
 }
 
 CSendWndImpl::~CSendWndImpl() {
@@ -140,16 +141,17 @@ void CSendWndImpl::SendAndAck() {
 void CSendWndImpl::SendNext() {
     // send next bag
     if (_cur_send_size < _send_wnd_size && _cur) {
-        CMsg* temp = _priority_queue->Pop();    
-        if (temp) {
-            PushBackToSendWnd(temp);
-        }
-
         _send_queue.push(_cur);
         if (!_always_send) {
             _cur_send_size++;
         }
         _cur = _cur->GetNext();
+
+        // add a msg to send wnd
+        CMsg* temp = _priority_queue->Pop();    
+        if (temp) {
+            PushBackToSendWnd(temp);
+        }
     } 
 }
 

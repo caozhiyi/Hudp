@@ -2,7 +2,7 @@
 #include "IncrementalId.h"
 using namespace hudp;
 
-CIncrementalId id;
+CIncrementalId id(0);
 uint16_t a = 0xFFFF;
 uint16_t b = 1;
 uint16_t c = 0;

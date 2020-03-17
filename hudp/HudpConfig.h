@@ -28,7 +28,7 @@ namespace hudp {
     static const uint8_t  __pri_surplus = 2;
 
     // reliable msg receiver cache msg size to check repeat.
-    static const uint16_t __msx_cache_msg_num = 100;
+    static const uint16_t __msx_cache_msg_num = 256;
 
     // timer is empty. wait timer
     static const uint16_t __timer_empty_wait = 60000;

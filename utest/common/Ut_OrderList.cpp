@@ -40,7 +40,7 @@ TEST(OrderList, case1) {
     msg4->SetSocket(sock);
     msg5->SetSocket(sock);
 
-    CReliableOrderlyList reliable_order_list;
+    CReliableOrderlyList reliable_order_list(1);
     reliable_order_list.Insert(msg1.get());
     EXPECT_EQ(1, global_id);
     reliable_order_list.Insert(msg2.get());
@@ -54,7 +54,7 @@ TEST(OrderList, case1) {
 }
 
 TEST(OrderList, case2) {
-    CReliableList reliable_list;
+    CReliableList reliable_list(1);
     reliable_list.Insert(msg1.get());
     EXPECT_EQ(1, global_id);
     reliable_list.Insert(msg2.get());
@@ -68,7 +68,7 @@ TEST(OrderList, case2) {
 }
 
 TEST(OrderList, case3) {
-    COrderlyList orderly_list;
+    COrderlyList orderly_list(1);
     orderly_list.Insert(msg1.get());
     EXPECT_EQ(1, global_id);
     orderly_list.Insert(msg2.get());

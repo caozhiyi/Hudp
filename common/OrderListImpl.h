@@ -6,11 +6,10 @@
 #include "TSQueue.h"
 #include "CommonType.h"
 #include "IOrderList.h"
+#include "HudpConfig.h"
 
 namespace hudp {
     
-    static const uint16_t __order_list_size = 256; // 2 >> 8
-
 	class CMsg;
     // order list base class
 	class CRecvList : public COrderList {
@@ -28,7 +27,7 @@ namespace hudp {
     // receive list that reliable and orderly 
     class CReliableOrderlyList : public CRecvList {
     public:
-        CReliableOrderlyList();
+        CReliableOrderlyList(uint16_t start_id);
         virtual ~CReliableOrderlyList();
         // add a item to order list
         // return 0 if success
@@ -38,14 +37,14 @@ namespace hudp {
         std::mutex _mutex;
         uint16_t _expect_id;
 
-        CMsg* _order_list[__order_list_size];
+        CMsg* _order_list[__msx_cache_msg_num];
         base::CTSQueue<CMsg*> _recv_list;
     };
 
     //  receive list that only reliable
     class CReliableList : public CRecvList {
     public:
-        CReliableList();
+        CReliableList(uint16_t start_id);
         virtual ~CReliableList();
         // add a item to order list
         // return 0 if success
@@ -53,15 +52,14 @@ namespace hudp {
 		virtual uint16_t Insert(CMsg* msg);
     private:
         std::mutex _mutex;
-        uint16_t   _msg_num;
-        uint16_t   _order_list[__order_list_size];
-        uint16_t   _start;
+        uint16_t   _order_list[__msx_cache_msg_num];
+        uint16_t   _expect_id;
     };
 
     // receive list that only orderly
     class COrderlyList : public CRecvList {
     public:
-        COrderlyList();
+        COrderlyList(uint16_t start_id);
         virtual ~COrderlyList();
         // add a item to order list
         // always return 0

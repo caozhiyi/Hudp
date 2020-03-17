@@ -210,14 +210,15 @@ void CSocketImpl::AddToSendWnd(WndIndex index, CMsg* msg) {
 
 void CSocketImpl::AddToRecvList(WndIndex index, CMsg* msg) {
     if (!_recv_list[index]) {
+        uint16_t id = msg->GetId();
         if (index == WI_ORDERLY) {
-            _recv_list[index] = new COrderlyList();
+            _recv_list[index] = new COrderlyList(id);
 
         } else if (index == WI_RELIABLE) {
-            _recv_list[index] = new CReliableList();
+            _recv_list[index] = new CReliableList(id);
 
         } else if (index == WI_RELIABLE_ORDERLY) {
-            _recv_list[index] = new CReliableOrderlyList();
+            _recv_list[index] = new CReliableOrderlyList(id);
         }
     }
     // should send ack to remote

@@ -47,7 +47,7 @@ namespace hudp {
         std::mutex      _mutex;
         uint16_t        _send_wnd_size;
         uint16_t        _cur_send_size;
-        bool            _always_send;
+        bool            _always_send;   // only orderly use
 
         CPriorityQueue* _priority_queue;
         CIncrementalId* _incremental_id;

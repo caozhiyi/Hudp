@@ -8,7 +8,7 @@ namespace hudp {
 
     class CIncrementalId {
     public:
-        CIncrementalId();
+        CIncrementalId(uint16_t cur_id);
         ~CIncrementalId();
         
         // get next incremental id
