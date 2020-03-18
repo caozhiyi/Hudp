@@ -2,20 +2,21 @@
 #include "IMsg.h"
 #include "ISocket.h"
 #include "SendWnd.h"
+#include "HudpConfig.h"
+#include "CommonFunc.h"
 #include "IncrementalId.h"
 #include "IPriorityQueue.h"
-#include "CommonFunc.h"
 
 using namespace hudp;
 
 CSendWndImpl::CSendWndImpl(uint16_t send_wnd_size, CPriorityQueue* priority_queue, bool always_send) :
+                                                     _start(nullptr),
                                                      _end(nullptr),
                                                      _send_wnd_size(send_wnd_size),
                                                      _cur_send_size(0),
                                                      _always_send(always_send),
-                                                     _priority_queue(priority_queue) {
-    _start = _end;
-    _cur = _end;
+                                                     _priority_queue(priority_queue),
+                                                     _out_of_order_count(0) {
     _incremental_id = new CIncrementalId(GetRandomInitialValue());
 }
 
@@ -52,25 +53,31 @@ void CSendWndImpl::AcceptAck(uint16_t id) {
     }
 
     if (iter->second == _start) {
+        // only one node
+        if (_start == _end) {
+            _end = nullptr;
+        }
         _start = _start->GetNext();
         if (_start) {
             _start->SetPrev(nullptr);
         }
+        _out_of_order_count = 0;
 
     } else if (iter->second == _end) {
         _end = _end->GetPrev();
         if (_end) {
             _end->SetNext(nullptr);
         }
+        _out_of_order_count++;
 
     } else {
-        // remove from list
-        iter->second->GetNext()->SetPrev(iter->second->GetPrev());
-        iter->second->GetPrev()->SetNext(iter->second->GetNext());
+        _out_of_order_count++;
+        Remove(iter->second);
     }
 
-    if (iter->second == _cur) {
-        _cur = iter->second->GetNext();
+    if (_out_of_order_count >= __quick_resend_limit && _start) {
+        _send_queue.push(_start);
+        _out_of_order_count = 0;
     }
 
     _ack_queue.push(iter->second);
@@ -140,17 +147,17 @@ void CSendWndImpl::SendAndAck() {
 
 void CSendWndImpl::SendNext() {
     // send next bag
-    if (_cur_send_size < _send_wnd_size && _cur) {
-        _send_queue.push(_cur);
-        if (!_always_send) {
-            _cur_send_size++;
-        }
-        _cur = _cur->GetNext();
-
+    while (_cur_send_size < _send_wnd_size) {
         // add a msg to send wnd
         CMsg* temp = _priority_queue->Pop();    
         if (temp) {
             PushBackToSendWnd(temp);
+            if (!_always_send) {
+                _cur_send_size++;
+            }
+
+        } else {
+            break;
         }
     } 
 }
@@ -159,31 +166,37 @@ void CSendWndImpl::PushBackToSendWnd(CMsg* msg) {
     uint16_t id = _incremental_id->GetNextId();
     msg->SetId(id);
     _id_msg_map[id] = msg;
-    msg->SetNext(nullptr);
-    msg->SetPrev(nullptr);
+   
+    AddToEnd(msg);
 
-    if (_end) {
-        _end->SetNext(msg);
-        msg->SetPrev(_end);
-        _end = msg;
-    }
-
-    if (_cur == nullptr) {
-        _cur = _end;
-    }
-
-    if (_start == nullptr) {
-        _start = msg;
-        _end = msg;
-    }
-
-    if (_cur_send_size < _send_wnd_size) {
-        _send_queue.push(msg);
-        if (!_always_send) {
-            _cur_send_size++;
-        }
-        _cur = nullptr;
+    _send_queue.push(msg);
+    if (!_always_send) {
+        _cur_send_size++;
     }
 
     SendAndAck();
+}
+
+void CSendWndImpl::AddToEnd(CMsg* msg) {
+    // list is empty
+    if (!_end) {
+        _start = _end = msg;
+        return;
+    }
+
+    _end->SetNext(msg);
+    msg->SetPrev(_end);
+    _end = msg;
+}
+
+void CSendWndImpl::Remove(CMsg* msg) {
+    if (!msg) {
+        return;
+    }
+    if (msg->GetPrev()) {
+        msg->GetPrev()->SetNext(msg->GetNext());
+    }
+    if (msg->GetNext()) {
+        msg->GetNext()->SetPrev(msg->GetPrev());
+    }
 }

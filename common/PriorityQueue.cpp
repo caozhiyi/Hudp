@@ -67,7 +67,7 @@ CMsg* CPriorityQueueImpl::Pop() {
     _pri_high_count = __pri_surplus;
     _pri_highest_count = __pri_surplus;
 
-    if (_queue_arr[__pri_low].empty()) {
+    if (!_queue_arr[__pri_low].empty()) {
         msg = _queue_arr[__pri_low].front();
         _queue_arr[__pri_low].pop();
         return msg;

@@ -91,7 +91,8 @@ uint16_t CReliableList::Insert(CMsg* msg) {
 	auto id = msg->GetId();
     uint16_t index = HashFunc(id);
     // too farm, discard this msg
-    if (std::abs(id - _expect_id) || (_expect_id < (__max_id - __max_compare_num)) && id < __max_compare_num) {
+    if (std::abs(id - _expect_id) > __max_compare_num ||
+       (_expect_id > (__max_id - __max_compare_num / 2) && id < __max_compare_num / 2)) {
         return 0;
     }
 

@@ -48,6 +48,9 @@ namespace hudp {
     // message resend timer
     static const uint16_t __resend_time = 30;      // 30ms
 
+    // message resend timer
+    static const uint16_t __quick_resend_limit = 3;// if out of order ack is more than it, resend quickly
+
     // 15ms. so min rto = 60ms
     static const uint32_t __init_mdev_max = 15;
     // 1000ms.
@@ -56,11 +59,11 @@ namespace hudp {
 
     // about log setting
     // log level.
-    static const base::LogLevel __log_level = base::LOG_DEBUG_LEVEL;
+    static const base::LogLevel __log_level = base::LOG_WARN_LEVEL;
     // log file name .
     static const std::string __log_file_name = "HudpLog";
     // open log print.
-    static const bool __open_log = false;
+    static const bool __open_log = true;
 }
 
 #endif

@@ -15,17 +15,18 @@ void UtestHudpServer() {
 
     hudp::Start("127.0.0.1", 8011, RecvFunc);
     
-    int index = 0;
+    int index = 0;   
+
     while (1)
     {
         index++;
         std::string msg = "a test msg. id : " + std::to_string(index);
         
-        base::CRunnable::Sleep(3000);
-        if (index == 10) {
+        base::CRunnable::Sleep(300);
+        if (index == 100) {
             hudp::Close("127.0.0.1:8012");
-        } else if (index < 10) {
-            hudp::SendTo("127.0.0.1:8012", hudp::HTF_NORMAL | hudp::HPF_HIGHEST_PRI, msg);
+        } else if (index < 100) {
+            hudp::SendTo("127.0.0.1:8012", hudp::HTF_RELIABLE_ORDERLY | hudp::HPF_LOW_PRI, msg);
         }
     }
 

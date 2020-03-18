@@ -37,17 +37,26 @@ namespace hudp {
         // send next
         void SendNext();
         // push back to send wnd
-        void PushBackToSendWnd(CMsg* msg);      
+        void PushBackToSendWnd(CMsg* msg);
+        // add to list end
+        void AddToEnd(CMsg* msg);
+        // remove from list
+        void Remove(CMsg* msg);
 
     private:
-        CMsg*           _start;       // point to the list start
-        CMsg*           _end;         // point to the list end
-        CMsg*           _cur;         // current send point
+        // point to the send list start
+        // all msg will be added here after send
+        CMsg*           _start;
+        CMsg*           _end;
+        // when ack is not start, increase id
+        // when _out_of_order_count >= 3, resend _start msg quickly
+        uint16_t        _out_of_order_count;
         
         std::mutex      _mutex;
         uint16_t        _send_wnd_size;
         uint16_t        _cur_send_size;
-        bool            _always_send;   // only orderly use
+        // only orderly use
+        bool            _always_send;
 
         CPriorityQueue* _priority_queue;
         CIncrementalId* _incremental_id;
