@@ -60,6 +60,9 @@ namespace hudp {
         std::shared_ptr<CSocket> GetSocket();
         void SetSocket(std::shared_ptr<CSocket>& sock);
 
+        void SetSendTime(uint64_t time);
+        uint64_t GetSendTime();
+
     private:
         friend class CSerializes;
         // only head and body will be serialized
@@ -69,6 +72,7 @@ namespace hudp {
         std::string     _ip_port;
         int16_t         _flag;      // recv or send message. only use in self, won't be send
 
+        // two way linked list
         CMsg*           _next;
         CMsg*           _prev;
 

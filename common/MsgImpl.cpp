@@ -200,3 +200,11 @@ std::shared_ptr<CSocket> CMsgImpl::GetSocket() {
 void CMsgImpl::SetSocket(std::shared_ptr<CSocket>& sock) {
     _socket = sock;
 }
+
+void CMsgImpl::SetSendTime(uint64_t time) {
+    _head.SetSendTime(time);
+}
+
+uint64_t CMsgImpl::GetSendTime() {
+    return _head.GetSendTime();
+}

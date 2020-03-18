@@ -1,4 +1,6 @@
 #include <random>
+
+#include "TimeTool.h"
 #include "CommonFunc.h"
 
 namespace hudp {
@@ -21,6 +23,11 @@ namespace hudp {
         std::uniform_int_distribution<unsigned> u(0, __max_id);
         int ret = u(__engine);
         return ret;
+    }
+
+    uint64_t GetCurTimeStamp() {
+        base::CTimeTool __time_tool;
+        return (uint64_t)__time_tool.GetMsec();
     }
 
 }

@@ -25,6 +25,10 @@ namespace hudp {
         void     SetId(uint16_t id);
         uint16_t GetId();
 
+        // send time
+        void SetSendTime(uint64_t time);
+        uint64_t GetSendTime();
+
         // reliable orderly ack
         // only called once 
         bool AddReliableOrderlyAck(const std::vector<uint16_t>& ack_vec, bool continue_range = false);
@@ -40,6 +44,8 @@ namespace hudp {
         uint16_t _flag;     // this flag  will be send to remote
         uint16_t _id;       // msg id
         uint16_t _body_len; // body length if have
+
+        uint64_t _send_time;// time stamp 
  
         // reliable ack
         uint16_t _ack_reliable_len;

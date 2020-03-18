@@ -7,6 +7,7 @@ using namespace hudp;
 Head::Head() : _flag(0),
                _id(0),
                _body_len(0),
+               _send_time(0),
                _ack_reliable_len(0),
                _ack_reliable_orderly_len(0) {
 
@@ -53,6 +54,14 @@ void Head::SetId(uint16_t id) {
 
 uint16_t Head::GetId() {
     return _id;
+}
+
+void Head::SetSendTime(uint64_t time) {
+    _send_time = time;
+}
+
+uint64_t Head::GetSendTime() {
+    return _send_time;
 }
 
 bool Head::AddReliableOrderlyAck(const std::vector<uint16_t>& ack_vec, bool continue_range) {

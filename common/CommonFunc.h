@@ -9,5 +9,7 @@ namespace hudp {
     std::pair<uint16_t, std::string> SplitIpPort(const std::string& ip_port);
     // get a random num
     uint16_t GetRandomInitialValue();
+    // get current time stamp
+    uint64_t GetCurTimeStamp();
 }
 #endif

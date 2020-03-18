@@ -69,6 +69,10 @@ namespace hudp {
 
         virtual std::shared_ptr<CSocket> GetSocket() = 0;
         virtual void SetSocket(std::shared_ptr<CSocket>& sock) = 0;
+
+        // send time
+        virtual void SetSendTime(uint64_t time) = 0;
+        virtual uint64_t GetSendTime() = 0;
     };
 }
 #endif

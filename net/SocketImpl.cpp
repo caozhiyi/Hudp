@@ -9,6 +9,7 @@
 #include "SocketImpl.h"
 #include "HudpConfig.h"
 #include "CommonFlag.h"
+#include "CommonFunc.h"
 #include "OrderListImpl.h"
 #include "PriorityQueue.h"
 
@@ -102,6 +103,10 @@ void CSocketImpl::ToSend(CMsg* msg) {
     if (msg->GetHeaderFlag() & HTF_RELIABLE_ORDERLY || msg->GetHeaderFlag() & HTF_RELIABLE) {
         CTimer::Instance().AddTimer(msg->GetReSendTime(), msg);
     }
+
+    // set send msg time
+    msg->SetSendTime(GetCurTimeStamp());
+    
     // add ack info incidentally
     AddAckToMsg(msg);
     CHudpImpl::Instance().SendMessageToNet(msg);
@@ -127,6 +132,9 @@ void CSocketImpl::TimerOut(CMsg* msg) {
     if (!add_ack && msg->GetFlag() & msg_is_only_ack) {
         return;
     }
+
+    // set send msg time
+    msg->SetSendTime(GetCurTimeStamp());
     // send to net
     CHudpImpl::Instance().SendMessageToNet(msg);
 }
@@ -176,7 +184,6 @@ bool CSocketImpl::AddAckToMsg(CMsg* msg) {
 
 void CSocketImpl::GetAckToSendWnd(CMsg* msg) {
     if (msg->GetHeaderFlag() & HPF_WITH_RELIABLE_ORDERLY_ACK) {
-        //auto time_stap = CTimer::Instance().GetTimeStamp();
         std::vector<uint16_t> vec;
         msg->GetAck(HPF_WITH_RELIABLE_ORDERLY_ACK, vec);
         for (uint16_t index = 0; index < vec.size(); index++) {
@@ -233,4 +240,9 @@ void CSocketImpl::AddToPendAck(WndIndex index, CMsg* msg) {
         _pend_ack[index] = new CPendAck();
     }
     _pend_ack[index]->AddAck(msg->GetId());
+}
+
+uint64_t CSocketImpl::GetRtt(CMsg* msg) {
+    uint64_t now = GetCurTimeStamp();
+    return msg->GetSendTime() - now;
 }
