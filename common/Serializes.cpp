@@ -7,11 +7,15 @@
 
 using namespace hudp;
 
-bool CSerializes::Serializes(CMsgImpl& msg, CBitStreamWriter& bit_stream) {
-    return Serializes(msg._head, msg._body.c_str(), msg._body.length(), bit_stream);
+bool CSerializesNormal::Serializes(CMsg& msg, CBitStreamWriter& bit_stream) {
+    return Serializes(msg.GetHead(), msg.GetBody().c_str(), msg.GetBody().length(), bit_stream);
 }
 
-bool CSerializes::Serializes(const Head& head, CBitStreamWriter& bit_stream) {
+bool CSerializesNormal::Deseriali(CBitStreamReader& bit_stream, CMsg& msg) {
+    return Deseriali(bit_stream, msg.GetHead(), msg.GetBody());
+}
+
+bool CSerializesNormal::SerializesHead(Head& head, CBitStreamWriter& bit_stream) {
     // must serializes head first
     if (bit_stream.GetCurrentLength() > 0) {
         base::LOG_ERROR("head is not first to be serializes");
@@ -19,105 +23,172 @@ bool CSerializes::Serializes(const Head& head, CBitStreamWriter& bit_stream) {
     }
     
     // fixed sequence by read/write
-    bit_stream.Write(head._flag);
-    if (head._flag & HPF_WITH_ID) {
-        CHECK_RET(bit_stream.Write(head._id));
+    uint32_t flag = head.GetFlag();
+    bit_stream.Write(flag);
+    if (flag & HPF_WITH_ID) {
+        CHECK_RET(bit_stream.Write(head.GetId()));
     }
 
-    if (head._flag & HPF_WITH_RELIABLE_ORDERLY_ACK) {
-        if (head._ack_reliable_orderly_len > 0) {
-            CHECK_RET(bit_stream.Write(head._ack_reliable_orderly_len));
-            if (head._flag & HPF_RELIABLE_ORDERLY_ACK_RANGE) {
-                CHECK_RET(bit_stream.Write(head._ack_reliable_orderly_vec[0]));
+    if (flag & HPF_MSG_WITH_TIME_STAMP) {
+        CHECK_RET(bit_stream.Write(head.GetSendTime()));
+    }
+
+    if (flag & HPF_WITH_RELIABLE_ORDERLY_ACK) {
+        std::vector<uint16_t> reliable_orderly_vec;
+        head.GetReliableOrderlyAck(reliable_orderly_vec);
+        uint16_t len = reliable_orderly_vec.size();
+        if (len > 0) {
+            CHECK_RET(bit_stream.Write(len));
+            if (flag & HPF_RELIABLE_ORDERLY_ACK_RANGE) {
+                CHECK_RET(bit_stream.Write(reliable_orderly_vec[0]));
 
             } else {
-                for (uint16_t i = 0; i < head._ack_reliable_orderly_len; i++) {
-                    CHECK_RET(bit_stream.Write(head._ack_reliable_orderly_vec[i]));
+                for (uint16_t i = 0; i < len; i++) {
+                    CHECK_RET(bit_stream.Write(reliable_orderly_vec[i]));
                 }
             }
         }
+        if (flag & HPF_MSG_WITH_TIME_STAMP) {
+            std::vector<uint64_t> time_vec;
+            head.GetReliableOrderlyAckTime(time_vec);
+            for (uint16_t i = 0; i < len; i++) {
+                CHECK_RET(bit_stream.Write(time_vec[i]));
+            }
+        }
     }
-    if (head._flag & HPF_WITH_RELIABLE_ACK) {
-        if (head._ack_reliable_len > 0) {
-            CHECK_RET(bit_stream.Write(head._ack_reliable_len));
-            if (head._flag & HPF_RELIABLE_ACK_RANGE) {
-                CHECK_RET(bit_stream.Write(head._ack_reliable_vec[head._ack_reliable_orderly_len]));
+
+    if (flag & HPF_WITH_RELIABLE_ACK) {
+        std::vector<uint16_t> reliable_vec;
+        head.GetReliableAck(reliable_vec);
+        uint16_t len = reliable_vec.size();
+        if (len > 0) {
+            CHECK_RET(bit_stream.Write(len));
+            if (flag & HPF_RELIABLE_ACK_RANGE) {
+                CHECK_RET(bit_stream.Write(reliable_vec[0]));
 
             } else {
-                for (uint16_t i = head._ack_reliable_orderly_len; i < head._ack_reliable_len; i++) {
-                    CHECK_RET(bit_stream.Write(head._ack_reliable_vec[i]));
+                for (uint16_t i = 0; i < len; i++) {
+                    CHECK_RET(bit_stream.Write(reliable_vec[i]));
                 }
+            }
+        }
+        if (flag & HPF_MSG_WITH_TIME_STAMP) {
+            std::vector<uint64_t> time_vec;
+            head.GetReliableAckTime(time_vec);
+            for (uint16_t i = 0; i < len; i++) {
+                CHECK_RET(bit_stream.Write(time_vec[i]));
             }
         }
     }
     
-    if (head._flag & HPF_WITH_BODY) {
-        CHECK_RET(bit_stream.Write(head._body_len));
+    if (flag & HPF_WITH_BODY) {
+        CHECK_RET(bit_stream.Write(head.GetBodyLength()));
     }
     return true;
 }
 
-bool CSerializes::Serializes(Head& head, const char* body, uint16_t len, CBitStreamWriter& bit_stream) {
+bool CSerializesNormal::Serializes(Head& head, const char* body, uint16_t len, CBitStreamWriter& bit_stream) {
     if (len > 0) {
-        head._body_len = len;
+        head.SetBodyLength(len);
     }
-    if (!Serializes(head, bit_stream)) {
+    if (!SerializesHead(head, bit_stream)) {
         return false;
     }
     
     return bit_stream.Write(body, len);
 }
 
-bool CSerializes::Deseriali(CBitStreamReader& bit_stream, CMsgImpl& msg) {
-    return Deseriali(bit_stream, msg._head, msg._body);
-}
-
-bool CSerializes::Deseriali(CBitStreamReader& bit_stream, Head& head) {
+bool CSerializesNormal::DeserialiHead(CBitStreamReader& bit_stream, Head& head) {
     // fixed sequence by read/write
-    bit_stream.Read(head._flag);
-    if (head._flag & HPF_WITH_ID) {
-        CHECK_RET(bit_stream.Read(head._id));
+    uint32_t flag = 0;
+    bit_stream.Read(flag);
+    head.SetFlag(flag);
+    if (flag & HPF_WITH_ID) {
+        uint16_t id;
+        CHECK_RET(bit_stream.Read(id));
+        head.SetId(id);
     }
 
-    if (head._flag & HPF_WITH_RELIABLE_ORDERLY_ACK) {
-        CHECK_RET(bit_stream.Read(head._ack_reliable_orderly_len));
+    if (flag & HPF_MSG_WITH_TIME_STAMP) {
+        uint64_t time_stamp = 0;
+        CHECK_RET(bit_stream.Read(time_stamp));
+        head.SetSendTime(time_stamp);
+    }
+
+    if (flag & HPF_WITH_RELIABLE_ORDERLY_ACK) {
+        uint16_t len = 0;
+        CHECK_RET(bit_stream.Read(len));
         uint16_t tmp = 0;
-        if (head._flag & HPF_RELIABLE_ORDERLY_ACK_RANGE) {
+        if (flag & HPF_RELIABLE_ORDERLY_ACK_RANGE) {
             CHECK_RET(bit_stream.Read(tmp));
-            head._ack_reliable_orderly_vec.push_back(tmp);
+            std::vector<uint16_t> ack_vec;
+            for (uint16_t i = 0; i < len; i++) {
+                ack_vec.push_back(tmp + i);
+            }
+            head.AddReliableOrderlyAck(ack_vec, true);
 
         } else {
-            for (uint16_t i = 0; i < head._ack_reliable_orderly_len; i++) {
+            std::vector<uint16_t> ack_vec;
+            for (uint16_t i = 0; i < len; i++) {
                 CHECK_RET(bit_stream.Read(tmp));
-                head._ack_reliable_orderly_vec.push_back(tmp);
+                ack_vec.push_back(tmp);
             }
+            head.AddReliableOrderlyAck(ack_vec);
+        }
+
+        if (flag & HPF_MSG_WITH_TIME_STAMP) {
+            std::vector<uint64_t> time_vec;
+            uint64_t time_tmp = 0;
+            for (uint16_t i = 0; i < len; i++) {
+                CHECK_RET(bit_stream.Read(time_tmp));
+                time_vec.push_back(time_tmp);
+            }
+            head.AddReliableOrderlyAckTime(time_vec);
         }
     }
-    if (head._flag & HPF_WITH_RELIABLE_ACK) {
-        CHECK_RET(bit_stream.Read(head._ack_reliable_len));
+    if (flag & HPF_WITH_RELIABLE_ACK) {
+        uint16_t len = 0;
+        CHECK_RET(bit_stream.Read(len));
         uint16_t tmp = 0;
-        if (head._flag & HPF_RELIABLE_ACK_RANGE) {
+        if (flag & HPF_RELIABLE_ACK_RANGE) {
             CHECK_RET(bit_stream.Read(tmp));
-            head._ack_reliable_vec.push_back(tmp);
+            std::vector<uint16_t> ack_vec;
+            for (uint16_t i = 0; i < len; i++) {
+                ack_vec.push_back(tmp + i);
+            }
+             head.AddReliableAck(ack_vec, true);
 
         } else {
-            for (uint16_t i = head._ack_reliable_orderly_len; i < head._ack_reliable_len; i++) {
+            std::vector<uint16_t> ack_vec;
+            for (uint16_t i = 0; i < len; i++) {
                 CHECK_RET(bit_stream.Read(tmp));
-                head._ack_reliable_vec.push_back(tmp);
+                ack_vec.push_back(tmp);
             }
+            head.AddReliableAck(ack_vec);
+        }
+
+        if (flag & HPF_MSG_WITH_TIME_STAMP) {
+            std::vector<uint64_t> time_vec;
+            uint64_t time_tmp = 0;
+            for (uint16_t i = 0; i < len; i++) {
+                CHECK_RET(bit_stream.Read(time_tmp));
+                time_vec.push_back(time_tmp);
+            }
+            head.AddReliableAckTime(time_vec);
         }
     }
 
-    if (head._flag & HPF_WITH_BODY) {
-        CHECK_RET(bit_stream.Read(head._body_len));
+    if (flag & HPF_WITH_BODY) {
+        uint16_t body_len = 0;
+        CHECK_RET(bit_stream.Read(body_len));
+        head.SetBodyLength(body_len);
     }
     return true;
 }
-  
-bool CSerializes::Deseriali(CBitStreamReader& bit_stream, Head& head, std::string& body) {
-    if (!Deseriali(bit_stream, head)) {
+
+bool CSerializesNormal::Deseriali(CBitStreamReader& bit_stream, Head& head, std::string& body) {
+    if (!DeserialiHead(bit_stream, head)) {
         return false;
     }
-    CHECK_RET(bit_stream.Read(body, head._body_len));
-    return true;
+    return bit_stream.Read(body, head.GetBodyLength());
 }

@@ -16,6 +16,7 @@ namespace hudp {
     };
 
     class CSocket;
+    class Head;
     // msg base class.
     class CMsg
     {
@@ -26,6 +27,8 @@ namespace hudp {
         virtual void Clear() = 0;
         // // clear member which about ack
         virtual void ClearAck() = 0;
+
+        virtual Head& GetHead() = 0;
 
         virtual void SetId(const uint16_t& id) = 0;
         virtual uint16_t GetId() = 0;
@@ -50,8 +53,8 @@ namespace hudp {
         virtual std::string& GetBody() = 0;
 
         // ack about
-        virtual void SetAck(int16_t flag, std::vector<uint16_t>& ack_vec, bool continuity) = 0;
-        virtual void GetAck(int16_t flag, std::vector<uint16_t>& ack_vec) = 0;
+        virtual void SetAck(int16_t flag, std::vector<uint16_t>& ack_vec, std::vector<uint64_t>& time_vec, bool continuity) = 0;
+        virtual void GetAck(int16_t flag, std::vector<uint16_t>& ack_vec, std::vector<uint64_t>& time_vec) = 0;
 
         // get buffer that is serialized
         virtual std::string GetSerializeBuffer() = 0;

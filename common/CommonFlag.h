@@ -32,6 +32,9 @@ namespace hudp {
         HPF_WITH_RELIABLE_ORDERLY_ACK  = 0x004000,
         // bag has body.
         HPF_WITH_BODY                  = 0x008000,
+
+        // msg with send time stamp, to calculation rtt time
+        HPF_MSG_WITH_TIME_STAMP        = 0x010000,
     };
 }
 #endif

@@ -48,14 +48,15 @@ namespace hudp {
     // message resend timer
     static const uint16_t __resend_time = 30;      // 30ms
 
-    // message resend timer
-    static const uint16_t __quick_resend_limit = 3;// if out of order ack is more than it, resend quickly
+    // if out of order ack is more than it, resend quickly
+    static const uint16_t __quick_resend_limit = 3;
 
     // 15ms. so min rto = 60ms
     static const uint32_t __init_mdev_max = 15;
     // 1000ms.
     static const uint32_t __init_cur_rto = 1000;
-
+    // msg with send time stamp, to calculation rtt time
+    static const bool     __msg_with_time = true;
 
     // about log setting
     // log level.

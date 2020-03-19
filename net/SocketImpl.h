@@ -56,7 +56,9 @@ namespace hudp {
         void AddToSendWnd(WndIndex index, CMsg* msg);
         void AddToRecvList(WndIndex index, CMsg* msg);
         void AddToPendAck(WndIndex index, CMsg* msg);
+        // calculation rtt time
         uint64_t GetRtt(CMsg* msg);
+        uint64_t GetRtt(uint64_t time);
 
     private:
         // reliable correlation

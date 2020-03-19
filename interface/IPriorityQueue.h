@@ -4,7 +4,7 @@
 #include "CommonType.h"
 
 namespace hudp {
-    // rto calc base class.
+
     class CMsg;
     class CPriorityQueue
     {

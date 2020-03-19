@@ -167,16 +167,18 @@ bool CSocketImpl::AddAckToMsg(CMsg* msg) {
     if (_pend_ack[WI_RELIABLE_ORDERLY] && _pend_ack[WI_RELIABLE_ORDERLY]->HasAck()) {
         bool continuity = false;
         std::vector<uint16_t> ack_vec;
-        _pend_ack[WI_RELIABLE_ORDERLY]->GetAllAck(ack_vec, continuity);
-        msg->SetAck(HPF_WITH_RELIABLE_ORDERLY_ACK, ack_vec, continuity);
+        std::vector<uint64_t> time_vec;
+        _pend_ack[WI_RELIABLE_ORDERLY]->GetAllAck(ack_vec, time_vec, continuity);
+        msg->SetAck(HPF_WITH_RELIABLE_ORDERLY_ACK, ack_vec, time_vec, continuity);
         ret = true;
     }
 
     if (_pend_ack[WI_RELIABLE] && _pend_ack[WI_RELIABLE]->HasAck()) {
         bool continuity = false;
         std::vector<uint16_t> ack_vec;
-        _pend_ack[WI_RELIABLE]->GetAllAck(ack_vec, continuity);
-        msg->SetAck(HPF_WITH_RELIABLE_ACK, ack_vec, continuity);
+        std::vector<uint64_t> time_vec;
+        _pend_ack[WI_RELIABLE]->GetAllAck(ack_vec, time_vec, continuity);
+        msg->SetAck(HPF_WITH_RELIABLE_ACK, ack_vec, time_vec, continuity);
         ret = true;
     }
     return ret;
@@ -185,9 +187,21 @@ bool CSocketImpl::AddAckToMsg(CMsg* msg) {
 void CSocketImpl::GetAckToSendWnd(CMsg* msg) {
     if (msg->GetHeaderFlag() & HPF_WITH_RELIABLE_ORDERLY_ACK) {
         std::vector<uint16_t> vec;
-        msg->GetAck(HPF_WITH_RELIABLE_ORDERLY_ACK, vec);
+        std::vector<uint64_t> time_vec;
+        msg->GetAck(HPF_WITH_RELIABLE_ORDERLY_ACK, vec, time_vec);
         for (uint16_t index = 0; index < vec.size(); index++) {
             _send_wnd[WI_RELIABLE_ORDERLY]->AcceptAck(vec[index]);
+
+            uint64_t rtt_time = 0;
+            if (__msg_with_time) {
+                rtt_time = GetRtt(time_vec[index]);
+                // TODO
+                // set rtt sample
+                // _rto.SetAckTime(index, time_stap);
+            }
+        }
+        if (!__msg_with_time) {
+            uint64_t rtt_time = GetRtt(msg);
             // TODO
             // set rtt sample
             // _rto.SetAckTime(index, time_stap);
@@ -195,14 +209,24 @@ void CSocketImpl::GetAckToSendWnd(CMsg* msg) {
     }
 
     if (msg->GetHeaderFlag() & HPF_WITH_RELIABLE_ACK) {
-        //auto time_stap = CTimer::Instance().GetTimeStamp();
         std::vector<uint16_t> vec;
-        msg->GetAck(HPF_WITH_RELIABLE_ACK, vec);
+        std::vector<uint64_t> time_vec;
+        msg->GetAck(HPF_WITH_RELIABLE_ACK, vec, time_vec);
         for (uint16_t index = 0; index < vec.size(); index++) {
             _send_wnd[WI_RELIABLE]->AcceptAck(vec[index]);
+
+            if (__msg_with_time) {
+                uint64_t rtt_time = GetRtt(time_vec[index]);
+                // TODO
+                // set rtt sample
+                // _rto.SetAckTime(index, time_stap);
+            }
+        }
+        if (!__msg_with_time) {
+            uint64_t rtt_time = GetRtt(msg);
             // TODO
             // set rtt sample
-            //_rto.SetAckTime(index, time_stap);
+            // _rto.SetAckTime(index, time_stap);
         }
     }
 }
@@ -239,10 +263,20 @@ void CSocketImpl::AddToPendAck(WndIndex index, CMsg* msg) {
     if (!_pend_ack[index]) {
         _pend_ack[index] = new CPendAck();
     }
-    _pend_ack[index]->AddAck(msg->GetId());
+    if (__msg_with_time) {
+        _pend_ack[index]->AddAck(msg->GetId(), msg->GetSendTime());
+
+    } else {
+        _pend_ack[index]->AddAck(msg->GetId());
+    }
 }
 
 uint64_t CSocketImpl::GetRtt(CMsg* msg) {
     uint64_t now = GetCurTimeStamp();
     return msg->GetSendTime() - now;
+}
+
+uint64_t CSocketImpl::GetRtt(uint64_t time) {
+    uint64_t now = GetCurTimeStamp();
+    return time - now;
 }

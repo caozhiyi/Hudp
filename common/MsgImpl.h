@@ -8,6 +8,7 @@
 namespace hudp {
 
     class CSocket;
+    class CSerializes;
     class CMsgImpl : public CMsg {
     public:
         CMsgImpl();
@@ -16,6 +17,8 @@ namespace hudp {
         void Clear();
         // clear member which about ack
         void ClearAck();
+
+        Head& GetHead();
 
         void SetId(const uint16_t& id);
         uint16_t GetId();
@@ -40,8 +43,8 @@ namespace hudp {
         std::string& GetBody();
 
         // ack about
-        void SetAck(int16_t flag, std::vector<uint16_t>& ack_vec, bool continuity);
-        void GetAck(int16_t flag, std::vector<uint16_t>& ack_vec);
+        void SetAck(int16_t flag, std::vector<uint16_t>& ack_vec, std::vector<uint64_t>& time_vec, bool continuity);
+        void GetAck(int16_t flag, std::vector<uint16_t>& ack_vec, std::vector<uint64_t>& time_vec);
 
         // get buffer that is serialized
         std::string GetSerializeBuffer();
@@ -64,7 +67,6 @@ namespace hudp {
         uint64_t GetSendTime();
 
     private:
-        friend class CSerializes;
         // only head and body will be serialized
         Head            _head;      // head msg. set by hudp
         std::string     _body;      // body msg. set by user
@@ -78,6 +80,8 @@ namespace hudp {
 
         uint64_t       _time_id;
         uint16_t       _backoff_factor;  // timer out resend backoff factor, every time resend it will * 2
+
+        static CSerializes*  _serializes;
 
         std::weak_ptr<CSocket> _socket;
     };

@@ -4,7 +4,7 @@
 #include "CommonType.h"
 
 namespace hudp {
-    // msg base class.
+    // net base class.
     class CNetIO
     {
     public:

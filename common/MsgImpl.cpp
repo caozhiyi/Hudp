@@ -5,6 +5,9 @@
 #include "CommonFlag.h"
 
 using namespace hudp;
+
+CSerializes* CMsgImpl::_serializes = new CSerializesNormal();
+
 CMsgImpl::CMsgImpl() : _backoff_factor(1),
                        _flag(msg_with_out_id),
                        _next(nullptr),
@@ -29,6 +32,10 @@ void CMsgImpl::Clear() {
 
 void CMsgImpl::ClearAck() {
     _head.ClearAck();
+}
+
+Head& CMsgImpl::GetHead() {
+    return _head;
 }
 
 void CMsgImpl::SetId(const uint16_t& id) {
@@ -134,27 +141,31 @@ std::string& CMsgImpl::GetBody() {
     return _body;
 }
 
-void CMsgImpl::SetAck(int16_t flag, std::vector<uint16_t>& ack_vec, bool continuity) {
+void CMsgImpl::SetAck(int16_t flag, std::vector<uint16_t>& ack_vec, std::vector<uint64_t>& time_vec, bool continuity) {
     if (flag & HPF_WITH_RELIABLE_ACK) {
         _head.AddReliableAck(ack_vec, continuity);
+        _head.AddReliableAckTime(time_vec);
     }
     if (flag & HPF_WITH_RELIABLE_ORDERLY_ACK) {
         _head.AddReliableOrderlyAck(ack_vec, continuity);
+        _head.AddReliableOrderlyAckTime(time_vec);
     }
 }
 
-void CMsgImpl::GetAck(int16_t flag, std::vector<uint16_t>& ack_vec) {
+void CMsgImpl::GetAck(int16_t flag, std::vector<uint16_t>& ack_vec, std::vector<uint64_t>& time_vec) {
     if (_head._flag & HPF_WITH_RELIABLE_ACK) {
         _head.GetReliableAck(ack_vec);
+        _head.GetReliableAckTime(time_vec);
     }
     if (_head._flag & HPF_WITH_RELIABLE_ORDERLY_ACK) {
         _head.GetReliableOrderlyAck(ack_vec);
+        _head.AddReliableOrderlyAckTime(time_vec);
     }
 }
 
 std::string CMsgImpl::GetSerializeBuffer() {
     CBitStreamWriter bit_stream;
-    if (!CSerializes::Serializes(*this, bit_stream)) {
+    if (!_serializes->Serializes(*this, bit_stream)) {
         return "";
     }
     return std::string(bit_stream.GetDataPoint(), bit_stream.GetCurrentLength());
@@ -163,7 +174,7 @@ std::string CMsgImpl::GetSerializeBuffer() {
 bool CMsgImpl::InitWithBuffer(const std::string& msg) {
     CBitStreamReader bit_stream;
     bit_stream.Init(msg.c_str(), msg.length());
-    if (!CSerializes::Deseriali(bit_stream, *this)) {
+    if (!_serializes->Deseriali(bit_stream, *this)) {
         return false;
     }
     return true;
@@ -203,6 +214,9 @@ void CMsgImpl::SetSocket(std::shared_ptr<CSocket>& sock) {
 
 void CMsgImpl::SetSendTime(uint64_t time) {
     _head.SetSendTime(time);
+    if (__msg_with_time) {
+        _head._flag |= HPF_MSG_WITH_TIME_STAMP;
+    }
 }
 
 uint64_t CMsgImpl::GetSendTime() {
