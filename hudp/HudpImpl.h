@@ -30,8 +30,8 @@ namespace hudp {
         void Join();
 
         // send msg
-        void SendTo(const HudpHandle& handle, uint16_t flag, const std::string& msg);
-        void SendTo(const HudpHandle& Hhandle, uint16_t flag, const char* msg, uint16_t len);
+        bool SendTo(const HudpHandle& handle, uint16_t flag, const std::string& msg);
+        bool SendTo(const HudpHandle& Hhandle, uint16_t flag, const char* msg, uint16_t len);
 
         // recv msg
         void RecvMsgFromNet(const HudpHandle& handle, const std::string& msg);
@@ -50,6 +50,8 @@ namespace hudp {
         CMsg* CreateMessage();
         // get a default priority queue instance
         CPriorityQueue* CreatePriorityQueue();
+        // release socket
+        void ReleaseSocket(const HudpHandle& handle);
 
     public:
         void AfterSendFilter(CMsg* msg);

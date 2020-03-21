@@ -21,11 +21,15 @@ void Head::Clear() {
     _body_len = 0;
     _ack_reliable_vec.clear();
     _ack_reliable_orderly_vec.clear();
+    _reliable_msg_send_time_vec.clear();
+    _reliable_orderly_msg_send_time_vec.clear();
 }
 
 void Head::ClearAck() {
     _ack_reliable_vec.clear();
     _ack_reliable_orderly_vec.clear();
+    _reliable_msg_send_time_vec.clear();
+    _reliable_orderly_msg_send_time_vec.clear();
     _flag &= ~HPF_WITH_RELIABLE_ACK;
     _flag &= ~HPF_WITH_RELIABLE_ORDERLY_ACK;
     _flag &= ~HPF_RELIABLE_ACK_RANGE;

@@ -13,12 +13,12 @@ void hudp::Join() {
     CHudpImpl::Instance().Join();
 }
 
-void hudp::SendTo(const HudpHandle& handle, uint16_t flag, const std::string& msg) {
-    CHudpImpl::Instance().SendTo(handle, flag, msg);
+bool hudp::SendTo(const HudpHandle& handle, uint16_t flag, const std::string& msg) {
+    return CHudpImpl::Instance().SendTo(handle, flag, msg);
 }
 
-void hudp::SendTo(const HudpHandle& handle, uint16_t flag, const char* msg, uint16_t len) {
-    CHudpImpl::Instance().SendTo(handle, flag, msg, len);
+bool hudp::SendTo(const HudpHandle& handle, uint16_t flag, const char* msg, uint16_t len) {
+    return CHudpImpl::Instance().SendTo(handle, flag, msg, len);
 }
 
 void hudp::Close(const HudpHandle& handle) {

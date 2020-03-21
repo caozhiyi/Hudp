@@ -31,7 +31,9 @@ void CProcessThread::Run() {
             // get a recv msg.
             if (flag & msg_recv) {
                 auto sock = msg->GetSocket();
-                sock->RecvMessage(msg);
+                if (sock) {
+                    sock->RecvMessage(msg);
+                }
 
             } else {
                 _filter_process->PushSendMsg(msg);

@@ -12,7 +12,8 @@ namespace hudp {
         msg_is_only_ack   = 0x0004,   // message is only with ack
         msg_with_out_id   = 0x0008,   // message don't have id
         msg_send          = 0x0010,   // the msg will be send
-        msg_recv          = 0x0020    // the msg will be recv
+        msg_recv          = 0x0020,   // the msg will be recv
+        msg_wait_2_msl    = 0x0040    // wait 2 msl time then close
     };
 
     class CSocket;

@@ -7,6 +7,7 @@
 #include "ISocket.h"
 #include "HudpFlag.h"
 #include "CommonType.h"
+#include "CommonFlag.h"
 
 namespace hudp {
 
@@ -45,10 +46,12 @@ namespace hudp {
         void AckDone(CMsg* msg);
         // called back by timer t when timer out.
         void TimerOut(CMsg* msg);
-
         // add a ack msg to remote 
         void AddAck(CMsg* msg);
 
+        // send fin msg to close connection
+        void SendFinMessage();
+        bool CanSendMessage();
     private:
         // return ture if add ack to msg, otherwise return false
         bool AddAckToMsg(CMsg* msg);
@@ -59,6 +62,14 @@ namespace hudp {
         // calculation rtt time
         uint64_t GetRtt(CMsg* msg);
         uint64_t GetRtt(uint64_t time);
+        // socket status change
+        void StatusChange(socket_status sk_status);
+        // send fin ack
+        void SendFinAckMessage();
+        // add 2msl timer
+        void Wait2MslClose();
+        // about close flag
+        void CheckClose(uint32_t header_flag);
 
     private:
         // reliable correlation
@@ -72,6 +83,8 @@ namespace hudp {
         CRto*                _rto;
         // socket handle
         HudpHandle           _handle;
+        // socket status
+        socket_status        _sk_status;
     };
 }
 

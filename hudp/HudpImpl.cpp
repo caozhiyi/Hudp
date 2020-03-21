@@ -75,14 +75,21 @@ void CHudpImpl::Join() {
     CTimer::Instance().Join();
 }
 
-void CHudpImpl::SendTo(const HudpHandle& handle, uint16_t flag, const std::string& msg) {
-    SendTo(handle, flag, msg.c_str(), msg.length());
+bool CHudpImpl::SendTo(const HudpHandle& handle, uint16_t flag, const std::string& msg) {
+    return SendTo(handle, flag, msg.c_str(), msg.length());
 }
 
-void CHudpImpl::SendTo(const HudpHandle& handle, uint16_t flag, const char* msg, uint16_t len) {
+bool CHudpImpl::SendTo(const HudpHandle& handle, uint16_t flag, const char* msg, uint16_t len) {
     if (len > __msg_body_size) {
         base::LOG_ERROR("msg size is bigger than msg body size.");
-        return;
+        return false;
+    }
+
+    //get a socket. 
+    std::shared_ptr<CSocket> sock = _socket_mananger->GetSocket(handle);
+    if (!sock->CanSendMessage()) {
+        base::LOG_ERROR("the socket is not ready.");
+        return false;
     }
 
     CMsg* net_msg = _msg_factory->CreateMsg();
@@ -90,9 +97,11 @@ void CHudpImpl::SendTo(const HudpHandle& handle, uint16_t flag, const char* msg,
     net_msg->SetHeaderFlag(flag);
     net_msg->SetHandle(handle);
     net_msg->SetBody(std::string(msg, len));
+    net_msg->SetSocket(sock);
 
     // push msg to process thread
     _process_thread->Push(net_msg);
+    return true;
 }
 
 void CHudpImpl::RecvMsgFromNet(const HudpHandle& handle, const std::string& msg) {
@@ -128,6 +137,9 @@ void CHudpImpl::SendMessageToNet(CMsg* msg) {
 }
 
 void CHudpImpl::ReleaseMessage(CMsg* msg) {
+    if (msg->GetTimerId() > 0) {
+        CTimer::Instance().RemoveTimer(msg);
+    }
     _msg_factory->DeleteMsg(msg);
 }
 
@@ -139,11 +151,12 @@ CPriorityQueue* CHudpImpl::CreatePriorityQueue() {
     return new CPriorityQueueImpl();
 }
 
-void CHudpImpl::AfterSendFilter(CMsg* msg) {
-    //get a socket. 
-    std::shared_ptr<CSocket> sock = _socket_mananger->GetSocket(msg->GetHandle());
-    msg->SetSocket(sock);
+void CHudpImpl::ReleaseSocket(const HudpHandle& handle) {
+    _socket_mananger->DeleteSocket(handle);
+}
 
+void CHudpImpl::AfterSendFilter(CMsg* msg) {
+    auto sock = msg->GetSocket();
     sock->SendMessage(msg);
 }
 

@@ -18,7 +18,7 @@ using namespace hudp;
 // this size may be a dynamic algorithm control
 static const uint16_t __send_wnd_size = 5;
 
-CSocketImpl::CSocketImpl(const HudpHandle& handle) : _handle(handle) {
+CSocketImpl::CSocketImpl(const HudpHandle& handle) : _handle(handle), _sk_status(SS_CLOSE){
     memset(_send_wnd, 0, sizeof(_send_wnd));
     memset(_recv_list, 0, sizeof(_recv_list));
     memset(_pend_ack, 0, sizeof(_pend_ack));
@@ -69,7 +69,13 @@ void CSocketImpl::RecvMessage(CMsg* msg) {
     bool done = false;
     uint16_t ret = 0;
 
+    // first time recv msg
+    if (_sk_status == SS_CLOSE) {
+        StatusChange(SS_READY);
+    }
+
     auto header_flag = msg->GetHeaderFlag();
+
     // reliable and orderly
     if (header_flag & HTF_RELIABLE_ORDERLY) {
         AddToRecvList(WI_RELIABLE_ORDERLY, msg);
@@ -86,6 +92,8 @@ void CSocketImpl::RecvMessage(CMsg* msg) {
         done = true;
     }
 
+    CheckClose(header_flag);
+
     // normal udp. 
     if (!done && header_flag & HPF_WITH_BODY/*must have body*/) {
         CHudpImpl::Instance().RecvMessageToUpper(_handle, msg);
@@ -95,7 +103,9 @@ void CSocketImpl::RecvMessage(CMsg* msg) {
 void CSocketImpl::ToRecv(CMsg* msg) {
     // send ack msg to remote
     base::LOG_DEBUG("[receiver] :receiver msg. id : %d", msg->GetId());
-    CHudpImpl::Instance().RecvMessageToUpper(_handle, msg);
+    if (!msg->GetBody().empty()) {
+        CHudpImpl::Instance().RecvMessageToUpper(_handle, msg);
+    }
 }
 
 void CSocketImpl::ToSend(CMsg* msg) {
@@ -124,6 +134,12 @@ void CSocketImpl::TimerOut(CMsg* msg) {
 
     } else {
         _is_in_timer = false;
+    }
+
+    // close now
+    if (msg->GetFlag() & msg_wait_2_msl) {
+        StatusChange(SS_CLOSE);
+        return;
     }
 
     // add ack 
@@ -160,6 +176,30 @@ void CSocketImpl::AddAck(CMsg* msg) {
     }
 }
 
+void CSocketImpl::SendFinMessage() {
+    if (_sk_status != SS_READY && _sk_status != SS_CLOSE_WIAT) {
+        base::LOG_ERROR("current status %d can't send a fin msg", _sk_status);
+        return;
+    }
+    CMsg* fin_msg = CHudpImpl::Instance().CreateMessage();
+    if (__send_all_msg_when_close) {
+        fin_msg->SetHeaderFlag(HTF_RELIABLE_ORDERLY | HPF_LOW_PRI | HPF_FIN);
+
+    } else {
+        fin_msg->SetHeaderFlag(HTF_RELIABLE_ORDERLY | HPF_HIGHEST_PRI | HPF_FIN);
+    }
+    std::shared_ptr<CSocket> sock = shared_from_this();
+    fin_msg->SetSocket(sock);
+    fin_msg->SetHandle(_handle);
+
+    StatusChange(_sk_status == SS_READY ? SS_FIN_WAIT_1 : SS_LAST_ACK);
+    SendMessage(fin_msg);
+}
+
+bool CSocketImpl::CanSendMessage() {
+    return _sk_status == SS_CLOSE || _sk_status == SS_READY;
+}
+
 bool CSocketImpl::AddAckToMsg(CMsg* msg) {
     // clear prv ack info
     msg->ClearAck();
@@ -185,6 +225,10 @@ bool CSocketImpl::AddAckToMsg(CMsg* msg) {
 }
 
 void CSocketImpl::GetAckToSendWnd(CMsg* msg) {
+    // first time recv ack msg
+    if (_sk_status == SS_CLOSE) {
+        StatusChange(SS_READY);
+    }
     if (msg->GetHeaderFlag() & HPF_WITH_RELIABLE_ORDERLY_ACK) {
         std::vector<uint16_t> vec;
         std::vector<uint64_t> time_vec;
@@ -279,4 +323,137 @@ uint64_t CSocketImpl::GetRtt(CMsg* msg) {
 uint64_t CSocketImpl::GetRtt(uint64_t time) {
     uint64_t now = GetCurTimeStamp();
     return time - now;
+}
+
+void CSocketImpl::StatusChange(socket_status sk_status) {
+    switch (sk_status) {
+    case hudp::SS_CLOSE:
+        // release socket
+        CHudpImpl::Instance().ReleaseSocket(_handle);
+        break;
+    case hudp::SS_READY:
+        if (_sk_status == SS_CLOSE) {
+            _sk_status = SS_READY;
+
+        } else {
+            base::LOG_ERROR("error socket status change. %d to SS_READY", _sk_status);
+        }
+        break;
+    case hudp::SS_FIN_WAIT_1:
+        if (_sk_status == SS_READY) {
+            _sk_status = SS_FIN_WAIT_1;
+
+        } else {
+            base::LOG_ERROR("error socket status change. %d to SS_FIN_WAIT_1", _sk_status);
+        }
+        break;
+    case hudp::SS_FIN_WAIT_2:
+        if (_sk_status == SS_FIN_WAIT_1) {
+            _sk_status = SS_FIN_WAIT_2;
+
+        } else {
+            base::LOG_ERROR("error socket status change. %d to SS_FIN_WAIT_2", _sk_status);
+        }
+        break;
+    case hudp::SS_TIME_WAIT:
+        if (_sk_status == SS_FIN_WAIT_2 || _sk_status == SS_CLOSING) {
+            _sk_status = SS_TIME_WAIT;
+            // add 2MSL timer
+
+        } else {
+            base::LOG_ERROR("error socket status change. %d to SS_TIME_WAIT", _sk_status);
+        }
+        break;
+    case hudp::SS_CLOSING:
+        if (_sk_status == SS_FIN_WAIT_1) {
+            _sk_status = SS_CLOSING;
+
+        } else {
+            base::LOG_ERROR("error socket status change. %d to SS_CLOSING", _sk_status);
+        }
+        break;
+    case hudp::SS_CLOSE_WIAT:
+        if (_sk_status == SS_READY) {
+            _sk_status = SS_CLOSE_WIAT;
+
+        } else {
+            base::LOG_ERROR("error socket status change. %d to SS_CLOSE_WIAT", _sk_status);
+        }
+        break;
+    case hudp::SS_LAST_ACK:
+        if (_sk_status == SS_CLOSE_WIAT) {
+            _sk_status = SS_LAST_ACK;
+
+        } else {
+            base::LOG_ERROR("error socket status change. %d to SS_CLOSE_WIAT", _sk_status);
+        }
+        break;
+    default:
+        base::LOG_ERROR("unknow socket status. %d", sk_status);
+        break;
+    }
+}
+
+void CSocketImpl::SendFinAckMessage() {
+    CMsg* fin_msg = CHudpImpl::Instance().CreateMessage();
+    // this msg don't need ack
+    fin_msg->SetHeaderFlag(HTF_ORDERLY | HPF_HIGHEST_PRI | HPF_FIN_ACK);
+    std::shared_ptr<CSocket> sock = shared_from_this();
+    fin_msg->SetSocket(sock);
+    fin_msg->SetHandle(_handle);
+    SendMessage(fin_msg);
+}
+
+void CSocketImpl::Wait2MslClose() {
+    if (_sk_status != SS_TIME_WAIT) {
+        base::LOG_ERROR("error status to add 2 msl timer", _sk_status);
+        return;
+    }
+
+    CMsg* timer_msg = CHudpImpl::Instance().CreateMessage();
+    timer_msg->SetFlag(msg_wait_2_msl);
+    std::shared_ptr<CSocket> sock = shared_from_this();
+    timer_msg->SetSocket(sock);
+    timer_msg->SetHandle(_handle);
+    CTimer::Instance().AddTimer(__2_msl_time, timer_msg);
+}
+
+void CSocketImpl::CheckClose(uint32_t header_flag) {
+    // remote start to close connection
+    if (header_flag & HPF_FIN) {
+        // send fin ack now
+        SendFinAckMessage();
+        if (_sk_status == SS_READY) {
+            StatusChange(SS_CLOSE_WIAT);
+            SendFinMessage();
+
+        } else if (_sk_status == SS_FIN_WAIT_1) {
+            StatusChange(SS_CLOSING);
+
+        } else if (_sk_status == SS_FIN_WAIT_2) {
+            StatusChange(SS_TIME_WAIT);
+            Wait2MslClose();
+
+        } else {
+            base::LOG_ERROR("error status %d when recv fin", _sk_status);
+        }
+        return;
+    }
+    // recv fin ack
+    if (header_flag & HPF_FIN_ACK) {
+        if (_sk_status == SS_LAST_ACK) {
+            StatusChange(SS_CLOSE);
+
+        } else if (_sk_status == SS_FIN_WAIT_1) {
+            StatusChange(SS_FIN_WAIT_2);
+
+        } else if (_sk_status == SS_CLOSING) {
+            StatusChange(SS_TIME_WAIT);
+            Wait2MslClose();
+
+        } else {
+            base::LOG_ERROR("error status %d when recv fin ack", _sk_status);
+        }
+        return;
+    }
 }

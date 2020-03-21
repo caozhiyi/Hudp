@@ -39,21 +39,22 @@ namespace hudp {
 
     /*
     * socket status when hudp running.
-    * SS_INIT: when a socket just created.
+    * SS_CLOSE: when a socket just created or not use.
     * SS_READY: client send a mag to remote and recv a ack back
     *           or server recv a msg. 
     *
     * The following states are the same as TCP.
-    * SS_FIN_WAIT_1: when Close be called, send all msg in cache then send HPF_FIN to remote
-    * SS_FIN_WAIT_2: when SS_FIN_WAIT_1 recv a HPF_FIN_ACK
-    * SS_TIMW_WAIT: when SS_FIN_WAIT_2 recv a HPF_FIN
-    * SS_CLOSE_WIAT: when SS_READY recv a HPF_FIN, send all msg in cache the send HPF_FIN to remote
-    * SS_LAST_ACK: when SS_CLOSE_WIAT send HPF_FIN to remote until recv HPF_FIN_ACK
+    * SS_FIN_WAIT_1: when Close be called, send all msg in cache then send HPF_FIN to remote.
+    * SS_FIN_WAIT_2: when SS_FIN_WAIT_1 recv a HPF_FIN_ACK.
+    * SS_TIMW_WAIT: when SS_FIN_WAIT_2 recv a HPF_FIN.
+    * SS_CLOSING: send HPF_FIN to remote but recv a HPF_FIN not HPF_FIN_ACK.
+    * SS_CLOSE_WIAT: when SS_READY recv a HPF_FIN, send all msg in cache the send HPF_FIN to remote.
+    * SS_LAST_ACK: when SS_CLOSE_WIAT send HPF_FIN to remote until recv HPF_FIN_ACK.
     *
     * status change:
     *     client         server
     *              MSG
-    *     SS_INIT------->SS_INIT
+    *    SS_CLOSE------->SS_CLOSE
     *       |               |
     *       V      ACK      V
     *    SS_READY<-------SS_READY
@@ -71,15 +72,19 @@ namespace hudp {
     *  SS_TIME_WAIT<---SS_LAST_ACK
     *             FIN_ACK
     *  SS_TIME_WAIT--->SS_LAST_ACK
+    *       |               |
+    *       V               V
+    *   SS_CLOSE         SS_CLOSE
     */
     enum socket_status {
-        SS_INIT       = 0,
+        SS_CLOSE      = 0,
         SS_READY      = 1,
         SS_FIN_WAIT_1 = 2,
         SS_FIN_WAIT_2 = 3,
         SS_TIME_WAIT  = 4,
-        SS_CLOSE_WIAT = 5,
-        SS_LAST_ACK   = 6
+        SS_CLOSING    = 5,
+        SS_CLOSE_WIAT = 6,
+        SS_LAST_ACK   = 7,
     };
 }
 #endif

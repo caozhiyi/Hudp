@@ -39,7 +39,7 @@ Head& CMsgImpl::GetHead() {
 }
 
 void CMsgImpl::SetId(const uint16_t& id) {
-    _flag |= ~msg_with_out_id;
+    _flag &= ~msg_with_out_id;
     _head.SetId(id);
 }
 
@@ -103,11 +103,11 @@ std::string CMsgImpl::DebugHeaderFlag() {
     if (_head._flag & HPF_RELIABLE_ORDERLY_ACK_RANGE) {
         ret.append(" HPF_RELIABLE_ORDERLY_ACK_RANGE ");
     }
-    if (_head._flag & HPF_CLOSE) {
-        ret.append(" HPF_CLOSE ");
+    if (_head._flag & HPF_FIN) {
+        ret.append(" HPF_FIN ");
     }
-    if (_head._flag & HPF_CLOSE_ACK) {
-        ret.append(" HPF_CLOSE_ACK ");
+    if (_head._flag & HPF_FIN_ACK) {
+        ret.append(" HPF_FIN_ACK ");
     }
     if (_head._flag & HPF_WITH_ID) {
         ret.append(" HPF_WITH_ID ");
@@ -159,7 +159,7 @@ void CMsgImpl::GetAck(int16_t flag, std::vector<uint16_t>& ack_vec, std::vector<
     }
     if (_head._flag & HPF_WITH_RELIABLE_ORDERLY_ACK) {
         _head.GetReliableOrderlyAck(ack_vec);
-        _head.AddReliableOrderlyAckTime(time_vec);
+        _head.GetReliableOrderlyAckTime(time_vec);
     }
 }
 

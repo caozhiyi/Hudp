@@ -115,7 +115,9 @@ void CTimer::Run() {
         if (timer_vec.size() > 0) {
             for (size_t i = 0; i < timer_vec.size(); i++) {
                 auto sock = timer_vec[i]->GetSocket();
-                sock->TimerOut(timer_vec[i]);
+                if (sock) {
+                    sock->TimerOut(timer_vec[i]);
+                }
             }
             timer_vec.clear();
         }

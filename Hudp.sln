@@ -10,8 +10,14 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "example", "example", "{2A325C4A-DDAC-496D-9F31-E0546F5C00E3}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HudpClient", "test\example\HudpClient.vcxproj", "{581B6A85-71E7-4DE2-8AA8-18D97DF4B246}"
+	ProjectSection(ProjectDependencies) = postProject
+		{DE0D19A0-D775-4B5F-B0E3-E2ED9046E41A} = {DE0D19A0-D775-4B5F-B0E3-E2ED9046E41A}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HudpServer", "test\example\HudpServer.vcxproj", "{DB6EFB19-31F8-41F6-B6F4-31C74F68AC9D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{DE0D19A0-D775-4B5F-B0E3-E2ED9046E41A} = {DE0D19A0-D775-4B5F-B0E3-E2ED9046E41A}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

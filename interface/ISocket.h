@@ -25,6 +25,10 @@ namespace hudp {
         virtual void AckDone(CMsg* msg) = 0;
         // called back by timer t when timer out.
         virtual void TimerOut(CMsg* msg) = 0;
+        // send fin message to remote to close connection
+        virtual void SendFinMessage() = 0;
+        // can send msg?
+        virtual bool CanSendMessage() = 0;
     };
 }
 #endif

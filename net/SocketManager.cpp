@@ -43,5 +43,10 @@ void CSocketManagerImpl::DeleteSocket(const HudpHandle& handle) {
 
 void CSocketManagerImpl::CloseSocket(const HudpHandle& handle) {
     // send close msg to remote here
-    // TODO
+    auto iter = _socket_map.find(handle);
+    if (iter == _socket_map.end()) {
+        return;
+    }
+
+    iter->second->SendFinMessage();
 }

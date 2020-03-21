@@ -40,13 +40,13 @@ namespace hudp {
     static const uint16_t __init_send_wnd_size = 6;
 
     // pend ack timer wait time.
-    static const uint16_t __pend_ack_send = 50;    // 50ms
+    static const uint16_t __pend_ack_send = 100;    // 100ms
 
     // max rto time after retreat
     static const uint16_t __max_rto_time = 12000;  // max rto 120s
 
     // message resend timer
-    static const uint16_t __resend_time = 30;      // 30ms
+    static const uint16_t __resend_time = 150;      // 150ms
 
     // if out of order ack is more than it, resend quickly
     static const uint16_t __quick_resend_limit = 3;
@@ -57,6 +57,11 @@ namespace hudp {
     static const uint32_t __init_cur_rto = 1000;
     // msg with send time stamp, to calculation rtt time
     static const bool     __msg_with_time = true;
+
+    // when close socket, msg in cache should send complete?
+    static const bool     __send_all_msg_when_close = true;
+    // msl time
+    static const uint32_t __2_msl_time = 30000;   // 30s
 
     // about log setting
     // log level.

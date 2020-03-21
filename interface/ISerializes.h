@@ -11,9 +11,9 @@ namespace hudp {
 
     class CSerializes {
     public:
-        bool Serializes(CMsg& msg, CBitStreamWriter& bit_stream);
+        virtual bool Serializes(CMsg& msg, CBitStreamWriter& bit_stream) = 0;
 
-        bool Deseriali(CBitStreamReader& bit_stream, CMsg& msg);
+        virtual bool Deseriali(CBitStreamReader& bit_stream, CMsg& msg) = 0;
     };
 }
 
