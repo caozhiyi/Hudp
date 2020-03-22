@@ -22,10 +22,10 @@ namespace hudp {
         CPriorityQueueImpl();
         ~CPriorityQueueImpl();
 
-        void PushBack(CMsg* msg);
+        void PushBack(std::shared_ptr<CMsg> msg);
 
         // get a item from queue by priority
-        CMsg* Pop();
+        std::shared_ptr<CMsg> Pop();
 
         // get current number of item in queue
         uint64_t Size();
@@ -34,7 +34,7 @@ namespace hudp {
         void Clear();
         
     private:
-        std::queue<CMsg*>           _queue_arr[__pri_queue_size];
+        std::queue<std::shared_ptr<CMsg>> _queue_arr[__pri_queue_size];
         // control priority surplus
         int8_t                      _pri_normal_count;
         int8_t                      _pri_high_count;

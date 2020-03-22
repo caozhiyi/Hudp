@@ -17,7 +17,7 @@ CPriorityQueueImpl::~CPriorityQueueImpl() {
     Clear();
 }
 
-void CPriorityQueueImpl::PushBack(CMsg* msg) {
+void CPriorityQueueImpl::PushBack(std::shared_ptr<CMsg> msg) {
     uint16_t flag = msg->GetFlag();
     if (flag & HPF_LOW_PRI) {
         _queue_arr[__pri_low].push(msg);
@@ -33,8 +33,8 @@ void CPriorityQueueImpl::PushBack(CMsg* msg) {
     }
 }
 
-CMsg* CPriorityQueueImpl::Pop() {
-    CMsg* msg;
+std::shared_ptr<CMsg> CPriorityQueueImpl::Pop() {
+    std::shared_ptr<CMsg> msg;
     if (_pri_highest_count > 0) {
         if (!_queue_arr[__pri_highest].empty()) {
             msg = _queue_arr[__pri_highest].front();
@@ -116,12 +116,12 @@ uint64_t CPriorityQueueImpl::Size() {
 
 void CPriorityQueueImpl::Clear() {
     for (size_t i = 0; i < __pri_queue_size; i++) {
-        CMsg* msg = nullptr;
+        std::shared_ptr<CMsg> msg;
         while (!_queue_arr[i].empty()) {
             // return to msg pool
             msg = _queue_arr[i].front();
             _queue_arr[i].pop();
-            CHudpImpl::Instance().ReleaseMessage(msg);
+            msg.reset();
         }
     }
 }

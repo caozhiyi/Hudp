@@ -15,7 +15,7 @@ CTimer::~CTimer() {
     Join();
 }
 
-uint64_t CTimer::AddTimer(uint32_t ms, CMsg* ti) {
+uint64_t CTimer::AddTimer(uint32_t ms, std::shared_ptr<CMsg> ti) {
     _time_tool.Now();
     uint64_t expiration_time = ms + _time_tool.GetMsec();
 
@@ -29,7 +29,7 @@ uint64_t CTimer::AddTimer(uint32_t ms, CMsg* ti) {
     // add same time
     } else {
         // check same item
-        CMsg* tmp = iter->second;
+        std::shared_ptr<CMsg> tmp = iter->second;
         while (tmp->GetNext()) {
             // the same item
             if (tmp == ti) {
@@ -54,6 +54,15 @@ uint64_t CTimer::AddTimer(uint32_t ms, CMsg* ti) {
     return expiration_time;
 }
 
+void CTimer::RemoveTimer(std::shared_ptr<CMsg> ti) {
+    {
+        std::unique_lock<std::mutex> lock(_mutex);
+        _timer_map.erase(ti->GetTimerId());
+        ti->SetTimerId(0);
+    }
+    _notify.notify_one();
+}
+
 void CTimer::RemoveTimer(CMsg* ti) {
     {
         std::unique_lock<std::mutex> lock(_mutex);
@@ -69,13 +78,13 @@ uint64_t CTimer::GetTimeStamp() {
 }
 
 void CTimer::Run() {
-    std::vector<CMsg*> timer_vec;
-    std::map<uint64_t, CMsg*>::iterator iter;
-    CMsg* cur_solt = nullptr;
+    std::vector<std::shared_ptr<CMsg>> timer_vec;
+    std::map<uint64_t, std::shared_ptr<CMsg>>::iterator iter;
+    std::shared_ptr<CMsg> cur_solt;
     bool timer_out = false;
     while (!_stop) {
         {
-            cur_solt = nullptr;
+            cur_solt.reset();
             timer_out = false;
             std::unique_lock<std::mutex> lock(_mutex);
             if (_timer_map.empty()) {

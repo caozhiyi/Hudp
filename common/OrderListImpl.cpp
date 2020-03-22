@@ -28,13 +28,12 @@ CReliableOrderlyList::~CReliableOrderlyList() {
     std::unique_lock<std::mutex> lock(_mutex);
     for (size_t i = 0; i < __msx_cache_msg_num; i++) {
         if (_order_list[i]) {
-            // return to msg pool
-            CHudpImpl::Instance().ReleaseMessage(_order_list[i]);
+           _order_list[i].reset();
         }
     }
 }
 
-uint16_t CReliableOrderlyList::Insert(CMsg* msg) {
+uint16_t CReliableOrderlyList::Insert(std::shared_ptr<CMsg> msg) {
 	auto id = msg->GetId();
     uint16_t index = HashFunc(id);
     
@@ -67,7 +66,7 @@ uint16_t CReliableOrderlyList::Insert(CMsg* msg) {
     }
     
     if (_recv_list.Size() > 0) {
-		CMsg* item = nullptr;
+        std::shared_ptr<CMsg> item;
 
         while (_recv_list.Pop(item)) {
 			auto sock = item->GetSocket();
@@ -87,7 +86,7 @@ CReliableList::~CReliableList() {
 }
 
 // reliable list, only judgement repetition in msg cache
-uint16_t CReliableList::Insert(CMsg* msg) {
+uint16_t CReliableList::Insert(std::shared_ptr<CMsg> msg) {
 	auto id = msg->GetId();
     uint16_t index = HashFunc(id);
     // too farm, discard this msg
@@ -122,7 +121,7 @@ COrderlyList::~COrderlyList() {
 }
 
 // orderly list, if msg id is bigger than expect id, recv it.
-uint16_t COrderlyList::Insert(CMsg* msg) {
+uint16_t COrderlyList::Insert(std::shared_ptr<CMsg> msg) {
 	auto id = msg->GetId();
     if (id < _expect_id) {
         return 0;

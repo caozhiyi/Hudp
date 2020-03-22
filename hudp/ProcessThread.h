@@ -5,9 +5,9 @@
 
 namespace hudp {
 
-    class CFilterProcess;
     class CMsg;
-    class CProcessThread : public base::CRunnableAloneTaskList<CMsg*> {
+    class CFilterProcess;
+    class CProcessThread : public base::CRunnableAloneTaskList<std::shared_ptr<CMsg>> {
     public:
         CProcessThread();
         ~CProcessThread();

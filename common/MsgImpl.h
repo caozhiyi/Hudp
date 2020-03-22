@@ -2,6 +2,7 @@
 #define HEADER_COMMON_MSGIMPL
 
 #include <string>   // for string
+
 #include "IMsg.h"
 #include "MsgHead.h"
 
@@ -51,11 +52,11 @@ namespace hudp {
         bool InitWithBuffer(const std::string& msg);
 
         // next point about
-        void SetNext(CMsg* msg);
-        CMsg* GetNext();
+        void SetNext(std::shared_ptr<CMsg> msg);
+        std::shared_ptr<CMsg> GetNext();
 
-        void SetPrev(CMsg* msg);
-        CMsg* GetPrev();
+        void SetPrev(std::shared_ptr<CMsg> msg);
+        std::shared_ptr<CMsg> GetPrev();
 
         void SetTimerId(uint64_t id);
         uint64_t GetTimerId();
@@ -75,8 +76,8 @@ namespace hudp {
         int16_t         _flag;      // recv or send message. only use in self, won't be send
 
         // two way linked list
-        CMsg*           _next;
-        CMsg*           _prev;
+        std::shared_ptr<CMsg> _next;
+        std::shared_ptr<CMsg> _prev;
 
         uint64_t       _time_id;
         uint16_t       _backoff_factor;  // timer out resend backoff factor, every time resend it will * 2

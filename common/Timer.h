@@ -18,9 +18,10 @@ namespace hudp {
         CTimer();
         ~CTimer();
         // add a timer event. return time id
-        uint64_t AddTimer(uint32_t ms, CMsg* ti);
+        uint64_t AddTimer(uint32_t ms, std::shared_ptr<CMsg> ti);
 
         // remove a timer event.  return cur time stamp
+        void RemoveTimer(std::shared_ptr<CMsg> ti);
         void RemoveTimer(CMsg* ti);
 
         // get cur time stamp
@@ -31,7 +32,7 @@ namespace hudp {
         
     private:
         // all expiration in list
-        std::map<uint64_t, CMsg*>    _timer_map;
+        std::map<uint64_t, std::shared_ptr<CMsg>> _timer_map;
 
         // cur wait time
         uint64_t                     _wait_time;

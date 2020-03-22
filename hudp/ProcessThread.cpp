@@ -24,7 +24,7 @@ void CProcessThread::Start(std::shared_ptr<CFilterProcess>& filter_process) {
 
 void CProcessThread::Run() {
     while (!_stop) {
-        auto msg = static_cast<CMsg*>(_Pop());
+        auto msg =_Pop();
         // msg not free to pool
         if (msg) {
             auto flag = msg->GetFlag();

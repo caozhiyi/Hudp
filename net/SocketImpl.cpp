@@ -12,6 +12,7 @@
 #include "CommonFunc.h"
 #include "OrderListImpl.h"
 #include "PriorityQueue.h"
+#include "MsgPoolFactory.h"
 
 using namespace hudp;
 
@@ -44,7 +45,7 @@ HudpHandle CSocketImpl::GetHandle() {
     return _handle;
 }
 
-void CSocketImpl::SendMessage(CMsg* msg) {
+void CSocketImpl::SendMessage(std::shared_ptr<CMsg> msg) {
     auto header_flag = msg->GetHeaderFlag();
     if (header_flag & HTF_ORDERLY) {
         AddToSendWnd(WI_ORDERLY, msg);
@@ -62,7 +63,7 @@ void CSocketImpl::SendMessage(CMsg* msg) {
     }
 }
 
-void CSocketImpl::RecvMessage(CMsg* msg) {
+void CSocketImpl::RecvMessage(std::shared_ptr<CMsg> msg) {
     // get ack info
     GetAckToSendWnd(msg);
     // recv msg to orderlist
@@ -100,7 +101,7 @@ void CSocketImpl::RecvMessage(CMsg* msg) {
     }
 }
 
-void CSocketImpl::ToRecv(CMsg* msg) {
+void CSocketImpl::ToRecv(std::shared_ptr<CMsg> msg) {
     // send ack msg to remote
     base::LOG_DEBUG("[receiver] :receiver msg. id : %d", msg->GetId());
     if (!msg->GetBody().empty()) {
@@ -108,7 +109,7 @@ void CSocketImpl::ToRecv(CMsg* msg) {
     }
 }
 
-void CSocketImpl::ToSend(CMsg* msg) {
+void CSocketImpl::ToSend(std::shared_ptr<CMsg> msg) {
     // add to timer
     if (msg->GetHeaderFlag() & HTF_RELIABLE_ORDERLY || msg->GetHeaderFlag() & HTF_RELIABLE) {
         CTimer::Instance().AddTimer(msg->GetReSendTime(), msg);
@@ -122,12 +123,11 @@ void CSocketImpl::ToSend(CMsg* msg) {
     CHudpImpl::Instance().SendMessageToNet(msg);
 }
 
-void CSocketImpl::AckDone(CMsg* msg) {
+void CSocketImpl::AckDone(std::shared_ptr<CMsg> msg) {
     // release msg here
-    CHudpImpl::Instance().ReleaseMessage(msg);
 }
 
-void CSocketImpl::TimerOut(CMsg* msg) {
+void CSocketImpl::TimerOut(std::shared_ptr<CMsg> msg) {
     if (!(msg->GetFlag() & msg_is_only_ack)) {
         // msg resend, increase send delay
         msg->AddSendDelay();
@@ -155,7 +155,7 @@ void CSocketImpl::TimerOut(CMsg* msg) {
     CHudpImpl::Instance().SendMessageToNet(msg);
 }
 
-void CSocketImpl::AddPendAck(CMsg* msg) {
+void CSocketImpl::AddPendAck(std::shared_ptr<CMsg> msg) {
     auto header_flag = msg->GetHeaderFlag();
     if (header_flag & HTF_RELIABLE_ORDERLY) {
         AddToPendAck(WI_RELIABLE_ORDERLY, msg);
@@ -166,7 +166,7 @@ void CSocketImpl::AddPendAck(CMsg* msg) {
 
     // add to timer
     if (!_is_in_timer) {
-        CMsg* timer_msg = CHudpImpl::Instance().CreateMessage();
+        std::shared_ptr<CMsg> timer_msg = CMsgPoolFactory::Instance().CreateSharedMsg();
         timer_msg->SetFlag(msg_is_only_ack);
         std::shared_ptr<CSocket> sock = shared_from_this();
         timer_msg->SetSocket(sock);
@@ -176,14 +176,14 @@ void CSocketImpl::AddPendAck(CMsg* msg) {
     }
 }
 
-void CSocketImpl::AddQuicklyAck(CMsg* msg) {
+void CSocketImpl::AddQuicklyAck(std::shared_ptr<CMsg> msg) {
     std::vector<uint16_t> ack_vec;
     std::vector<uint64_t> time_vec;
 
     ack_vec.push_back(msg->GetId());
     time_vec.push_back(msg->GetSendTime());
 
-    CMsg* ack_msg = CHudpImpl::Instance().CreateMessage();
+    std::shared_ptr<CMsg> ack_msg = CMsgPoolFactory::Instance().CreateSharedMsg();
     ack_msg->SetFlag(msg_is_only_ack);
     std::shared_ptr<CSocket> sock = shared_from_this();
     ack_msg->SetSocket(sock);
@@ -205,7 +205,7 @@ void CSocketImpl::SendFinMessage() {
         base::LOG_ERROR("current status %d can't send a fin msg", _sk_status);
         return;
     }
-    CMsg* fin_msg = CHudpImpl::Instance().CreateMessage();
+    std::shared_ptr<CMsg> fin_msg = CMsgPoolFactory::Instance().CreateSharedMsg();
     if (__send_all_msg_when_close) {
         fin_msg->SetHeaderFlag(HTF_RELIABLE_ORDERLY | HPF_LOW_PRI | HPF_FIN);
 
@@ -224,7 +224,7 @@ bool CSocketImpl::CanSendMessage() {
     return _sk_status == SS_CLOSE || _sk_status == SS_READY;
 }
 
-bool CSocketImpl::AddAckToMsg(CMsg* msg) {
+bool CSocketImpl::AddAckToMsg(std::shared_ptr<CMsg> msg) {
     // clear prv ack info
     msg->ClearAck();
     bool ret = false;
@@ -248,7 +248,7 @@ bool CSocketImpl::AddAckToMsg(CMsg* msg) {
     return ret;
 }
 
-void CSocketImpl::GetAckToSendWnd(CMsg* msg) {
+void CSocketImpl::GetAckToSendWnd(std::shared_ptr<CMsg> msg) {
     // first time recv ack msg
     if (_sk_status == SS_CLOSE) {
         StatusChange(SS_READY);
@@ -299,7 +299,7 @@ void CSocketImpl::GetAckToSendWnd(CMsg* msg) {
     }
 }
 
-void CSocketImpl::AddToSendWnd(WndIndex index, CMsg* msg) {
+void CSocketImpl::AddToSendWnd(WndIndex index, std::shared_ptr<CMsg> msg) {
     if (!_send_wnd[index]) {
         _send_wnd[index] = new CSendWndImpl(__init_send_wnd_size, CHudpImpl::Instance().CreatePriorityQueue(), 
                 index == WI_ORDERLY/*if only orderly, there is no transmission limit*/);
@@ -307,7 +307,7 @@ void CSocketImpl::AddToSendWnd(WndIndex index, CMsg* msg) {
     _send_wnd[index]->PushBack(msg);
 }
 
-void CSocketImpl::AddToRecvList(WndIndex index, CMsg* msg) {
+void CSocketImpl::AddToRecvList(WndIndex index, std::shared_ptr<CMsg> msg) {
     if (!_recv_list[index]) {
         uint16_t id = msg->GetId();
         if (index == WI_ORDERLY) {
@@ -327,7 +327,7 @@ void CSocketImpl::AddToRecvList(WndIndex index, CMsg* msg) {
     _recv_list[index]->Insert(msg);
 }
 
-void CSocketImpl::AddToPendAck(WndIndex index, CMsg* msg) {
+void CSocketImpl::AddToPendAck(WndIndex index, std::shared_ptr<CMsg> msg) {
     if (!_pend_ack[index]) {
         _pend_ack[index] = new CPendAck();
     }
@@ -339,7 +339,7 @@ void CSocketImpl::AddToPendAck(WndIndex index, CMsg* msg) {
     }
 }
 
-uint64_t CSocketImpl::GetRtt(CMsg* msg) {
+uint64_t CSocketImpl::GetRtt(std::shared_ptr<CMsg> msg) {
     uint64_t now = GetCurTimeStamp();
     return msg->GetSendTime() - now;
 }
@@ -419,7 +419,7 @@ void CSocketImpl::StatusChange(socket_status sk_status) {
 }
 
 void CSocketImpl::SendFinAckMessage() {
-    CMsg* fin_msg = CHudpImpl::Instance().CreateMessage();
+    std::shared_ptr<CMsg> fin_msg = CMsgPoolFactory::Instance().CreateSharedMsg();
     // this msg don't need ack
     fin_msg->SetHeaderFlag(HTF_ORDERLY | HPF_HIGHEST_PRI | HPF_FIN_ACK);
     std::shared_ptr<CSocket> sock = shared_from_this();
@@ -434,7 +434,7 @@ void CSocketImpl::Wait2MslClose() {
         return;
     }
 
-    CMsg* timer_msg = CHudpImpl::Instance().CreateMessage();
+    std::shared_ptr<CMsg> timer_msg = CMsgPoolFactory::Instance().CreateSharedMsg();
     timer_msg->SetFlag(msg_wait_2_msl);
     std::shared_ptr<CSocket> sock = shared_from_this();
     timer_msg->SetSocket(sock);

@@ -23,11 +23,11 @@ void UtestHudpServer() {
         index++;
         std::string msg = "a test msg. id : " + std::to_string(index);
         
-        base::CRunnable::Sleep(3000);
-        if (index == 2) {
+        base::CRunnable::Sleep(300);
+        if (index == 20) {
             hudp::Close("127.0.0.1:8012");
             
-        } else if (index < 2) {
+        } else if (index < 20) {
             hudp::SendTo("127.0.0.1:8012", hudp::HTF_RELIABLE_ORDERLY | hudp::HPF_LOW_PRI, msg);
         }
     }

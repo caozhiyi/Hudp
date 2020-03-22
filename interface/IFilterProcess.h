@@ -1,12 +1,14 @@
 #ifndef HEADER_INTERFACE_FILTERPROCESS
 #define HEADER_INTERFACE_FILTERPROCESS
 
+#include <memory> // for shared_ptr
 #include <string> // for string
 #include <functional>
 
 namespace hudp {
-    class CFilter;
+
     class CMsg;
+    class CFilter;
     class CFilterProcess
     {
     public:
@@ -17,13 +19,13 @@ namespace hudp {
         // remove a filter
         virtual bool RemoveFilter(const std::shared_ptr<CFilter>& filter) = 0;
         // push message to send process
-        virtual void PushSendMsg(CMsg* msg) = 0;
+        virtual void PushSendMsg(std::shared_ptr<CMsg> msg) = 0;
         // set send message call back
-        virtual void SetSendFunc(const std::function<void(CMsg*)>& func) = 0;
+        virtual void SetSendFunc(const std::function<void(std::shared_ptr<CMsg>)>& func) = 0;
         // push message to recv process
-        virtual void PushRecvMsg(CMsg* msg) = 0;
+        virtual void PushRecvMsg(std::shared_ptr<CMsg> msg) = 0;
         // set recv message call back
-        virtual void SetRecvFunc(const std::function<void(CMsg*)>& func) = 0;
+        virtual void SetRecvFunc(const std::function<void(std::shared_ptr<CMsg>)>& func) = 0;
     };
 }
 #endif

@@ -28,31 +28,31 @@ bool CFilterProcessNoThread::RemoveFilter(const std::shared_ptr<CFilter>& filter
     return false;
 }
 
-void CFilterProcessNoThread::PushSendMsg(CMsg* msg) {
+void CFilterProcessNoThread::PushSendMsg(std::shared_ptr<CMsg> msg) {
     SendProcess(msg);
     _send_call_back(msg);
 }
 
-void CFilterProcessNoThread::SetSendFunc(const std::function<void(CMsg*)>& func) {
+void CFilterProcessNoThread::SetSendFunc(const std::function<void(std::shared_ptr<CMsg>)>& func) {
     _send_call_back = func;
 }
 
-void CFilterProcessNoThread::PushRecvMsg(CMsg* msg) {
+void CFilterProcessNoThread::PushRecvMsg(std::shared_ptr<CMsg> msg) {
     RecvProcess(msg);
     _recv_call_back(msg);
 }
 
-void CFilterProcessNoThread::SetRecvFunc(const std::function<void(CMsg*)>& func) {
+void CFilterProcessNoThread::SetRecvFunc(const std::function<void(std::shared_ptr<CMsg>)>& func) {
     _recv_call_back = func;
 }
 
-void CFilterProcessNoThread::SendProcess(CMsg* msg) {
+void CFilterProcessNoThread::SendProcess(std::shared_ptr<CMsg> msg) {
     for (size_t i = 0; i < _filer_vec.size(); i++) {
         _filer_vec[i]->FilterProcess(msg);
     }
 }
 
-void CFilterProcessNoThread::RecvProcess(CMsg* msg) {
+void CFilterProcessNoThread::RecvProcess(std::shared_ptr<CMsg> msg) {
     for (size_t i = 0; i < _filer_vec.size(); i++) {
         _filer_vec[i]->RelieveFilterProcess(msg);
     }

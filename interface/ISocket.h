@@ -1,6 +1,7 @@
 #ifndef HEADER_INTERFACE_SOCKET
 #define HEADER_INTERFACE_SOCKET
 
+#include <memory> // for shared_ptr
 #include "CommonType.h"
 
 namespace hudp {
@@ -13,18 +14,18 @@ namespace hudp {
 
         virtual HudpHandle GetHandle() = 0;
 
-        virtual void SendMessage(CMsg* msg) = 0;
+        virtual void SendMessage(std::shared_ptr<CMsg> msg) = 0;
 
-        virtual void RecvMessage(CMsg* msg) = 0;
+        virtual void RecvMessage(std::shared_ptr<CMsg> msg) = 0;
 
         // called back by order list when msg recv to upper.
-        virtual void ToRecv(CMsg* msg) = 0;
+        virtual void ToRecv(std::shared_ptr<CMsg> msg) = 0;
         // called back by send window t when send a bag to net.
-        virtual void ToSend(CMsg* msg) = 0;
+        virtual void ToSend(std::shared_ptr<CMsg> msg) = 0;
         // called back by send window t when recv a ack.
-        virtual void AckDone(CMsg* msg) = 0;
+        virtual void AckDone(std::shared_ptr<CMsg> msg) = 0;
         // called back by timer t when timer out.
-        virtual void TimerOut(CMsg* msg) = 0;
+        virtual void TimerOut(std::shared_ptr<CMsg> msg) = 0;
         // send fin message to remote to close connection
         virtual void SendFinMessage() = 0;
         // can send msg?

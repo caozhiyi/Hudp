@@ -20,22 +20,22 @@ namespace hudp {
         // remove a filter
         bool RemoveFilter(const std::shared_ptr<CFilter>& filter);
         // push message to send process
-        void PushSendMsg(CMsg* msg);
+        void PushSendMsg(std::shared_ptr<CMsg> msg);
         // set send message call back
-        void SetSendFunc(const std::function<void(CMsg*)>& func);
+        void SetSendFunc(const std::function<void(std::shared_ptr<CMsg>)>& func);
         // push message to recv process
-        void PushRecvMsg(CMsg* msg);
+        void PushRecvMsg(std::shared_ptr<CMsg> msg);
         // set recv message call back
-        void SetRecvFunc(const std::function<void(CMsg*)>& func);
+        void SetRecvFunc(const std::function<void(std::shared_ptr<CMsg>)>& func);
 
     private:
-        void SendProcess(CMsg* msg);
-        void RecvProcess(CMsg* msg);
+        void SendProcess(std::shared_ptr<CMsg> msg);
+        void RecvProcess(std::shared_ptr<CMsg> msg);
 
     private:
         std::vector<std::shared_ptr<CFilter>> _filer_vec;
-        std::function<void(CMsg*)>            _recv_call_back;
-        std::function<void(CMsg*)>            _send_call_back;
+        std::function<void(std::shared_ptr<CMsg>)>            _recv_call_back;
+        std::function<void(std::shared_ptr<CMsg>)>            _send_call_back;
     };
 }
 

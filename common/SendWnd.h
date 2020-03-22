@@ -10,16 +10,17 @@
 
 namespace hudp {
 
+    class CMsg;
     class CPriorityQueue;
     class CIncrementalId;
-    class CMsg;
+    
     // send window
     class CSendWndImpl : public CSendWnd {
     public:
         CSendWndImpl(uint16_t send_wnd_size, CPriorityQueue* priority_queue, bool always_send = false);
         ~CSendWndImpl();
 
-        void PushBack(CMsg* msg);
+        void PushBack(std::shared_ptr<CMsg> msg);
         // receive a ack
         void AcceptAck(uint16_t id);
         void AcceptAck(uint16_t start_id, uint16_t len);
@@ -37,17 +38,17 @@ namespace hudp {
         // send next
         void SendNext();
         // push back to send wnd
-        void PushBackToSendWnd(CMsg* msg);
+        void PushBackToSendWnd(std::shared_ptr<CMsg> msg);
         // add to list end
-        void AddToEnd(CMsg* msg);
+        void AddToEnd(std::shared_ptr<CMsg> msg);
         // remove from list
-        void Remove(CMsg* msg);
+        void Remove(std::shared_ptr<CMsg> msg);
 
     private:
         // point to the send list start
         // all msg will be added here after send
-        CMsg*           _start;
-        CMsg*           _end;
+        std::shared_ptr<CMsg> _start;
+        std::shared_ptr<CMsg> _end;
         // when ack is not start, increase id
         // when _out_of_order_count >= 3, resend _start msg quickly
         uint16_t        _out_of_order_count;
@@ -61,9 +62,9 @@ namespace hudp {
         CPriorityQueue* _priority_queue;
         CIncrementalId* _incremental_id;
 
-        std::queue<CMsg*>                   _ack_queue;
-        std::queue<CMsg*>                   _send_queue;
-        std::unordered_map<uint16_t, CMsg*> _id_msg_map;
+        std::queue<std::shared_ptr<CMsg>>                   _ack_queue;
+        std::queue<std::shared_ptr<CMsg>>                   _send_queue;
+        std::unordered_map<uint16_t, std::shared_ptr<CMsg>> _id_msg_map;
     }; 
     
 }

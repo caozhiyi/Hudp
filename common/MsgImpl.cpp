@@ -180,19 +180,19 @@ bool CMsgImpl::InitWithBuffer(const std::string& msg) {
     return true;
 }
 
-void CMsgImpl::SetNext(CMsg* msg) {
+void CMsgImpl::SetNext(std::shared_ptr<CMsg> msg) {
     _next = msg;
 }
 
-CMsg* CMsgImpl::GetNext() {
+std::shared_ptr<CMsg> CMsgImpl::GetNext() {
     return _next;
 }
 
-void CMsgImpl::SetPrev(CMsg* msg) {
+void CMsgImpl::SetPrev(std::shared_ptr<CMsg> msg) {
     _prev = msg;
 }
 
-CMsg* CMsgImpl::GetPrev() {
+std::shared_ptr<CMsg> CMsgImpl::GetPrev() {
     return _prev;
 }
 

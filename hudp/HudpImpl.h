@@ -8,14 +8,13 @@
 #include "CommonType.h"
 
 namespace hudp {
-
-    class CNetIO;
+    
     class CMsg;
-    class CMsgFactory;
+    class CNetIO;
+    class CRecvThread;
     class CFilterProcess;
     class CSocketManager;
     class CProcessThread;
-    class CRecvThread;
     class CPriorityQueue;
 
     class CHudpImpl : public base::CSingle<CHudpImpl> {
@@ -41,25 +40,20 @@ namespace hudp {
 
     public:
         // notify supper recv a message.
-        void RecvMessageToUpper(const HudpHandle& handle, CMsg* msg);
+        void RecvMessageToUpper(const HudpHandle& handle, std::shared_ptr<CMsg> msg);
         // send message to net
-        void SendMessageToNet(CMsg* msg);
-        // release send message
-        void ReleaseMessage(CMsg* msg);
-        // create a msg
-        CMsg* CreateMessage();
+        void SendMessageToNet(std::shared_ptr<CMsg> msg);
         // get a default priority queue instance
         CPriorityQueue* CreatePriorityQueue();
         // release socket
         void ReleaseSocket(const HudpHandle& handle);
 
     public:
-        void AfterSendFilter(CMsg* msg);
-        void AfterRecvFilter(CMsg* msg);
+        void AfterSendFilter(std::shared_ptr<CMsg> msg);
+        void AfterRecvFilter(std::shared_ptr<CMsg> msg);
 
     private:
         std::shared_ptr<CNetIO>                    _net_io;
-        std::shared_ptr<CMsgFactory>               _msg_factory;
         std::shared_ptr<CFilterProcess>            _filter_process;
         std::shared_ptr<CSocketManager>            _socket_mananger;
         recv_back                                  _recv_call_back;

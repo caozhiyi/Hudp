@@ -24,7 +24,7 @@ CSendWndImpl::~CSendWndImpl() {
     Clear();
 }
 
-void CSendWndImpl::PushBack(CMsg* msg) {
+void CSendWndImpl::PushBack(std::shared_ptr<CMsg> msg) {
     if (msg == nullptr) {
         base::LOG_WARN("send a nullptr to send wnd.");
         return;
@@ -128,7 +128,7 @@ void CSendWndImpl::Clear() {
 }
 
 void CSendWndImpl::SendAndAck() {
-    CMsg* item = nullptr;
+    std::shared_ptr<CMsg> item;
 
     while (!_send_queue.empty()) {
         item = _send_queue.front();
@@ -149,7 +149,7 @@ void CSendWndImpl::SendNext() {
     // send next bag
     while (_cur_send_size < _send_wnd_size) {
         // add a msg to send wnd
-        CMsg* temp = _priority_queue->Pop();    
+        std::shared_ptr<CMsg> temp = _priority_queue->Pop();
         if (temp) {
             PushBackToSendWnd(temp);
             if (!_always_send) {
@@ -162,7 +162,7 @@ void CSendWndImpl::SendNext() {
     } 
 }
 
-void CSendWndImpl::PushBackToSendWnd(CMsg* msg) {
+void CSendWndImpl::PushBackToSendWnd(std::shared_ptr<CMsg> msg) {
     uint16_t id = _incremental_id->GetNextId();
     msg->SetId(id);
     _id_msg_map[id] = msg;
@@ -177,7 +177,7 @@ void CSendWndImpl::PushBackToSendWnd(CMsg* msg) {
     SendAndAck();
 }
 
-void CSendWndImpl::AddToEnd(CMsg* msg) {
+void CSendWndImpl::AddToEnd(std::shared_ptr<CMsg> msg) {
     // list is empty
     if (!_end) {
         _start = _end = msg;
@@ -189,7 +189,7 @@ void CSendWndImpl::AddToEnd(CMsg* msg) {
     _end = msg;
 }
 
-void CSendWndImpl::Remove(CMsg* msg) {
+void CSendWndImpl::Remove(std::shared_ptr<CMsg> msg) {
     if (!msg) {
         return;
     }

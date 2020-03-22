@@ -1,6 +1,7 @@
 #ifndef HEADER_INTERFACE_SENDWND
 #define HEADER_INTERFACE_SENDWND
 
+#include <memory> // for shared_ptr
 #include <vector> // for vector
 #include "CommonType.h"
 
@@ -12,7 +13,7 @@ namespace hudp {
         CSendWnd() {}
         virtual ~CSendWnd() {}
 
-        virtual void PushBack(CMsg* msg) = 0;
+        virtual void PushBack(std::shared_ptr<CMsg> msg) = 0;
         // receive a ack
         virtual void AcceptAck(uint16_t id) = 0;
         virtual void AcceptAck(uint16_t start_id, uint16_t len) = 0;

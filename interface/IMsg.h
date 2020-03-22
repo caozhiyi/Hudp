@@ -2,7 +2,7 @@
 #define HEADER_INTERFACE_MSG
 
 #include <vector>
-#include <memory>
+#include <memory> // for shared_ptr
 #include "CommonType.h"
 
 namespace hudp {
@@ -62,11 +62,11 @@ namespace hudp {
         virtual bool InitWithBuffer(const std::string&) = 0;
 
         // next point about
-        virtual void SetNext(CMsg* msg) = 0;
-        virtual CMsg* GetNext() = 0;
+        virtual void SetNext(std::shared_ptr<CMsg> msg) = 0;
+        virtual std::shared_ptr<CMsg> GetNext() = 0;
 
-        virtual void SetPrev(CMsg* msg) = 0;
-        virtual CMsg* GetPrev() = 0;
+        virtual void SetPrev(std::shared_ptr<CMsg> msg) = 0;
+        virtual std::shared_ptr<CMsg> GetPrev() = 0;
 
         virtual void SetTimerId(uint64_t id) = 0;
         virtual uint64_t GetTimerId() = 0;

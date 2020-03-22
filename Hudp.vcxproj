@@ -150,7 +150,6 @@
     <ClCompile Include="common\SendWnd.cpp" />
     <ClCompile Include="common\Serializes.cpp" />
     <ClCompile Include="common\Timer.cpp" />
-    <ClCompile Include="hudp\CloseMageger.cpp" />
     <ClCompile Include="hudp\FilterProcessNoThread.cpp" />
     <ClCompile Include="hudp\Hudp.cpp" />
     <ClCompile Include="hudp\HudpImpl.cpp" />
@@ -160,14 +159,14 @@
     <ClCompile Include="net\SocketImpl.cpp" />
     <ClCompile Include="net\SocketManager.cpp" />
     <ClCompile Include="net\win\OsNet.cpp" />
-    <ClCompile Include="utest\common\Ut_BitStream.cpp" />
-    <ClCompile Include="utest\common\Ut_IncrementalId.cpp" />
-    <ClCompile Include="utest\common\Ut_OrderList.cpp" />
-    <ClCompile Include="utest\common\Ut_PendAck.cpp" />
-    <ClCompile Include="utest\common\Ut_SendWnd.cpp" />
-    <ClCompile Include="utest\common\Ut_Serializes.cpp" />
-    <ClCompile Include="utest\common\Ut_Timer.cpp" />
-    <ClCompile Include="utest\net\Ut_OsNet.cpp" />
+    <None Include="utest\common\Ut_BitStream.cpp" />
+    <None Include="utest\common\Ut_IncrementalId.cpp" />
+    <None Include="utest\common\Ut_OrderList.cpp" />
+    <None Include="utest\common\Ut_PendAck.cpp" />
+    <None Include="utest\common\Ut_SendWnd.cpp" />
+    <None Include="utest\common\Ut_Serializes.cpp" />
+    <None Include="utest\common\Ut_Timer.cpp" />
+    <None Include="utest\net\Ut_OsNet.cpp" />
     <ClCompile Include="utest\Test.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -201,7 +200,6 @@
     <ClInclude Include="common\Serializes.h" />
     <ClInclude Include="common\Timer.h" />
     <ClInclude Include="common\CommonFunc.h" />
-    <ClInclude Include="hudp\CloseManager.h" />
     <ClInclude Include="hudp\FilterProcessNoThread.h" />
     <ClInclude Include="hudp\HudpConfig.h" />
     <ClInclude Include="hudp\HudpImpl.h" />
@@ -219,6 +217,7 @@
     <ClInclude Include="interface\IPriorityQueue.h" />
     <ClInclude Include="interface\IRto.h" />
     <ClInclude Include="interface\ISendWnd.h" />
+    <ClInclude Include="interface\ISerializes.h" />
     <ClInclude Include="interface\ISocket.h" />
     <ClInclude Include="interface\ISocketManager.h" />
     <ClInclude Include="net\SocketImpl.h" />

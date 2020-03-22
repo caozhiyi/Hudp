@@ -19,13 +19,13 @@ namespace hudp {
         WI_RELIABLE_ORDERLY = 2
     };
 
+    class CRto;
+    class CMsg;
+    class CPendAck;
     class CSendWnd;
     class COrderList;
     class CPriorityQueue;
     class CIncrementalId;
-    class CMsg;
-    class CPendAck;
-    class CRto;
 
     class CSocketImpl : public CSocket, public std::enable_shared_from_this<CSocketImpl> {
     public:
@@ -34,35 +34,35 @@ namespace hudp {
 
         HudpHandle GetHandle();
 
-        void SendMessage(CMsg* msg);
+        void SendMessage(std::shared_ptr<CMsg> msg);
 
-        void RecvMessage(CMsg* msg);
+        void RecvMessage(std::shared_ptr<CMsg> msg);
 
         // called back by order list when msg recv to upper.
-        void ToRecv(CMsg* msg);
+        void ToRecv(std::shared_ptr<CMsg> msg);
         // called back by send window t when send a bag to net.
-        void ToSend(CMsg* msg);
+        void ToSend(std::shared_ptr<CMsg> msg);
         // called back by send window t when recv a ack.
-        void AckDone(CMsg* msg);
+        void AckDone(std::shared_ptr<CMsg> msg);
         // called back by timer t when timer out.
-        void TimerOut(CMsg* msg);
+        void TimerOut(std::shared_ptr<CMsg> msg);
         // add a ack msg timer to remote 
-        void AddPendAck(CMsg* msg);
+        void AddPendAck(std::shared_ptr<CMsg> msg);
         // send a ack quickey
-        void AddQuicklyAck(CMsg* msg);
+        void AddQuicklyAck(std::shared_ptr<CMsg> msg);
     
         // send fin msg to close connection
         void SendFinMessage();
         bool CanSendMessage();
     private:
         // return ture if add ack to msg, otherwise return false
-        bool AddAckToMsg(CMsg* msg);
-        void GetAckToSendWnd(CMsg* msg);
-        void AddToSendWnd(WndIndex index, CMsg* msg);
-        void AddToRecvList(WndIndex index, CMsg* msg);
-        void AddToPendAck(WndIndex index, CMsg* msg);
+        bool AddAckToMsg(std::shared_ptr<CMsg> msg);
+        void GetAckToSendWnd(std::shared_ptr<CMsg> msg);
+        void AddToSendWnd(WndIndex index, std::shared_ptr<CMsg> msg);
+        void AddToRecvList(WndIndex index, std::shared_ptr<CMsg> msg);
+        void AddToPendAck(WndIndex index, std::shared_ptr<CMsg> msg);
         // calculation rtt time
-        uint64_t GetRtt(CMsg* msg);
+        uint64_t GetRtt(std::shared_ptr<CMsg> msg);
         uint64_t GetRtt(uint64_t time);
         // socket status change
         void StatusChange(socket_status sk_status);
