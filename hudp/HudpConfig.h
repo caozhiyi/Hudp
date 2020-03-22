@@ -63,6 +63,9 @@ namespace hudp {
     // msl time
     static const uint32_t __2_msl_time = 30000;   // 30s
 
+    // message pool size if bigger than it, will reduce half of queue size
+    static const uint16_t __msg_pool_reduce_limit_size = 50;
+
     // about log setting
     // log level.
     static const base::LogLevel __log_level = base::LOG_WARN_LEVEL;

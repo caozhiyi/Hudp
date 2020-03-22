@@ -125,6 +125,8 @@ void CSocketImpl::ToSend(std::shared_ptr<CMsg> msg) {
 
 void CSocketImpl::AckDone(std::shared_ptr<CMsg> msg) {
     // release msg here
+    CTimer::Instance().RemoveTimer(msg);
+    msg.reset();
 }
 
 void CSocketImpl::TimerOut(std::shared_ptr<CMsg> msg) {
