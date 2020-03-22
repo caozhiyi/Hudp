@@ -46,9 +46,11 @@ namespace hudp {
         void AckDone(CMsg* msg);
         // called back by timer t when timer out.
         void TimerOut(CMsg* msg);
-        // add a ack msg to remote 
-        void AddAck(CMsg* msg);
-
+        // add a ack msg timer to remote 
+        void AddPendAck(CMsg* msg);
+        // send a ack quickey
+        void AddQuicklyAck(CMsg* msg);
+    
         // send fin msg to close connection
         void SendFinMessage();
         bool CanSendMessage();

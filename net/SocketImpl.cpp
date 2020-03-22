@@ -155,7 +155,7 @@ void CSocketImpl::TimerOut(CMsg* msg) {
     CHudpImpl::Instance().SendMessageToNet(msg);
 }
 
-void CSocketImpl::AddAck(CMsg* msg) {
+void CSocketImpl::AddPendAck(CMsg* msg) {
     auto header_flag = msg->GetHeaderFlag();
     if (header_flag & HTF_RELIABLE_ORDERLY) {
         AddToPendAck(WI_RELIABLE_ORDERLY, msg);
@@ -174,6 +174,30 @@ void CSocketImpl::AddAck(CMsg* msg) {
         CTimer::Instance().AddTimer(__pend_ack_send, timer_msg);
         _is_in_timer = true;
     }
+}
+
+void CSocketImpl::AddQuicklyAck(CMsg* msg) {
+    std::vector<uint16_t> ack_vec;
+    std::vector<uint64_t> time_vec;
+
+    ack_vec.push_back(msg->GetId());
+    time_vec.push_back(msg->GetSendTime());
+
+    CMsg* ack_msg = CHudpImpl::Instance().CreateMessage();
+    ack_msg->SetFlag(msg_is_only_ack);
+    std::shared_ptr<CSocket> sock = shared_from_this();
+    ack_msg->SetSocket(sock);
+    ack_msg->SetHandle(_handle);
+
+    auto header_flag = msg->GetHeaderFlag();
+    if (header_flag & HTF_RELIABLE) {
+        ack_msg->SetAck(HPF_WITH_RELIABLE_ACK, ack_vec, time_vec, false);
+
+    } else if (header_flag & HTF_RELIABLE_ORDERLY) {
+        ack_msg->SetAck(HPF_WITH_RELIABLE_ORDERLY_ACK, ack_vec, time_vec, false);
+    }
+    // send to net
+    CHudpImpl::Instance().SendMessageToNet(ack_msg);
 }
 
 void CSocketImpl::SendFinMessage() {
@@ -298,7 +322,7 @@ void CSocketImpl::AddToRecvList(WndIndex index, CMsg* msg) {
     }
     // should send ack to remote
     if (index == WI_RELIABLE || index == WI_RELIABLE_ORDERLY) {
-        AddAck(msg);
+        AddPendAck(msg);
     }
     _recv_list[index]->Insert(msg);
 }
