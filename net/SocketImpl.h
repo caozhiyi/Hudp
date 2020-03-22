@@ -48,7 +48,7 @@ namespace hudp {
         void TimerOut(std::shared_ptr<CMsg> msg);
         // add a ack msg timer to remote 
         void AddPendAck(std::shared_ptr<CMsg> msg);
-        // send a ack quickey
+        // send a ack quickly
         void AddQuicklyAck(std::shared_ptr<CMsg> msg);
     
         // send fin msg to close connection

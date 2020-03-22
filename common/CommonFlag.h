@@ -35,6 +35,8 @@ namespace hudp {
 
         // msg with send time stamp, to calculation rtt time
         HPF_MSG_WITH_TIME_STAMP        = 0x010000,
+        // reset the connection
+        HPF_RST                        = 0x020000,
     };
 
     /*

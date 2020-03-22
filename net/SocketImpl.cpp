@@ -322,11 +322,19 @@ void CSocketImpl::AddToRecvList(WndIndex index, std::shared_ptr<CMsg> msg) {
             _recv_list[index] = new CReliableOrderlyList(id);
         }
     }
+    
+    auto ret = _recv_list[index]->Insert(msg);
+
     // should send ack to remote
     if (index == WI_RELIABLE || index == WI_RELIABLE_ORDERLY) {
-        AddPendAck(msg);
+        // disorder msg, send ack quickly
+        if (ret == 1) {
+            AddQuicklyAck(msg);
+
+        } else {
+            AddPendAck(msg);
+        }
     }
-    _recv_list[index]->Insert(msg);
 }
 
 void CSocketImpl::AddToPendAck(WndIndex index, std::shared_ptr<CMsg> msg) {
