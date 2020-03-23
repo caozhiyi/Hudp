@@ -18,10 +18,15 @@ namespace hudp {
         virtual ~CRecvList();
 
         // add a item to order list
+        // return 0, msg is normal
+        // return 1, repeat msg
+        // return 2, continuously disordered messages
 		virtual uint16_t Insert(std::shared_ptr<CMsg> msg) = 0;
 
         // make id little than order list max size
         uint16_t HashFunc(uint16_t id);
+    protected:
+        uint16_t _discard_msg_count;
     };
 
     // receive list that reliable and orderly 

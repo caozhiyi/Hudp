@@ -8,7 +8,7 @@
 
 using namespace hudp;
 
-CRecvList::CRecvList() {
+CRecvList::CRecvList() : _discard_msg_count(0){
     
 }
 
@@ -36,6 +36,16 @@ CReliableOrderlyList::~CReliableOrderlyList() {
 uint16_t CReliableOrderlyList::Insert(std::shared_ptr<CMsg> msg) {
 	auto id = msg->GetId();
     uint16_t index = HashFunc(id);
+
+    // too farm, discard this msg
+    if (std::abs(id - _expect_id) > __max_compare_num ||
+        (_expect_id > (__max_id - __max_compare_num / 2) && id < __max_compare_num / 2)) {
+        _discard_msg_count++;
+        if (_discard_msg_count >= __msg_discard_limit) {
+            return 2;
+        }
+        return 0;
+    }
     
     {
         std::unique_lock<std::mutex> lock(_mutex);
@@ -92,6 +102,10 @@ uint16_t CReliableList::Insert(std::shared_ptr<CMsg> msg) {
     // too farm, discard this msg
     if (std::abs(id - _expect_id) > __max_compare_num ||
        (_expect_id > (__max_id - __max_compare_num / 2) && id < __max_compare_num / 2)) {
+        _discard_msg_count++;
+        if (_discard_msg_count >= __msg_discard_limit) {
+            return 2;
+        }
         return 0;
     }
 
@@ -123,6 +137,15 @@ COrderlyList::~COrderlyList() {
 // orderly list, if msg id is bigger than expect id, recv it.
 uint16_t COrderlyList::Insert(std::shared_ptr<CMsg> msg) {
 	auto id = msg->GetId();
+    // too farm, discard this msg
+    if (std::abs(id - _expect_id) > __max_compare_num ||
+        (_expect_id > (__max_id - __max_compare_num / 2) && id < __max_compare_num / 2)) {
+        _discard_msg_count++;
+        if (_discard_msg_count >= __msg_discard_limit) {
+            return 2;
+        }
+        return 0;
+    }
     if (id < _expect_id) {
         return 0;
     }

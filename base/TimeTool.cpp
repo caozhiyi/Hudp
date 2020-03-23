@@ -164,8 +164,8 @@ int base::CTimeTool::gmtime64(const time_t *t, std::tm *tp) {
     long int days, rem, y;
     const unsigned short int *ip;
 
-    days = *t / SECS_PER_DAY;
-    rem = *t % SECS_PER_DAY;
+    days = (long int)(*t / SECS_PER_DAY);
+    rem = (long int)(*t % SECS_PER_DAY);
     while (rem < 0)
     {
         rem += SECS_PER_DAY;

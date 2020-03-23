@@ -66,6 +66,9 @@ namespace hudp {
     // message pool size if bigger than it, will reduce half of queue size
     static const uint16_t __msg_pool_reduce_limit_size = 50;
 
+    // if discard msg count is bigger than it, send resrt to remote
+    static const uint16_t __msg_discard_limit = 3;
+
     // about log setting
     // log level.
     static const base::LogLevel __log_level = base::LOG_WARN_LEVEL;

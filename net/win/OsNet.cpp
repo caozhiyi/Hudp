@@ -43,7 +43,7 @@ bool COsNetImpl::Bind(uint64_t socket, const std::string& ip, uint16_t port) {
     return true;
 }
 
-int COsNetImpl::SendTo(uint64_t socket, const char * buf, int len, const std::string& ip, uint16_t port) {
+int COsNetImpl::SendTo(uint64_t socket, const char * buf, uint32_t len, const std::string& ip, uint16_t port) {
     SOCKADDR_IN addr_cli;
     addr_cli.sin_family = AF_INET;
     addr_cli.sin_port = htons(port);
@@ -55,12 +55,12 @@ int COsNetImpl::SendTo(uint64_t socket, const char * buf, int len, const std::st
     return ret;
 }
 
-int COsNetImpl::SendTo(uint64_t socket, const char * buf, int len, const std::string& ip_port) {
+int COsNetImpl::SendTo(uint64_t socket, const char * buf, uint32_t len, const std::string& ip_port) {
     auto ret = SplitIpPort(ip_port);
     return SendTo(socket, buf, len, ret.second, ret.first);
 }
 
-int COsNetImpl::SendTo(uint64_t socket, const char * buf, int len) {
+int COsNetImpl::SendTo(uint64_t socket, const char * buf, uint32_t len) {
     int ret = send(socket, buf, len, 0);
     if (ret <= 0) {
         base::LOG_ERROR("send to failed. errno : %d", WSAGetLastError());
@@ -68,7 +68,7 @@ int COsNetImpl::SendTo(uint64_t socket, const char * buf, int len) {
     return ret;
 }
 
-int COsNetImpl::RecvFrom(uint64_t sockfd, char *buf, size_t len, std::string& ip, uint16_t& port) {
+int COsNetImpl::RecvFrom(uint64_t sockfd, char *buf, uint32_t len, std::string& ip, uint16_t& port) {
     SOCKADDR_IN addr_cli;
     int fromlen = sizeof(SOCKADDR);
     int ret = recvfrom(sockfd, buf, len, 0, (SOCKADDR*)&addr_cli, &fromlen);

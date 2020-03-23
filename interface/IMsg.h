@@ -38,11 +38,11 @@ namespace hudp {
         virtual void AddSendDelay() = 0;
         virtual uint16_t GetReSendTime() = 0;
 
-        virtual void SetHeaderFlag(uint16_t flag) = 0;
-        virtual uint16_t GetHeaderFlag() = 0;
+        virtual void SetHeaderFlag(uint32_t flag) = 0;
+        virtual uint32_t GetHeaderFlag() = 0;
 
-        virtual void SetFlag(uint16_t flag) = 0;
-        virtual uint16_t GetFlag() = 0;
+        virtual void SetFlag(uint32_t flag) = 0;
+        virtual uint32_t GetFlag() = 0;
         
         // return header flag to string
         virtual std::string DebugHeaderFlag() = 0;

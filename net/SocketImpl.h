@@ -46,15 +46,14 @@ namespace hudp {
         void AckDone(std::shared_ptr<CMsg> msg);
         // called back by timer t when timer out.
         void TimerOut(std::shared_ptr<CMsg> msg);
-        // add a ack msg timer to remote 
-        void AddPendAck(std::shared_ptr<CMsg> msg);
-        // send a ack quickly
-        void AddQuicklyAck(std::shared_ptr<CMsg> msg);
-    
         // send fin msg to close connection
         void SendFinMessage();
         bool CanSendMessage();
     private:
+        // add a ack msg timer to remote 
+        void AddPendAck(std::shared_ptr<CMsg> msg);
+        // send a ack quickly
+        void AddQuicklyAck(std::shared_ptr<CMsg> msg);
         // return ture if add ack to msg, otherwise return false
         bool AddAckToMsg(std::shared_ptr<CMsg> msg);
         void GetAckToSendWnd(std::shared_ptr<CMsg> msg);
@@ -68,6 +67,8 @@ namespace hudp {
         void StatusChange(socket_status sk_status);
         // send fin ack
         void SendFinAckMessage();
+        // send reset msg
+        void SendResetMsg();
         // add 2msl timer
         void Wait2MslClose();
         // about close flag

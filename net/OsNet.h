@@ -18,12 +18,12 @@ namespace hudp {
         bool Bind(uint64_t socket, const std::string& ip, uint16_t port);
 
         // send a msg to client
-        int SendTo(uint64_t socket, const char * buf, int len, const std::string& ip, uint16_t port);
-        int SendTo(uint64_t socket, const char * buf, int len, const std::string& ip_port);
-        int SendTo(uint64_t socket, const char * buf, int len);
+        int SendTo(uint64_t socket, const char * buf, uint32_t len, const std::string& ip, uint16_t port);
+        int SendTo(uint64_t socket, const char * buf, uint32_t len, const std::string& ip_port);
+        int SendTo(uint64_t socket, const char * buf, uint32_t len);
 
         // receiver msg from socket
-        int RecvFrom(uint64_t sockfd, char *buf, size_t len, std::string& ip, uint16_t& port);
+        int RecvFrom(uint64_t sockfd, char *buf, uint32_t len, std::string& ip, uint16_t& port);
 
         // return a udp socket if success. else return 0
         uint64_t UdpSocket();

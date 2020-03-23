@@ -28,11 +28,11 @@ namespace hudp {
         void AddSendDelay();
         uint16_t GetReSendTime();
 
-        void SetHeaderFlag(uint16_t flag);
-        uint16_t GetHeaderFlag();
+        void SetHeaderFlag(uint32_t flag);
+        uint32_t GetHeaderFlag();
 
-        void SetFlag(uint16_t flag);
-        uint16_t GetFlag();
+        void SetFlag(uint32_t flag);
+        uint32_t GetFlag();
 
         // return header flag to string
         std::string DebugHeaderFlag();

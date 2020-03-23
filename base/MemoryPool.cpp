@@ -82,7 +82,7 @@ void* CMemoryPool::ReFill(int size, int num) {
 void* CMemoryPool::ChunkAlloc(int size, int& nums) {
     char* res;
     int need_bytes = size * nums;
-    int left_bytes = _pool_end - _pool_start;
+    int left_bytes = (int)(_pool_end - _pool_start);
 
     //pool is enough
     if (left_bytes >= need_bytes) {

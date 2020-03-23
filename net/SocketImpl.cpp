@@ -75,7 +75,20 @@ void CSocketImpl::RecvMessage(std::shared_ptr<CMsg> msg) {
         StatusChange(SS_READY);
     }
 
+    // time wait status send rst to remote.
+    if (_sk_status == SS_TIME_WAIT) {
+        SendResetMsg();
+        return; 
+    }
+
     auto header_flag = msg->GetHeaderFlag();
+
+    // if recv rst msg, close this connection now
+    if (header_flag & HPF_RST) {
+        // release socket
+        CHudpImpl::Instance().ReleaseSocket(_handle);
+        return;
+    }
 
     // reliable and orderly
     if (header_flag & HTF_RELIABLE_ORDERLY) {
@@ -157,12 +170,37 @@ void CSocketImpl::TimerOut(std::shared_ptr<CMsg> msg) {
     CHudpImpl::Instance().SendMessageToNet(msg);
 }
 
+void CSocketImpl::SendFinMessage() {
+    if (_sk_status != SS_READY && _sk_status != SS_CLOSE_WIAT) {
+        base::LOG_ERROR("current status %d can't send a fin msg", _sk_status);
+        return;
+    }
+    std::shared_ptr<CMsg> fin_msg = CMsgPoolFactory::Instance().CreateSharedMsg();
+    if (__send_all_msg_when_close) {
+        fin_msg->SetHeaderFlag(HTF_RELIABLE_ORDERLY | HPF_LOW_PRI | HPF_FIN);
+
+    } else {
+        fin_msg->SetHeaderFlag(HTF_RELIABLE_ORDERLY | HPF_HIGHEST_PRI | HPF_FIN);
+    }
+    std::shared_ptr<CSocket> sock = shared_from_this();
+    fin_msg->SetSocket(sock);
+    fin_msg->SetHandle(_handle);
+
+    StatusChange(_sk_status == SS_READY ? SS_FIN_WAIT_1 : SS_LAST_ACK);
+    SendMessage(fin_msg);
+}
+
+bool CSocketImpl::CanSendMessage() {
+    return _sk_status == SS_CLOSE || _sk_status == SS_READY;
+}
+
 void CSocketImpl::AddPendAck(std::shared_ptr<CMsg> msg) {
     auto header_flag = msg->GetHeaderFlag();
     if (header_flag & HTF_RELIABLE_ORDERLY) {
         AddToPendAck(WI_RELIABLE_ORDERLY, msg);
 
-    } else if (header_flag & HTF_RELIABLE) {
+    }
+    else if (header_flag & HTF_RELIABLE) {
         AddToPendAck(WI_RELIABLE, msg);
     }
 
@@ -195,35 +233,12 @@ void CSocketImpl::AddQuicklyAck(std::shared_ptr<CMsg> msg) {
     if (header_flag & HTF_RELIABLE) {
         ack_msg->SetAck(HPF_WITH_RELIABLE_ACK, ack_vec, time_vec, false);
 
-    } else if (header_flag & HTF_RELIABLE_ORDERLY) {
+    }
+    else if (header_flag & HTF_RELIABLE_ORDERLY) {
         ack_msg->SetAck(HPF_WITH_RELIABLE_ORDERLY_ACK, ack_vec, time_vec, false);
     }
     // send to net
     CHudpImpl::Instance().SendMessageToNet(ack_msg);
-}
-
-void CSocketImpl::SendFinMessage() {
-    if (_sk_status != SS_READY && _sk_status != SS_CLOSE_WIAT) {
-        base::LOG_ERROR("current status %d can't send a fin msg", _sk_status);
-        return;
-    }
-    std::shared_ptr<CMsg> fin_msg = CMsgPoolFactory::Instance().CreateSharedMsg();
-    if (__send_all_msg_when_close) {
-        fin_msg->SetHeaderFlag(HTF_RELIABLE_ORDERLY | HPF_LOW_PRI | HPF_FIN);
-
-    } else {
-        fin_msg->SetHeaderFlag(HTF_RELIABLE_ORDERLY | HPF_HIGHEST_PRI | HPF_FIN);
-    }
-    std::shared_ptr<CSocket> sock = shared_from_this();
-    fin_msg->SetSocket(sock);
-    fin_msg->SetHandle(_handle);
-
-    StatusChange(_sk_status == SS_READY ? SS_FIN_WAIT_1 : SS_LAST_ACK);
-    SendMessage(fin_msg);
-}
-
-bool CSocketImpl::CanSendMessage() {
-    return _sk_status == SS_CLOSE || _sk_status == SS_READY;
 }
 
 bool CSocketImpl::AddAckToMsg(std::shared_ptr<CMsg> msg) {
@@ -324,6 +339,12 @@ void CSocketImpl::AddToRecvList(WndIndex index, std::shared_ptr<CMsg> msg) {
     }
     
     auto ret = _recv_list[index]->Insert(msg);
+
+    // continuously disordered messages
+    if (ret == 2) {
+        SendResetMsg();
+        return;
+    }
 
     // should send ack to remote
     if (index == WI_RELIABLE || index == WI_RELIABLE_ORDERLY) {
@@ -436,6 +457,16 @@ void CSocketImpl::SendFinAckMessage() {
     fin_msg->SetSocket(sock);
     fin_msg->SetHandle(_handle);
     SendMessage(fin_msg);
+}
+
+void CSocketImpl::SendResetMsg() {
+    std::shared_ptr<CMsg> rst_msg = CMsgPoolFactory::Instance().CreateSharedMsg();
+    // this msg don't need ack
+    rst_msg->SetHeaderFlag(HTF_ORDERLY | HPF_HIGHEST_PRI | HPF_RST);
+    std::shared_ptr<CSocket> sock = shared_from_this();
+    rst_msg->SetSocket(sock);
+    rst_msg->SetHandle(_handle);
+    SendMessage(rst_msg);
 }
 
 void CSocketImpl::Wait2MslClose() {

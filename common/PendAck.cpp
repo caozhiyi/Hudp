@@ -43,7 +43,7 @@ bool CPendAck::GetAllAck(std::vector<uint16_t>& ack_vec, std::vector<uint64_t>& 
 
     continuity = true;
 
-    uint16_t len = _ack_set.size();
+    uint16_t len = (uint16_t)_ack_set.size();
     auto iter = _ack_set.find(_start);
     ack_vec.push_back(iter->first);
     time_vec.push_back(iter->second);

@@ -8,7 +8,7 @@
 using namespace hudp;
 
 bool CSerializesNormal::Serializes(CMsg& msg, CBitStreamWriter& bit_stream) {
-    return Serializes(msg.GetHead(), msg.GetBody().c_str(), msg.GetBody().length(), bit_stream);
+    return Serializes(msg.GetHead(), msg.GetBody().c_str(), (uint16_t)msg.GetBody().length(), bit_stream);
 }
 
 bool CSerializesNormal::Deseriali(CBitStreamReader& bit_stream, CMsg& msg) {
@@ -36,7 +36,7 @@ bool CSerializesNormal::SerializesHead(Head& head, CBitStreamWriter& bit_stream)
     if (flag & HPF_WITH_RELIABLE_ORDERLY_ACK) {
         std::vector<uint16_t> reliable_orderly_vec;
         head.GetReliableOrderlyAck(reliable_orderly_vec);
-        uint16_t len = reliable_orderly_vec.size();
+        uint16_t len = (uint16_t)reliable_orderly_vec.size();
         if (len > 0) {
             CHECK_RET(bit_stream.Write(len));
             if (flag & HPF_RELIABLE_ORDERLY_ACK_RANGE) {
@@ -60,7 +60,7 @@ bool CSerializesNormal::SerializesHead(Head& head, CBitStreamWriter& bit_stream)
     if (flag & HPF_WITH_RELIABLE_ACK) {
         std::vector<uint16_t> reliable_vec;
         head.GetReliableAck(reliable_vec);
-        uint16_t len = reliable_vec.size();
+        uint16_t len = (uint16_t)reliable_vec.size();
         if (len > 0) {
             CHECK_RET(bit_stream.Write(len));
             if (flag & HPF_RELIABLE_ACK_RANGE) {

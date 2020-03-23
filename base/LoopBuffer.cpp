@@ -212,32 +212,32 @@ bool CLoopBuffer::GetUseMemoryBlock(void*& res1, int& len1, void*& res2, int& le
 int CLoopBuffer::FindStr(const char* s, int s_len) {
     std::unique_lock<std::mutex> lock(_mutex);
     if (_write > _read) {
-        const char* find = _FindStrInMem(_read, s, _write - _read, s_len);
+        const char* find = _FindStrInMem(_read, s, (int)(_write - _read), s_len);
         if (find) {
             return (int)(find - _read + s_len);
         }
         return 0;
         
     } else if (_write < _read) {
-        const char* find = _FindStrInMem(_read, s, _buffer_end - _read, s_len);
+        const char* find = _FindStrInMem(_read, s, (int)(_buffer_end - _read), s_len);
         if (find) {
-            return find - _read + s_len;
+            return (int)(find - _read + s_len);
         }
-        find = _FindStrInMem(_buffer_start, s, _write - _buffer_start, s_len);
+        find = _FindStrInMem(_buffer_start, s, (int)(_write - _buffer_start), s_len);
         if (find) {
-            return find - _buffer_start + s_len + _buffer_end - _read;
+            return (int)(find - _buffer_start + s_len + _buffer_end - _read);
         }
         return 0;
 
     } else {
         if (_can_read) {
-            const char* find = _FindStrInMem(_read, s, _buffer_end - _read, s_len);
+            const char* find = _FindStrInMem(_read, s, (int)(_buffer_end - _read), s_len);
             if (find) {
-                return find - _read + s_len;
+                return (int)(find - _read + s_len);
             }
-            find = _FindStrInMem(_buffer_start, s, _write - _buffer_start, s_len);
+            find = _FindStrInMem(_buffer_start, s, (int)(_write - _buffer_start), s_len);
             if (find) {
-                return find - _buffer_start + s_len + _buffer_end - _read;
+                return (int)(find - _buffer_start + s_len + _buffer_end - _read);
             }
             return 0;
 
@@ -264,7 +264,7 @@ const char* CLoopBuffer::_FindStrInMem(const char* buffer, const char* ch, int b
 
     const char* buff = buffer;
     const char* find = nullptr;
-    int finded = 0;
+    size_t finded = 0;
     while(true) {
         find = (char*)memchr(buff, *ch, buffer_len - finded);
         if (!find) {

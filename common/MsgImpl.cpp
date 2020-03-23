@@ -55,19 +55,19 @@ uint16_t CMsgImpl::GetReSendTime() {
     return __resend_time * _backoff_factor;
 }
 
-void CMsgImpl::SetHeaderFlag(uint16_t flag) {
+void CMsgImpl::SetHeaderFlag(uint32_t flag) {
     _head._flag |= flag;
 }
 
-uint16_t CMsgImpl::GetHeaderFlag() {
+uint32_t CMsgImpl::GetHeaderFlag() {
     return _head._flag;
 }
 
-void CMsgImpl::SetFlag(uint16_t flag) {
+void CMsgImpl::SetFlag(uint32_t flag) {
     _flag |= flag;
 }
 
-uint16_t CMsgImpl::GetFlag() {
+uint32_t CMsgImpl::GetFlag() {
     return _flag;
 }
 
@@ -134,7 +134,7 @@ const HudpHandle& CMsgImpl::GetHandle() {
 
 void CMsgImpl::SetBody(const std::string& body) {
     _body = body;
-    _head.SetBodyLength(body.length());
+    _head.SetBodyLength((uint16_t)body.length());
 }
 
 std::string& CMsgImpl::GetBody() {
@@ -173,7 +173,7 @@ std::string CMsgImpl::GetSerializeBuffer() {
 
 bool CMsgImpl::InitWithBuffer(const std::string& msg) {
     CBitStreamReader bit_stream;
-    bit_stream.Init(msg.c_str(), msg.length());
+    bit_stream.Init(msg.c_str(), (uint16_t)msg.length());
     if (!_serializes->Deseriali(bit_stream, *this)) {
         return false;
     }

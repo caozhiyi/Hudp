@@ -75,7 +75,7 @@ void CHudpImpl::Join() {
 }
 
 bool CHudpImpl::SendTo(const HudpHandle& handle, uint16_t flag, const std::string& msg) {
-    return SendTo(handle, flag, msg.c_str(), msg.length());
+    return SendTo(handle, flag, msg.c_str(), (uint16_t)msg.length());
 }
 
 bool CHudpImpl::SendTo(const HudpHandle& handle, uint16_t flag, const char* msg, uint16_t len) {
@@ -131,7 +131,7 @@ void CHudpImpl::RecvMessageToUpper(const HudpHandle& HudpHandle, std::shared_ptr
 void CHudpImpl::SendMessageToNet(std::shared_ptr<CMsg> msg) {
     // get send buffer
     std::string net_msg = msg->GetSerializeBuffer();
-    _net_io->SendTo(_listen_socket, net_msg.c_str(), net_msg.length(), msg->GetHandle());
+    _net_io->SendTo(_listen_socket, net_msg.c_str(), (uint32_t)net_msg.length(), msg->GetHandle());
 }
 
 CPriorityQueue* CHudpImpl::CreatePriorityQueue() {
@@ -149,5 +149,5 @@ void CHudpImpl::AfterSendFilter(std::shared_ptr<CMsg> msg) {
 
 void CHudpImpl::AfterRecvFilter(std::shared_ptr<CMsg> msg) {
     std::string& body = msg->GetBody();
-    _recv_call_back(msg->GetHandle(), body.c_str(), body.length());
+    _recv_call_back(msg->GetHandle(), body.c_str(), (uint16_t)body.length());
 }
