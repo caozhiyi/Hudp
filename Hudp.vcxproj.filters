@@ -43,6 +43,12 @@
     <Filter Include="third\absl\strings">
       <UniqueIdentifier>{c56c5cec-f417-45f9-bf2d-7b8fd6c4c265}</UniqueIdentifier>
     </Filter>
+    <Filter Include="net\controller">
+      <UniqueIdentifier>{0cc69faa-cb60-4ae6-8664-f0df4fec7b71}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="net\controller\bbr">
+      <UniqueIdentifier>{6174acd2-56e6-44f6-a55c-fc8415498b97}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="base\Buffer.cpp">
@@ -131,6 +137,9 @@
     </ClCompile>
     <ClCompile Include="utest\Test.cpp">
       <Filter>utest</Filter>
+    </ClCompile>
+    <ClCompile Include="net\controller\OsCommon.h">
+      <Filter>net\controller</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -401,6 +410,9 @@
     <ClInclude Include="interface\ISerializes.h">
       <Filter>interface</Filter>
     </ClInclude>
+    <ClInclude Include="net\controller\TcpCommon.h">
+      <Filter>net\controller</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="third\gtest\include\gmock\gmock-generated-function-mockers.h.pump">
@@ -429,6 +441,12 @@
     </None>
     <None Include="utest\net\Ut_OsNet.cpp">
       <Filter>utest\net</Filter>
+    </None>
+    <None Include="net\controller\bbr\bbr.h">
+      <Filter>net\controller\bbr</Filter>
+    </None>
+    <None Include="net\controller\bbr\bbr.cpp">
+      <Filter>net\controller\bbr</Filter>
     </None>
   </ItemGroup>
 </Project>

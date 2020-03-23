@@ -156,6 +156,8 @@
     <ClCompile Include="hudp\MsgPoolFactory.cpp" />
     <ClCompile Include="hudp\RecvThread.cpp" />
     <ClCompile Include="hudp\ProcessThread.cpp" />
+    <None Include="net\controller\bbr\bbr.cpp" />
+    <ClCompile Include="net\controller\OsCommon.h" />
     <ClCompile Include="net\SocketImpl.cpp" />
     <ClCompile Include="net\SocketManager.cpp" />
     <ClCompile Include="net\win\OsNet.cpp" />
@@ -220,6 +222,8 @@
     <ClInclude Include="interface\ISerializes.h" />
     <ClInclude Include="interface\ISocket.h" />
     <ClInclude Include="interface\ISocketManager.h" />
+    <None Include="net\controller\bbr\bbr.h" />
+    <ClInclude Include="net\controller\TcpCommon.h" />
     <ClInclude Include="net\SocketImpl.h" />
     <ClInclude Include="net\OsNet.h" />
     <ClInclude Include="net\SocketManager.h" />
