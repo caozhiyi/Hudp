@@ -15,6 +15,67 @@ bool CSerializesNormal::Deseriali(CBitStreamReader& bit_stream, CMsg& msg) {
     return Deseriali(bit_stream, msg.GetHead(), msg.GetBody());
 }
 
+uint32_t CSerializesNormal::EstimateSize(CMsg& msg) {
+    uint32_t ret = 0;
+
+    auto& head = msg.GetHead();
+    uint32_t header_flag = head.GetFlag();
+
+    ret += sizeof(header_flag);
+    if (header_flag & HPF_WITH_ID) {
+        ret += sizeof(uint16_t);
+    }
+
+    if (header_flag & HPF_MSG_WITH_TIME_STAMP) {
+        ret += sizeof(uint64_t);
+    }
+
+    if (header_flag & HPF_WITH_RELIABLE_ORDERLY_ACK) {
+        std::vector<uint16_t> reliable_orderly_vec;
+        head.GetReliableOrderlyAck(reliable_orderly_vec);
+        uint16_t len = (uint16_t)reliable_orderly_vec.size();
+        if (len > 0) {
+            ret += sizeof(uint16_t);
+            if (header_flag & HPF_RELIABLE_ORDERLY_ACK_RANGE) {
+                ret += sizeof(uint16_t);
+
+            } else {
+                ret += sizeof(uint16_t) * len;
+            }
+        }
+        if (header_flag & HPF_MSG_WITH_TIME_STAMP) {
+            std::vector<uint64_t> time_vec;
+            head.GetReliableOrderlyAckTime(time_vec);
+            ret += sizeof(uint64_t) * len;
+        }
+    }
+
+    if (header_flag & HPF_WITH_RELIABLE_ACK) {
+        std::vector<uint16_t> reliable_vec;
+        head.GetReliableAck(reliable_vec);
+        uint16_t len = (uint16_t)reliable_vec.size();
+        if (len > 0) {
+            ret += sizeof(uint16_t);
+            if (header_flag & HPF_RELIABLE_ACK_RANGE) {
+                ret += sizeof(uint16_t);
+
+            } else {
+                ret += sizeof(uint16_t) * len;
+            }
+        }
+        if (header_flag & HPF_MSG_WITH_TIME_STAMP) {
+            std::vector<uint64_t> time_vec;
+            head.GetReliableAckTime(time_vec);
+            ret += sizeof(uint64_t) * len;
+        }
+    }
+    
+    if (header_flag & HPF_WITH_BODY) {
+        ret += head.GetBodyLength();
+    }
+    return ret;
+}
+
 bool CSerializesNormal::SerializesHead(Head& head, CBitStreamWriter& bit_stream) {
     // must serializes head first
     if (bit_stream.GetCurrentLength() > 0) {

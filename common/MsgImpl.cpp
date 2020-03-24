@@ -222,3 +222,7 @@ void CMsgImpl::SetSendTime(uint64_t time) {
 uint64_t CMsgImpl::GetSendTime() {
     return _head.GetSendTime();
 }
+
+uint32_t CMsgImpl::GetEstimateSize() {
+    return _serializes->EstimateSize(*this);
+}

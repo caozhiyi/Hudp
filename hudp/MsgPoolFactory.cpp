@@ -5,7 +5,8 @@
 #include "MsgPoolFactory.h"
 using namespace hudp;
 
-static void SharedPtrDeleteer(CMsg* msg) {
+static void SharedPtrDeleter(CMsg* msg) {
+    // delete from timer.
     if (msg->GetTimerId() > 0) {
         CTimer::Instance().RemoveTimer(msg);
     }
@@ -26,7 +27,7 @@ CMsgPoolFactory::~CMsgPoolFactory() {
 }
 
 std::shared_ptr<CMsg> CMsgPoolFactory::CreateSharedMsg() {
-    return std::shared_ptr<CMsg>(CreateMsg(), SharedPtrDeleteer);
+    return std::shared_ptr<CMsg>(CreateMsg(), SharedPtrDeleter);
 }
 
 CMsg* CMsgPoolFactory::CreateMsg() {

@@ -67,6 +67,8 @@ namespace hudp {
         void SetSendTime(uint64_t time);
         uint64_t GetSendTime();
 
+        uint32_t GetEstimateSize();
+
     private:
         // only head and body will be serialized
         Head            _head;      // head msg. set by hudp

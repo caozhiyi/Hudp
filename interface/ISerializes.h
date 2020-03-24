@@ -14,6 +14,9 @@ namespace hudp {
         virtual bool Serializes(CMsg& msg, CBitStreamWriter& bit_stream) = 0;
 
         virtual bool Deseriali(CBitStreamReader& bit_stream, CMsg& msg) = 0;
+
+        // get estimate msg size
+        virtual uint32_t EstimateSize(CMsg& msg) = 0;
     };
 }
 

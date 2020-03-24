@@ -26,7 +26,7 @@ namespace hudp {
     }
 
     uint64_t GetCurTimeStamp() {
-        base::CTimeTool __time_tool;
+        static base::CTimeTool __time_tool;
         return (uint64_t)__time_tool.GetMsec();
     }
 

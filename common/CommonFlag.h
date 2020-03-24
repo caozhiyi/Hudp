@@ -50,7 +50,7 @@ namespace hudp {
     * SS_FIN_WAIT_2: when SS_FIN_WAIT_1 recv a HPF_FIN_ACK.
     * SS_TIMW_WAIT: when SS_FIN_WAIT_2 recv a HPF_FIN.
     * SS_CLOSING: send HPF_FIN to remote but recv a HPF_FIN not HPF_FIN_ACK.
-    * SS_CLOSE_WIAT: when SS_READY recv a HPF_FIN, send all msg in cache the send HPF_FIN to remote.
+    * SS_CLOSE_WIAT: when SS_READY recv a HPF_FIN, send all msg in cache then send HPF_FIN to remote.
     * SS_LAST_ACK: when SS_CLOSE_WIAT send HPF_FIN to remote until recv HPF_FIN_ACK.
     *
     * status change:

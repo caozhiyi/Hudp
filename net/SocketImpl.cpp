@@ -29,7 +29,6 @@ CSocketImpl::CSocketImpl(const HudpHandle& handle) : _handle(handle), _sk_status
 CSocketImpl::~CSocketImpl() {
     for (uint16_t i = 0; i < __wnd_size; i++) {
         if (_send_wnd[i]) {
-
             delete _send_wnd[i];
         }
         if (_recv_list[i]) {
@@ -143,6 +142,11 @@ void CSocketImpl::AckDone(std::shared_ptr<CMsg> msg) {
 }
 
 void CSocketImpl::TimerOut(std::shared_ptr<CMsg> msg) {
+    if (msg->GetFlag() & msg_pacing_send) {
+        // send to net
+        CHudpImpl::Instance().SendMessageToNet(msg);
+    }
+
     if (!(msg->GetFlag() & msg_is_only_ack)) {
         // msg resend, increase send delay
         msg->AddSendDelay();
@@ -199,8 +203,7 @@ void CSocketImpl::AddPendAck(std::shared_ptr<CMsg> msg) {
     if (header_flag & HTF_RELIABLE_ORDERLY) {
         AddToPendAck(WI_RELIABLE_ORDERLY, msg);
 
-    }
-    else if (header_flag & HTF_RELIABLE) {
+    } else if (header_flag & HTF_RELIABLE) {
         AddToPendAck(WI_RELIABLE, msg);
     }
 
@@ -233,8 +236,7 @@ void CSocketImpl::AddQuicklyAck(std::shared_ptr<CMsg> msg) {
     if (header_flag & HTF_RELIABLE) {
         ack_msg->SetAck(HPF_WITH_RELIABLE_ACK, ack_vec, time_vec, false);
 
-    }
-    else if (header_flag & HTF_RELIABLE_ORDERLY) {
+    } else if (header_flag & HTF_RELIABLE_ORDERLY) {
         ack_msg->SetAck(HPF_WITH_RELIABLE_ORDERLY_ACK, ack_vec, time_vec, false);
     }
     // send to net

@@ -20,11 +20,11 @@ namespace hudp {
 
         // called back by order list when msg recv to upper.
         virtual void ToRecv(std::shared_ptr<CMsg> msg) = 0;
-        // called back by send window t when send a bag to net.
+        // called back by send window when send a bag to net.
         virtual void ToSend(std::shared_ptr<CMsg> msg) = 0;
-        // called back by send window t when recv a ack.
+        // called back by send window when recv a ack.
         virtual void AckDone(std::shared_ptr<CMsg> msg) = 0;
-        // called back by timer t when timer out.
+        // called back by timer when timer out.
         virtual void TimerOut(std::shared_ptr<CMsg> msg) = 0;
         // send fin message to remote to close connection
         virtual void SendFinMessage() = 0;

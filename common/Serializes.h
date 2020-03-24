@@ -14,7 +14,8 @@ namespace hudp {
     public:
         bool Serializes(CMsg& msg, CBitStreamWriter& bit_stream);
         bool Deseriali(CBitStreamReader& bit_stream, CMsg& msg);
-        
+        // get estimate msg size
+        uint32_t EstimateSize(CMsg& msg);
     private:
         bool SerializesHead(Head& head, CBitStreamWriter& bit_stream);
         bool Serializes(Head& head, const char* body, uint16_t len, CBitStreamWriter& bit_stream);
