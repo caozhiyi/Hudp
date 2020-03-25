@@ -72,6 +72,9 @@ namespace hudp {
     // default pacing rate, if connect can't calc pacing will use it
     static const uint32_t __defaule_pacing_rate = 0xFFFF;
 
+    // use pacing and flow queue control send flow?
+    static const bool     __use_fq_and_pacing = true;
+
     // about log setting
     // log level.
     static const base::LogLevel __log_level = base::LOG_WARN_LEVEL;

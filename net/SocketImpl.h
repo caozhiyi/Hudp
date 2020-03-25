@@ -21,8 +21,10 @@ namespace hudp {
 
     class CRto;
     class CMsg;
+    class CPacing;
     class CPendAck;
     class CSendWnd;
+    class CFlowQueue;
     class COrderList;
     class CPriorityQueue;
     class CIncrementalId;
@@ -73,6 +75,8 @@ namespace hudp {
         void Wait2MslClose();
         // about close flag
         void CheckClose(uint32_t header_flag);
+        // send msg by FQ and pacing
+        void SendPacingMsg(std::shared_ptr<CMsg> msg, bool add_fq = true);
 
     private:
         // reliable correlation
@@ -88,6 +92,9 @@ namespace hudp {
         HudpHandle           _handle;
         // socket status
         socket_status        _sk_status;
+
+        std::shared_ptr<CPacing>    _pacing;
+        std::shared_ptr<CFlowQueue> _flow_queue;
     };
 }
 

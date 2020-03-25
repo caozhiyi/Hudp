@@ -193,6 +193,12 @@ void CSendWndImpl::Remove(std::shared_ptr<CMsg> msg) {
     if (!msg) {
         return;
     }
+    if (msg == _start) {
+        _start = _start->GetNext();
+    }
+    if (msg == _end) {
+        _end = _end->GetPrev();
+    }
     if (msg->GetPrev()) {
         msg->GetPrev()->SetNext(msg->GetNext());
     }

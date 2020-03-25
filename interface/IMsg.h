@@ -14,7 +14,8 @@ namespace hudp {
         msg_send          = 0x0010,   // the msg will be send
         msg_recv          = 0x0020,   // the msg will be recv
         msg_wait_2_msl    = 0x0040,   // wait 2 msl time then close
-        msg_pacing_send   = 0x0040    // msg in pacing timer
+        msg_pacing_send   = 0x0080,   // msg in pacing timer
+        msg_resend        = 0x0100    // msg is resend
     };
 
     class CSocket;

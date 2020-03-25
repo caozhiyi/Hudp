@@ -141,6 +141,12 @@
     <ClCompile Include="net\controller\OsCommon.h">
       <Filter>net\controller</Filter>
     </ClCompile>
+    <ClCompile Include="net\controller\Pacing.cpp">
+      <Filter>net\controller</Filter>
+    </ClCompile>
+    <ClCompile Include="net\controller\FlowQueue.cpp">
+      <Filter>net\controller</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="base\Any.h">
@@ -411,6 +417,12 @@
       <Filter>interface</Filter>
     </ClInclude>
     <ClInclude Include="net\controller\TcpCommon.h">
+      <Filter>net\controller</Filter>
+    </ClInclude>
+    <ClInclude Include="net\controller\Pacing.h">
+      <Filter>net\controller</Filter>
+    </ClInclude>
+    <ClInclude Include="net\controller\FlowQueue.h">
       <Filter>net\controller</Filter>
     </ClInclude>
   </ItemGroup>

@@ -13,6 +13,8 @@
 #include "OrderListImpl.h"
 #include "PriorityQueue.h"
 #include "MsgPoolFactory.h"
+#include "controller/Pacing.h"
+#include "controller/FlowQueue.h"
 
 using namespace hudp;
 
@@ -24,6 +26,8 @@ CSocketImpl::CSocketImpl(const HudpHandle& handle) : _handle(handle), _sk_status
     memset(_recv_list, 0, sizeof(_recv_list));
     memset(_pend_ack, 0, sizeof(_pend_ack));
     _is_in_timer.store(false);
+    _pacing.reset(new CPacing());
+    _flow_queue.reset(new CFlowQueue());
 }
 
 CSocketImpl::~CSocketImpl() {
@@ -58,7 +62,7 @@ void CSocketImpl::SendMessage(std::shared_ptr<CMsg> msg) {
     } else {
         // add ack info incidentally
         AddAckToMsg(msg);
-        CHudpImpl::Instance().SendMessageToNet(msg);
+        SendPacingMsg(msg);
     }
 }
 
@@ -132,24 +136,28 @@ void CSocketImpl::ToSend(std::shared_ptr<CMsg> msg) {
     
     // add ack info incidentally
     AddAckToMsg(msg);
-    CHudpImpl::Instance().SendMessageToNet(msg);
+    SendPacingMsg(msg);
 }
 
 void CSocketImpl::AckDone(std::shared_ptr<CMsg> msg) {
     // release msg here
     CTimer::Instance().RemoveTimer(msg);
+    if (__use_fq_and_pacing) {
+       _flow_queue->Remove(msg);
+    }
     msg.reset();
 }
 
 void CSocketImpl::TimerOut(std::shared_ptr<CMsg> msg) {
     if (msg->GetFlag() & msg_pacing_send) {
         // send to net
-        CHudpImpl::Instance().SendMessageToNet(msg);
+        SendPacingMsg(msg, false);
     }
 
     if (!(msg->GetFlag() & msg_is_only_ack)) {
         // msg resend, increase send delay
         msg->AddSendDelay();
+        msg->SetFlag(msg_resend);
 
     } else {
         _is_in_timer = false;
@@ -168,10 +176,8 @@ void CSocketImpl::TimerOut(std::shared_ptr<CMsg> msg) {
         return;
     }
 
-    // set send msg time
-    msg->SetSendTime(GetCurTimeStamp());
-    // send to net
-    CHudpImpl::Instance().SendMessageToNet(msg);
+    // resend to net
+    SendPacingMsg(msg);
 }
 
 void CSocketImpl::SendFinMessage() {
@@ -523,4 +529,20 @@ void CSocketImpl::CheckClose(uint32_t header_flag) {
         }
         return;
     }
+}
+
+void CSocketImpl::SendPacingMsg(std::shared_ptr<CMsg> msg, bool add_fq) {
+    if (__use_fq_and_pacing && !(msg->GetFlag() & msg_is_only_ack)) {
+        if (add_fq) {
+            _flow_queue->Add(msg);
+        }
+        auto send_msg = _flow_queue->Get();
+        if (send_msg) {
+            _pacing->SendMessage(send_msg);
+        }
+        return;
+    }
+    // set send msg time
+    msg->SetSendTime(GetCurTimeStamp());
+    CHudpImpl::Instance().SendMessageToNet(msg);    
 }

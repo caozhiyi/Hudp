@@ -1,5 +1,5 @@
-#ifndef HEADER_NET_PACINGQUEUE
-#define HEADER_NET_PACINGQUEUE
+#ifndef HEADER_NET_CONTROLLER_PACING
+#define HEADER_NET_CONTROLLER_PACING
 
 #include <memory>
 #include "Timer.h"
@@ -7,10 +7,10 @@
 namespace hudp {
 
 class CMsg;
-class CPacingQueue {
+class CPacing {
     public:
-    CPacingQueue();
-    ~CPacingQueue();
+    CPacing();
+    ~CPacing();
 
     void SetPacingRate(uint32_t pacing_rate);
     uint32_t GetPacingRate();
