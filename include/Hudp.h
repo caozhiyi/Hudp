@@ -14,8 +14,8 @@ namespace hudp {
     void Join();
 
     // send msg
-    bool SendTo(const HudpHandle& handle, uint16_t flag, const std::string& msg);
-    bool SendTo(const HudpHandle& handle, uint16_t flag, const char* msg, uint16_t len);
+    bool SendTo(const HudpHandle& handle, uint16_t flag, std::string& msg);
+    bool SendTo(const HudpHandle& handle, uint16_t flag, const char* msg, uint32_t len);
 
     // destory socket. release resources
     void Close(const HudpHandle& handle);

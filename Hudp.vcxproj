@@ -70,17 +70,17 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(SolutionDir)common;$(SolutionDir)base;$(SolutionDir)hudp;$(SolutionDir)include;$(SolutionDir)interface;$(SolutionDir)third\absl\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)common;$(SolutionDir)base;$(SolutionDir)hudp;$(SolutionDir)include;$(SolutionDir)interface;$(SolutionDir)third\absl\include;$(IncludePath);$(SolutionDir)third\snappy;$(SolutionDir)filter</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(SolutionDir)common;$(SolutionDir)base;$(SolutionDir)third\absl\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)common;$(SolutionDir)base;$(SolutionDir)third\absl\include;$(IncludePath);$(SolutionDir)third\snappy;$(SolutionDir)filter</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SolutionDir)common;$(SolutionDir)base;$(SolutionDir)hudp;$(SolutionDir)include;$(SolutionDir)interface;$(SolutionDir)third\absl\include;$(SolutionDir)third\gtest\include;$(SolutionDir)net;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)common;$(SolutionDir)base;$(SolutionDir)hudp;$(SolutionDir)include;$(SolutionDir)interface;$(SolutionDir)third\absl\include;$(SolutionDir)third\gtest\include;$(SolutionDir)net;$(IncludePath);$(SolutionDir)third\snappy;$(SolutionDir)filter</IncludePath>
     <LibraryPath>$(SolutionDir)third\gtest\win64\lib;$(SolutionDir)third\absl\win64-debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(SolutionDir)third\absl\include;$(SolutionDir)third\gtest\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)third\absl\include;$(SolutionDir)third\gtest\include;$(IncludePath);$(SolutionDir)third\snappy;$(SolutionDir)filter</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -150,6 +150,10 @@
     <ClCompile Include="common\SendWnd.cpp" />
     <ClCompile Include="common\Serializes.cpp" />
     <ClCompile Include="common\Timer.cpp" />
+    <ClCompile Include="filter\EndFilter.cpp" />
+    <ClCompile Include="filter\FlowSlicingFilter.cpp" />
+    <ClCompile Include="filter\HeadFilter.cpp" />
+    <ClCompile Include="filter\SnappyFilter.cpp" />
     <ClCompile Include="hudp\FilterProcessNoThread.cpp" />
     <ClCompile Include="hudp\Hudp.cpp" />
     <ClCompile Include="hudp\HudpImpl.cpp" />
@@ -204,6 +208,10 @@
     <ClInclude Include="common\Serializes.h" />
     <ClInclude Include="common\Timer.h" />
     <ClInclude Include="common\CommonFunc.h" />
+    <ClInclude Include="filter\EndFilter.h" />
+    <ClInclude Include="filter\FlowSlicingFilter.h" />
+    <ClInclude Include="filter\HeadFilter.h" />
+    <ClInclude Include="filter\SnappyFilter.h" />
     <ClInclude Include="hudp\FilterProcessNoThread.h" />
     <ClInclude Include="hudp\HudpConfig.h" />
     <ClInclude Include="hudp\HudpImpl.h" />
@@ -224,6 +232,10 @@
     <ClInclude Include="interface\ISerializes.h" />
     <ClInclude Include="interface\ISocket.h" />
     <ClInclude Include="interface\ISocketManager.h" />
+    <ClInclude Include="third\snappy\snappy-c.h" />
+    <ClInclude Include="third\snappy\snappy-sinksource.h" />
+    <ClInclude Include="third\snappy\snappy-stubs-public.h" />
+    <ClInclude Include="third\snappy\snappy.h" />
     <None Include="net\controller\bbr\bbr.h" />
     <ClInclude Include="net\controller\FlowQueue.h" />
     <ClInclude Include="net\controller\Pacing.h" />
@@ -231,19 +243,6 @@
     <ClInclude Include="net\SocketImpl.h" />
     <ClInclude Include="net\OsNet.h" />
     <ClInclude Include="net\SocketManager.h" />
-    <ClInclude Include="third\absl\include\absl\strings\ascii.h" />
-    <ClInclude Include="third\absl\include\absl\strings\charconv.h" />
-    <ClInclude Include="third\absl\include\absl\strings\escaping.h" />
-    <ClInclude Include="third\absl\include\absl\strings\match.h" />
-    <ClInclude Include="third\absl\include\absl\strings\numbers.h" />
-    <ClInclude Include="third\absl\include\absl\strings\string_view.h" />
-    <ClInclude Include="third\absl\include\absl\strings\strip.h" />
-    <ClInclude Include="third\absl\include\absl\strings\str_cat.h" />
-    <ClInclude Include="third\absl\include\absl\strings\str_format.h" />
-    <ClInclude Include="third\absl\include\absl\strings\str_join.h" />
-    <ClInclude Include="third\absl\include\absl\strings\str_replace.h" />
-    <ClInclude Include="third\absl\include\absl\strings\str_split.h" />
-    <ClInclude Include="third\absl\include\absl\strings\substitute.h" />
     <ClInclude Include="third\gtest\include\gmock\gmock-actions.h" />
     <ClInclude Include="third\gtest\include\gmock\gmock-cardinalities.h" />
     <ClInclude Include="third\gtest\include\gmock\gmock-function-mocker.h" />

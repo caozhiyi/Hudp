@@ -113,7 +113,7 @@ void CSocketImpl::RecvMessage(std::shared_ptr<CMsg> msg) {
 
     // normal udp. 
     if (!done && header_flag & HPF_WITH_BODY/*must have body*/) {
-        CHudpImpl::Instance().RecvMessageToUpper(_handle, msg);
+        CHudpImpl::Instance().RecvMsgToFilter(_handle, msg->GetHeaderFlag(), msg->GetBody());
     }
 }
 
@@ -121,7 +121,7 @@ void CSocketImpl::ToRecv(std::shared_ptr<CMsg> msg) {
     // send ack msg to remote
     base::LOG_DEBUG("[receiver] :receiver msg. id : %d", msg->GetId());
     if (!msg->GetBody().empty()) {
-        CHudpImpl::Instance().RecvMessageToUpper(_handle, msg);
+        CHudpImpl::Instance().RecvMsgToFilter(_handle, msg->GetHeaderFlag(), msg->GetBody());
     }
 }
 

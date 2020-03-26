@@ -34,20 +34,20 @@
     <Filter Include="third">
       <UniqueIdentifier>{1e85c499-0795-4e57-82e6-2e80abc9ce08}</UniqueIdentifier>
     </Filter>
-    <Filter Include="third\absl">
-      <UniqueIdentifier>{a182bfdb-faeb-42c1-81b8-ae65ed12bb5e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="third\gtest">
       <UniqueIdentifier>{af8d04c5-0bce-40f0-b26b-9d47be8d4edd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="third\absl\strings">
-      <UniqueIdentifier>{c56c5cec-f417-45f9-bf2d-7b8fd6c4c265}</UniqueIdentifier>
     </Filter>
     <Filter Include="net\controller">
       <UniqueIdentifier>{0cc69faa-cb60-4ae6-8664-f0df4fec7b71}</UniqueIdentifier>
     </Filter>
     <Filter Include="net\controller\bbr">
       <UniqueIdentifier>{6174acd2-56e6-44f6-a55c-fc8415498b97}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="filter">
+      <UniqueIdentifier>{9c2463c6-3c08-48b5-9caf-cec41171cf9a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="third\snappy">
+      <UniqueIdentifier>{bf60b72a-4f5d-4c40-951f-4169bb8e9e68}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -146,6 +146,18 @@
     </ClCompile>
     <ClCompile Include="net\controller\FlowQueue.cpp">
       <Filter>net\controller</Filter>
+    </ClCompile>
+    <ClCompile Include="filter\EndFilter.cpp">
+      <Filter>filter</Filter>
+    </ClCompile>
+    <ClCompile Include="filter\FlowSlicingFilter.cpp">
+      <Filter>filter</Filter>
+    </ClCompile>
+    <ClCompile Include="filter\HeadFilter.cpp">
+      <Filter>filter</Filter>
+    </ClCompile>
+    <ClCompile Include="filter\SnappyFilter.cpp">
+      <Filter>filter</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -293,45 +305,6 @@
     <ClInclude Include="interface\IPriorityQueue.h">
       <Filter>interface</Filter>
     </ClInclude>
-    <ClInclude Include="third\absl\include\absl\strings\ascii.h">
-      <Filter>third\absl\strings</Filter>
-    </ClInclude>
-    <ClInclude Include="third\absl\include\absl\strings\charconv.h">
-      <Filter>third\absl\strings</Filter>
-    </ClInclude>
-    <ClInclude Include="third\absl\include\absl\strings\escaping.h">
-      <Filter>third\absl\strings</Filter>
-    </ClInclude>
-    <ClInclude Include="third\absl\include\absl\strings\match.h">
-      <Filter>third\absl\strings</Filter>
-    </ClInclude>
-    <ClInclude Include="third\absl\include\absl\strings\numbers.h">
-      <Filter>third\absl\strings</Filter>
-    </ClInclude>
-    <ClInclude Include="third\absl\include\absl\strings\str_cat.h">
-      <Filter>third\absl\strings</Filter>
-    </ClInclude>
-    <ClInclude Include="third\absl\include\absl\strings\str_format.h">
-      <Filter>third\absl\strings</Filter>
-    </ClInclude>
-    <ClInclude Include="third\absl\include\absl\strings\str_join.h">
-      <Filter>third\absl\strings</Filter>
-    </ClInclude>
-    <ClInclude Include="third\absl\include\absl\strings\str_replace.h">
-      <Filter>third\absl\strings</Filter>
-    </ClInclude>
-    <ClInclude Include="third\absl\include\absl\strings\str_split.h">
-      <Filter>third\absl\strings</Filter>
-    </ClInclude>
-    <ClInclude Include="third\absl\include\absl\strings\string_view.h">
-      <Filter>third\absl\strings</Filter>
-    </ClInclude>
-    <ClInclude Include="third\absl\include\absl\strings\strip.h">
-      <Filter>third\absl\strings</Filter>
-    </ClInclude>
-    <ClInclude Include="third\absl\include\absl\strings\substitute.h">
-      <Filter>third\absl\strings</Filter>
-    </ClInclude>
     <ClInclude Include="third\gtest\include\gtest\gtest.h">
       <Filter>third\gtest</Filter>
     </ClInclude>
@@ -424,6 +397,30 @@
     </ClInclude>
     <ClInclude Include="net\controller\FlowQueue.h">
       <Filter>net\controller</Filter>
+    </ClInclude>
+    <ClInclude Include="filter\EndFilter.h">
+      <Filter>filter</Filter>
+    </ClInclude>
+    <ClInclude Include="filter\FlowSlicingFilter.h">
+      <Filter>filter</Filter>
+    </ClInclude>
+    <ClInclude Include="filter\HeadFilter.h">
+      <Filter>filter</Filter>
+    </ClInclude>
+    <ClInclude Include="filter\SnappyFilter.h">
+      <Filter>filter</Filter>
+    </ClInclude>
+    <ClInclude Include="third\snappy\snappy.h">
+      <Filter>third\snappy</Filter>
+    </ClInclude>
+    <ClInclude Include="third\snappy\snappy-c.h">
+      <Filter>third\snappy</Filter>
+    </ClInclude>
+    <ClInclude Include="third\snappy\snappy-sinksource.h">
+      <Filter>third\snappy</Filter>
+    </ClInclude>
+    <ClInclude Include="third\snappy\snappy-stubs-public.h">
+      <Filter>third\snappy</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

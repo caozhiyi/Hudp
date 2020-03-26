@@ -6,6 +6,8 @@
 #include "Timer.h"
 #include "ISocket.h"
 #include "HudpImpl.h"
+#include "EndFilter.h"
+#include "HeadFilter.h"
 #include "HudpConfig.h"
 #include "RecvThread.h"
 #include "PriorityQueue.h"
@@ -39,9 +41,9 @@ void CHudpImpl::Init() {
             base::CLog::Instance().SetLogLevel(__log_level);
             base::CLog::Instance().Start();
         }
-        _filter_process->SetSendFunc(std::bind(&CHudpImpl::AfterSendFilter, this, std::placeholders::_1));
-        _filter_process->SetRecvFunc(std::bind(&CHudpImpl::AfterRecvFilter, this, std::placeholders::_1));
     }
+    _filter_process->AddFilter(std::shared_ptr<CFilter>(new CHeadFilter()));
+    _filter_process->AddFilter(std::shared_ptr<CFilter>(new CEndFilter()));
 }
 
 bool CHudpImpl::Start(const std::string& ip, uint16_t port, const recv_back& func) {
@@ -75,11 +77,7 @@ void CHudpImpl::Join() {
 }
 
 bool CHudpImpl::SendTo(const HudpHandle& handle, uint16_t flag, const std::string& msg) {
-    return SendTo(handle, flag, msg.c_str(), (uint16_t)msg.length());
-}
-
-bool CHudpImpl::SendTo(const HudpHandle& handle, uint16_t flag, const char* msg, uint16_t len) {
-    if (len > __msg_body_size) {
+    if (msg.length() > __msg_body_size) {
         base::LOG_ERROR("msg size is bigger than msg body size.");
         return false;
     }
@@ -95,7 +93,7 @@ bool CHudpImpl::SendTo(const HudpHandle& handle, uint16_t flag, const char* msg,
     net_msg->SetFlag(msg_send);
     net_msg->SetHeaderFlag(flag);
     net_msg->SetHandle(handle);
-    net_msg->SetBody(std::string(msg, len));
+    net_msg->SetBody(msg);
     net_msg->SetSocket(sock);
 
     // push msg to process thread
@@ -124,8 +122,8 @@ void CHudpImpl::Close(const HudpHandle& handle) {
     _socket_mananger->CloseSocket(handle);
 }
 
-void CHudpImpl::RecvMessageToUpper(const HudpHandle& HudpHandle, std::shared_ptr<CMsg> msg) {
-    _filter_process->PushRecvMsg(msg);
+void CHudpImpl::RecvMessageToUpper(const HudpHandle& handle, std::string& body) {
+    _recv_call_back(handle, body.c_str(), (uint16_t)body.length());
 }
 
 void CHudpImpl::SendMessageToNet(std::shared_ptr<CMsg> msg) {
@@ -142,12 +140,10 @@ void CHudpImpl::ReleaseSocket(const HudpHandle& handle) {
     _socket_mananger->DeleteSocket(handle);
 }
 
-void CHudpImpl::AfterSendFilter(std::shared_ptr<CMsg> msg) {
-    auto sock = msg->GetSocket();
-    sock->SendMessage(msg);
+bool CHudpImpl::SendMsgToFilter(const HudpHandle& handle, uint16_t flag, std::string& msg) {
+    return _filter_process->PushSendMsg(handle, flag, msg);
 }
 
-void CHudpImpl::AfterRecvFilter(std::shared_ptr<CMsg> msg) {
-    std::string& body = msg->GetBody();
-    _recv_call_back(msg->GetHandle(), body.c_str(), (uint16_t)body.length());
+bool CHudpImpl::RecvMsgToFilter(const HudpHandle& handle, uint16_t flag, std::string& msg) {
+    return _filter_process->PushRecvMsg(handle, flag, msg);
 }

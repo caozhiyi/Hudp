@@ -9,23 +9,16 @@ namespace hudp {
 
     class CMsg;
     class CFilter;
-    class CFilterProcess
-    {
+    class CFilterProcess {
     public:
         CFilterProcess() {}
         virtual ~CFilterProcess() {}
         // add a filter
-        virtual bool AddFilter(const std::shared_ptr<CFilter>& filter) = 0;
-        // remove a filter
-        virtual bool RemoveFilter(const std::shared_ptr<CFilter>& filter) = 0;
+        virtual void AddFilter(std::shared_ptr<CFilter> filter) = 0;
         // push message to send process
-        virtual void PushSendMsg(std::shared_ptr<CMsg> msg) = 0;
-        // set send message call back
-        virtual void SetSendFunc(const std::function<void(std::shared_ptr<CMsg>)>& func) = 0;
+        virtual bool PushSendMsg(const HudpHandle& handle, uint16_t flag, std::string& body) = 0;
         // push message to recv process
-        virtual void PushRecvMsg(std::shared_ptr<CMsg> msg) = 0;
-        // set recv message call back
-        virtual void SetRecvFunc(const std::function<void(std::shared_ptr<CMsg>)>& func) = 0;
+        virtual bool PushRecvMsg(const HudpHandle& handle, uint16_t flag, std::string& body) = 0;
     };
 }
 #endif

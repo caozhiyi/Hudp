@@ -36,7 +36,7 @@ void CProcessThread::Run() {
                 }
 
             } else {
-                _filter_process->PushSendMsg(msg);
+                _filter_process->PushSendMsg(msg->GetHandle(), msg->GetHeaderFlag(), msg->GetBody());
             }
 
         } else {

@@ -10,7 +10,7 @@ namespace hudp {
     static const uint16_t __mtu = 400;
 
     // bitstream will return false when length of bag is bigger than __mtu.
-    static const bool     __must_less_mtu = false;
+    static const bool     __must_less_mtu = true;
 
     // max length of bitstream bag.
     static const uint16_t __max_length = (uint16_t)0xFFFF;

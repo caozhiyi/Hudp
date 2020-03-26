@@ -30,7 +30,6 @@ namespace hudp {
 
         // send msg
         bool SendTo(const HudpHandle& handle, uint16_t flag, const std::string& msg);
-        bool SendTo(const HudpHandle& Hhandle, uint16_t flag, const char* msg, uint16_t len);
 
         // recv msg
         void RecvMsgFromNet(const HudpHandle& handle, const std::string& msg);
@@ -40,17 +39,17 @@ namespace hudp {
 
     public:
         // notify supper recv a message.
-        void RecvMessageToUpper(const HudpHandle& handle, std::shared_ptr<CMsg> msg);
+        void RecvMessageToUpper(const HudpHandle& handle, std::string& );
         // send message to net
         void SendMessageToNet(std::shared_ptr<CMsg> msg);
         // get a default priority queue instance
         CPriorityQueue* CreatePriorityQueue();
         // release socket
         void ReleaseSocket(const HudpHandle& handle);
-
-    public:
-        void AfterSendFilter(std::shared_ptr<CMsg> msg);
-        void AfterRecvFilter(std::shared_ptr<CMsg> msg);
+        // send msg to send filter, final will send msg to socket
+        bool SendMsgToFilter(const HudpHandle& handle, uint16_t flag, std::string& msg);
+        // recv msg to recv filter, filal will recv msg to upper
+        bool RecvMsgToFilter(const HudpHandle& handle, uint16_t flag, std::string& msg);
 
     private:
         std::shared_ptr<CNetIO>                    _net_io;
