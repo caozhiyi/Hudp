@@ -9,6 +9,11 @@ namespace hudp {
 
     class CMsg;
     class CFilter;
+    // manage all filters.
+    // filters are organized as a two-way linked list,
+    // called from list header to list tail when sending message,
+    // called from list tail to list header when recving message,
+    // so pay attention to the location where the filter is added.
     class CFilterProcess {
     public:
         CFilterProcess() {}

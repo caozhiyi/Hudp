@@ -2,29 +2,28 @@
 #define HEADER_FILTER_FLOW_SLICING
 
 #include <map>
+#include <atomic>
 #include "IFilter.h"
 
 namespace hudp {
+    // slice head info
+    struct Head {
+        uint16_t _count;    // msg total number of slice
+        uint16_t _index;    // current slice index of total slice
+        uint16_t _flag;     // identify different msgs
+    } _head;
 
+    // slice bag, hold message value
     struct SliceBag {
-        struct Head {
-            uint16_t _count;    // msg total number of slice
-            uint16_t _index;    // current slice index of total slice
-            uint16_t _flag;     // identify different msgs
-        } _head;
-
+        Head        _head;
         std::string _body;
     };
 
+    // slice bag, reference message values only
     struct SliceBagRef {
-        struct Head {
-            uint16_t _count;    // msg total number of slice
-            uint16_t _index;    // current slice index of total slice
-            uint16_t _flag;     // identify different msgs
-        } _head;
-
-        char*    _data;
-        uint32_t _data_len;
+        Head        _head;
+        char*       _data;
+        uint32_t    _data_len;
     };
 
     // the flow slicing filter
@@ -42,7 +41,7 @@ namespace hudp {
         std::string SliceBagRefToString(SliceBagRef& bag);
         SliceBag StringToSliceBag(std::string& msg);
         
-        uint16_t _cur_flag;
+        std::atomic_uint16_t _cur_flag;
         std::map<uint16_t, std::vector<SliceBag>> _slice_map;
     };
 }

@@ -6,6 +6,7 @@
 
 namespace hudp {
     class CMsg;
+    // msg factory interface
     class CMsgFactory
     {
     public:

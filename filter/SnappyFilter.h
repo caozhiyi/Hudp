@@ -4,8 +4,8 @@
 #include "IFilter.h"
 
 namespace hudp {
-    // the firt filter
-    // send msg to upper
+    // snappy filter.
+    // compress messages through snappy.
     class CSnappyFilter : public CFilter {
     public:
         CSnappyFilter() {}

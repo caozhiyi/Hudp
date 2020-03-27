@@ -6,6 +6,7 @@
 
 namespace hudp {
     class CMsg;
+    // recv list interface
     class COrderList
     {
     public:

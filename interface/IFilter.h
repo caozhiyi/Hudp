@@ -6,7 +6,8 @@
 
 namespace hudp {
     // msg filter base.
-    // If you want to add a inclusion process, can inherit this interface.
+    // if you want to add a message filter, can inherit this interface.
+    // add filter in CHudpImpl::Init().
     class CFilter {
     public:
         CFilter() : _next_filter(nullptr), _prev_filter(nullptr) {}

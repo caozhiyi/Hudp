@@ -5,14 +5,14 @@
 using namespace hudp;
 
 static const uint16_t __slice_limit = __mtu;
-static const uint16_t __slice_header_size = sizeof(SliceBag::Head);
+static const uint16_t __slice_header_size = sizeof(Head);
 
 static bool SliceBagComparer(const SliceBag& bag1, const SliceBag& bag2) {
     return bag1._head._index < bag2._head._index;
 }
 
 bool CFlowSlicingFilter::FilterProcess(const HudpHandle& handle, uint16_t flag, std::string& body) {
-    _cur_flag++;
+    _cur_flag.fetch_add(1);
 
     uint32_t total_size = (uint32_t)body.length();
     uint32_t slice_num = total_size / __slice_limit;
@@ -24,7 +24,7 @@ bool CFlowSlicingFilter::FilterProcess(const HudpHandle& handle, uint16_t flag, 
     uint32_t cur_index = 0;
     SliceBagRef bag;
     bag._head._count = slice_num;
-    bag._head._flag  = _cur_flag;
+    bag._head._flag  = _cur_flag.load();
     for (uint32_t i = 0; i < slice_num; i++) {
         bag._head._index = i;
         if (total_size - cur_index < __slice_limit) {
