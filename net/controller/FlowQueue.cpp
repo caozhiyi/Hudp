@@ -72,7 +72,7 @@ void CFlowQueue::AddToNormalTail(std::shared_ptr<CMsg> msg) {
         _normal_end->SetNext(msg);
     }
     _normal_end = msg;
-    if (_normal_head) {
+    if (!_normal_head) {
         _normal_head = _normal_end;
     }
 }
@@ -96,7 +96,7 @@ void CFlowQueue::AddToResendTail(std::shared_ptr<CMsg> msg) {
         _resend_end->SetNext(msg);
     }
     _resend_end = msg;
-    if (_resend_head) {
+    if (!_resend_head) {
         _resend_head = _resend_end;
     }
 }
