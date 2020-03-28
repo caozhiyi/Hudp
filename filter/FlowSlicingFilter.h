@@ -7,21 +7,21 @@
 
 namespace hudp {
     // slice head info
-    struct Head {
+    struct SliceHead {
         uint16_t _count;    // msg total number of slice
         uint16_t _index;    // current slice index of total slice
         uint16_t _flag;     // identify different msgs
-    } _head;
+    };
 
     // slice bag, hold message value
     struct SliceBag {
-        Head        _head;
+        SliceHead   _head;
         std::string _body;
     };
 
     // slice bag, reference message values only
     struct SliceBagRef {
-        Head        _head;
+        SliceHead   _head;
         char*       _data;
         uint32_t    _data_len;
     };

@@ -30,13 +30,12 @@ void CPendAck::AddAck(uint16_t ack_id, uint64_t send_time) {
 }
 
 bool CPendAck::GetAllAck(std::vector<uint16_t>& ack_vec, bool& continuity) {
-    std::unique_lock<std::mutex> lock(_mutex);
     std::vector<uint64_t> time_vec;
     return GetAllAck(ack_vec, time_vec, continuity);
 }
 
 bool CPendAck::GetAllAck(std::vector<uint16_t>& ack_vec, std::vector<uint64_t>& time_vec, bool& continuity) {
-        std::unique_lock<std::mutex> lock(_mutex);
+    std::unique_lock<std::mutex> lock(_mutex);
     if (_ack_set.empty()) {
         return false;
     }

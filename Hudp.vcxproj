@@ -70,14 +70,14 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(SolutionDir)common;$(SolutionDir)base;$(SolutionDir)hudp;$(SolutionDir)include;$(SolutionDir)interface;$(SolutionDir)third\absl\include;$(IncludePath);$(SolutionDir)third\snappy;$(SolutionDir)filter</IncludePath>
+    <IncludePath>$(SolutionDir)common;$(SolutionDir)base;$(SolutionDir)hudp;$(SolutionDir)include;$(SolutionDir)interface;$(SolutionDir)third\absl\include;$(IncludePath);$(SolutionDir)third\snappy;$(SolutionDir)filter;$(SolutionDir)filter</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>$(SolutionDir)common;$(SolutionDir)base;$(SolutionDir)third\absl\include;$(IncludePath);$(SolutionDir)third\snappy;$(SolutionDir)filter</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SolutionDir)common;$(SolutionDir)base;$(SolutionDir)hudp;$(SolutionDir)include;$(SolutionDir)interface;$(SolutionDir)third\absl\include;$(SolutionDir)third\gtest\include;$(SolutionDir)net;$(IncludePath);$(SolutionDir)third\snappy;$(SolutionDir)filter</IncludePath>
-    <LibraryPath>$(SolutionDir)third\gtest\win64\lib;$(SolutionDir)third\absl\win64-debug;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)common;$(SolutionDir)base;$(SolutionDir)hudp;$(SolutionDir)include;$(SolutionDir)interface;$(SolutionDir)third\absl\include;$(SolutionDir)third\gtest\include;$(SolutionDir)net;$(IncludePath);$(SolutionDir)third\snappy;$(SolutionDir)filter;$(SolutionDir)filter</IncludePath>
+    <LibraryPath>$(SolutionDir)third\gtest\win64\lib;$(SolutionDir)third\absl\win64-debug;$(SolutionDir)third\snappy\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>$(SolutionDir)third\absl\include;$(SolutionDir)third\gtest\include;$(IncludePath);$(SolutionDir)third\snappy;$(SolutionDir)filter</IncludePath>
@@ -100,6 +100,9 @@
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
+    <Link>
+      <AdditionalDependencies>snappy.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -160,22 +163,21 @@
     <ClCompile Include="hudp\MsgPoolFactory.cpp" />
     <ClCompile Include="hudp\RecvThread.cpp" />
     <ClCompile Include="hudp\ProcessThread.cpp" />
-    <None Include="net\controller\bbr\bbr.cpp" />
+    <ClCompile Include="net\controller\bbr\bbr.cpp" />
     <ClCompile Include="net\controller\FlowQueue.cpp" />
     <ClCompile Include="net\controller\OsCommon.h" />
     <ClCompile Include="net\controller\Pacing.cpp" />
     <ClCompile Include="net\SocketImpl.cpp" />
     <ClCompile Include="net\SocketManager.cpp" />
     <ClCompile Include="net\win\OsNet.cpp" />
-    <None Include="utest\common\Ut_BitStream.cpp" />
-    <None Include="utest\common\Ut_IncrementalId.cpp" />
-    <None Include="utest\common\Ut_OrderList.cpp" />
-    <None Include="utest\common\Ut_PendAck.cpp" />
-    <None Include="utest\common\Ut_SendWnd.cpp" />
-    <None Include="utest\common\Ut_Serializes.cpp" />
-    <None Include="utest\common\Ut_Timer.cpp" />
-    <None Include="utest\net\Ut_OsNet.cpp" />
     <ClCompile Include="utest\Test.cpp" />
+    <ClCompile Include="utest\Ut_BitStream.cpp" />
+    <ClCompile Include="utest\Ut_FlowSlocingFilter.cpp" />
+    <ClCompile Include="utest\Ut_IncrementalId.cpp" />
+    <ClCompile Include="utest\Ut_OrderList.cpp" />
+    <ClCompile Include="utest\Ut_PendAck.cpp" />
+    <ClCompile Include="utest\Ut_Serializes.cpp" />
+    <ClCompile Include="utest\Ut_SnappyFilter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="base\Any.h" />
@@ -236,7 +238,7 @@
     <ClInclude Include="third\snappy\snappy-sinksource.h" />
     <ClInclude Include="third\snappy\snappy-stubs-public.h" />
     <ClInclude Include="third\snappy\snappy.h" />
-    <None Include="net\controller\bbr\bbr.h" />
+    <ClInclude Include="net\controller\bbr\bbr.h" />
     <ClInclude Include="net\controller\FlowQueue.h" />
     <ClInclude Include="net\controller\Pacing.h" />
     <ClInclude Include="net\controller\TcpCommon.h" />

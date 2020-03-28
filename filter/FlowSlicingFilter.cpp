@@ -5,7 +5,7 @@
 using namespace hudp;
 
 static const uint16_t __slice_limit = __mtu;
-static const uint16_t __slice_header_size = sizeof(Head);
+static const uint16_t __slice_header_size = sizeof(SliceHead);
 
 static bool SliceBagComparer(const SliceBag& bag1, const SliceBag& bag2) {
     return bag1._head._index < bag2._head._index;
@@ -53,12 +53,12 @@ bool CFlowSlicingFilter::RelieveFilterProcess(const HudpHandle& handle, uint16_t
     if (bag._head._count == (uint16_t)(_slice_map[bag._head._flag].size())) {
         std::string recv_msg;
         std::sort(_slice_map[bag._head._flag].begin(), _slice_map[bag._head._flag].end(), SliceBagComparer);
-        for (auto iter = _slice_map[bag._head._flag].begin(); iter != _slice_map[bag._head._flag].end(); iter) {
+        for (auto iter = _slice_map[bag._head._flag].begin(); iter != _slice_map[bag._head._flag].end(); iter++) {
             recv_msg.append(iter->_body);
         }
         _slice_map.erase(bag._head._flag);
         // send to prev filter
-        return _prev_filter->RelieveFilterProcess(handle, flag, body);
+        return _prev_filter->RelieveFilterProcess(handle, flag, recv_msg);
     }
     return true;
 }
@@ -79,7 +79,6 @@ std::string CFlowSlicingFilter::SliceBagRefToString(SliceBagRef& bag) {
     memcpy(header_buf, &bag._head, __slice_header_size);
     
     std::string ret;
-    ret.resize(__slice_header_size + bag._data_len);
     ret.append(header_buf, __slice_header_size);
     ret.append(bag._data, bag._data_len);
     return ret;

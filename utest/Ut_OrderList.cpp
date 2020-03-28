@@ -14,7 +14,7 @@ class CTestSocket : public CSocketImpl {
 public:
     CTestSocket() : CSocketImpl("") {}
     ~CTestSocket() {}
-    void ToRecv(CMsg* msg) {
+    void ToRecv(std::shared_ptr<CMsg> msg) {
         global_id = msg->GetId();
     }
 };
@@ -41,42 +41,42 @@ TEST(OrderList, case1) {
     msg5->SetSocket(sock);
 
     CReliableOrderlyList reliable_order_list(1);
-    reliable_order_list.Insert(msg1.get());
+    reliable_order_list.Insert(msg1);
     EXPECT_EQ(1, global_id);
-    reliable_order_list.Insert(msg2.get());
+    reliable_order_list.Insert(msg2);
     EXPECT_EQ(2, global_id);
-    reliable_order_list.Insert(msg5.get());
+    reliable_order_list.Insert(msg5);
     EXPECT_EQ(2, global_id);
-    reliable_order_list.Insert(msg4.get());
+    reliable_order_list.Insert(msg4);
     EXPECT_EQ(2, global_id);
-    reliable_order_list.Insert(msg3.get());
+    reliable_order_list.Insert(msg3);
     EXPECT_EQ(5, global_id);
 }
 
 TEST(OrderList, case2) {
     CReliableList reliable_list(1);
-    reliable_list.Insert(msg1.get());
+    reliable_list.Insert(msg1);
     EXPECT_EQ(1, global_id);
-    reliable_list.Insert(msg2.get());
+    reliable_list.Insert(msg2);
     EXPECT_EQ(2, global_id);
-    reliable_list.Insert(msg5.get());
+    reliable_list.Insert(msg5);
     EXPECT_EQ(5, global_id);
-    reliable_list.Insert(msg4.get());
+    reliable_list.Insert(msg4);
     EXPECT_EQ(4, global_id);
-    reliable_list.Insert(msg3.get());
+    reliable_list.Insert(msg3);
     EXPECT_EQ(3, global_id);
 }
 
 TEST(OrderList, case3) {
     COrderlyList orderly_list(1);
-    orderly_list.Insert(msg1.get());
+    orderly_list.Insert(msg1);
     EXPECT_EQ(1, global_id);
-    orderly_list.Insert(msg2.get());
+    orderly_list.Insert(msg2);
     EXPECT_EQ(2, global_id);
-    orderly_list.Insert(msg5.get());
+    orderly_list.Insert(msg5);
     EXPECT_EQ(5, global_id);
-    orderly_list.Insert(msg4.get());
+    orderly_list.Insert(msg4);
     EXPECT_EQ(5, global_id);
-    orderly_list.Insert(msg3.get());
+    orderly_list.Insert(msg3);
     EXPECT_EQ(5, global_id);
 }

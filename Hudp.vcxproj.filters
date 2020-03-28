@@ -4,9 +4,6 @@
     <Filter Include="utest">
       <UniqueIdentifier>{96696384-0823-4574-aa91-a07261a27b95}</UniqueIdentifier>
     </Filter>
-    <Filter Include="utest\common">
-      <UniqueIdentifier>{1a83cc35-6282-4247-82d6-44f972eac0ce}</UniqueIdentifier>
-    </Filter>
     <Filter Include="base">
       <UniqueIdentifier>{9750ecd1-d470-4641-840c-f2000ce3ce84}</UniqueIdentifier>
     </Filter>
@@ -21,9 +18,6 @@
     </Filter>
     <Filter Include="net\win">
       <UniqueIdentifier>{04c326ee-1170-43be-88a3-160c4b179d88}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="utest\net">
-      <UniqueIdentifier>{0cfe3810-f125-47d7-94cf-b7f8dd760336}</UniqueIdentifier>
     </Filter>
     <Filter Include="include">
       <UniqueIdentifier>{b1ad3157-80a9-49e7-924b-58235a58a3fe}</UniqueIdentifier>
@@ -158,6 +152,28 @@
     </ClCompile>
     <ClCompile Include="filter\SnappyFilter.cpp">
       <Filter>filter</Filter>
+    </ClCompile>
+    <ClCompile Include="net\controller\bbr\bbr.cpp" />
+    <ClCompile Include="utest\Ut_BitStream.cpp">
+      <Filter>utest</Filter>
+    </ClCompile>
+    <ClCompile Include="utest\Ut_FlowSlocingFilter.cpp">
+      <Filter>utest</Filter>
+    </ClCompile>
+    <ClCompile Include="utest\Ut_IncrementalId.cpp">
+      <Filter>utest</Filter>
+    </ClCompile>
+    <ClCompile Include="utest\Ut_OrderList.cpp">
+      <Filter>utest</Filter>
+    </ClCompile>
+    <ClCompile Include="utest\Ut_PendAck.cpp">
+      <Filter>utest</Filter>
+    </ClCompile>
+    <ClCompile Include="utest\Ut_Serializes.cpp">
+      <Filter>utest</Filter>
+    </ClCompile>
+    <ClCompile Include="utest\Ut_SnappyFilter.cpp">
+      <Filter>utest</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -422,40 +438,11 @@
     <ClInclude Include="third\snappy\snappy-stubs-public.h">
       <Filter>third\snappy</Filter>
     </ClInclude>
+    <ClInclude Include="net\controller\bbr\bbr.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="third\gtest\include\gmock\gmock-generated-function-mockers.h.pump">
       <Filter>third\gtest</Filter>
-    </None>
-    <None Include="utest\common\Ut_BitStream.cpp">
-      <Filter>utest\common</Filter>
-    </None>
-    <None Include="utest\common\Ut_IncrementalId.cpp">
-      <Filter>utest\common</Filter>
-    </None>
-    <None Include="utest\common\Ut_OrderList.cpp">
-      <Filter>utest\common</Filter>
-    </None>
-    <None Include="utest\common\Ut_PendAck.cpp">
-      <Filter>utest\common</Filter>
-    </None>
-    <None Include="utest\common\Ut_SendWnd.cpp">
-      <Filter>utest\common</Filter>
-    </None>
-    <None Include="utest\common\Ut_Serializes.cpp">
-      <Filter>utest\common</Filter>
-    </None>
-    <None Include="utest\common\Ut_Timer.cpp">
-      <Filter>utest\common</Filter>
-    </None>
-    <None Include="utest\net\Ut_OsNet.cpp">
-      <Filter>utest\net</Filter>
-    </None>
-    <None Include="net\controller\bbr\bbr.h">
-      <Filter>net\controller\bbr</Filter>
-    </None>
-    <None Include="net\controller\bbr\bbr.cpp">
-      <Filter>net\controller\bbr</Filter>
     </None>
   </ItemGroup>
 </Project>

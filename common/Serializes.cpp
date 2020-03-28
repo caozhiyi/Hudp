@@ -71,6 +71,9 @@ uint32_t CSerializesNormal::EstimateSize(CMsg& msg) {
     }
     
     if (header_flag & HPF_WITH_BODY) {
+        // body length
+        ret += sizeof(uint16_t);
+        // body value length
         ret += head.GetBodyLength();
     }
     return ret;

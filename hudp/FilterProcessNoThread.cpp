@@ -27,7 +27,7 @@ void CFilterProcessNoThread::AddFilter(std::shared_ptr<CFilter> filter) {
         _filter_end->SetNextFilter(filter);
     }
     _filter_end = filter;
-    if (_filter_head) {
+    if (!_filter_head) {
         _filter_head = filter;
     }
 }
