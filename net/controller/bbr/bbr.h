@@ -156,17 +156,15 @@ namespace hudp {
         uint32_t min_rtt_us;	            /* min RTT in min_rtt_win_sec window, rtt采集时间内最小rtt */
         uint64_t min_rtt_stamp;	            /* timestamp of min_rtt_us, min rtt 采集时间戳*/
         uint32_t probe_rtt_done_stamp;      /* end time for BBR_PROBE_RTT mode ， BBR_PROBE_RTT结束时间戳*/
-        struct minmax bw;	                /* Max recent delivery rate in pkts/uS << 24 */
+        struct minmax bw;	                /* Max recent delivery rate in pkts/uS << 24 本次bw */
         uint32_t rtt_cnt;	                /* count of packet-timed rounds elapsed */
         uint32_t next_rtt_delivered;        /* scb->tx.delivered at end of round, 在回合结束时发送的数据量 */
         uint32_t cycle_mstamp;	            /* time of this cycle phase start 本轮周期开始时间*/
         uint32_t mode : 3,		            /* current bbr_mode in state machine */
-                 prev_ca_state : 3,         /* CA state on previous ACK */
                  packet_conservation : 1,   /* use packet conservation? */
                  round_start : 1,	        /* start of packet-timed tx->ack round? */
                  idle_restart : 1,	        /* restarting after idle? 空闲后重新启动 */
                  probe_rtt_round_done : 1,  /* a BBR_PROBE_RTT round at 4 pkts? BBR_PROBE_RTT轮内4个pkts? */
-                 unused : 13,
                  lt_is_sampling : 1,        /* taking long-term ("LT") samples now? */
                  lt_rtt_cnt : 7,	        /* round trips in long-term interval */
                  lt_use_bw : 1;	            /* use lt_bw as our bw estimate? 使用lt_bw作为我们的bw估计值*/
@@ -179,12 +177,13 @@ namespace hudp {
                  full_bw_reached : 1,       /* reached full bw in Startup? 起始阶段达到了最大带宽？ */
                  full_bw_cnt : 2,	        /* number of rounds without large bw gains */
                  cycle_idx : 3,	            /* current index in pacing_gain cycle array， pacing_gain周期内的当前索引  */
-                 has_seen_rtt : 1,          /* have we seen an RTT sample yet? */
-                 unused_b : 5;
+                 has_seen_rtt : 1;          /* have we seen an RTT sample yet? */
         uint32_t prior_cwnd;	            /* prior cwnd upon entering loss recovery  在进入损失恢复之前，最大发送窗体*/
         uint32_t full_bw;	                /* recent bw, to estimate if pipe is full， 最近的bw，用于估计管道是否已满 */
 
-    public:
+    private:
+        CBbr() { bbr_init(); }
+        ~CBbr() {}
         /* Do we estimate that STARTUP filled the pipe? */
         bool bbr_full_bw_reached() { return full_bw_reached; }
         
@@ -341,18 +340,27 @@ namespace hudp {
         */
         // 检测是否该进入rtt探测状态以及相应参数更新
         void bbr_update_min_rtt(uint64_t delivered_mstamp, uint32_t inflight, uint64_t delivered, uint32_t rtt_us, bool is_ack_delayed, uint32_t& send_wnd);
-
+        void bbr_init();
         void bbr_update_model(uint32_t pacing_rate, uint32_t inflight, uint32_t rrt,
-                              uint64_t prior_delivered, uint64_t delivered_mstamp, 
-                              uint32_t delivered, uint32_t lost, bool app_limit, bool is_delay_ack, 
-                              uint32_t& snd_ssthresh, uint32_t& send_wnd);
+            uint64_t prior_delivered, uint64_t delivered_mstamp,
+            uint32_t delivered, uint32_t lost, bool app_limit, bool is_delay_ack,
+            uint32_t& snd_ssthresh, uint32_t& send_wnd);
 
+    public:
+        // BBR driven by incoming parameters, get snd_ssthresh, send_wnd and pacint_rate.
+        // params:
+        // inflight : in flight before this ACK
+        // rtt      : nearly observed rtt time
+        // acked    : number of packets newly (S)ACKed upon ACK
+        // prior_delivered : delivered packets to receiver in recovery
+        // delivered: total data packets delivered incl // 到目前为止已经确认的数据包数量
+        // delivered_mstamp: time we reached "delivered"// 最后确认数据包时间戳
+        // 
         void bbr_main(uint32_t inflight, uint32_t rrt, uint32_t acked,
                       uint64_t prior_delivered, uint64_t delivered_mstamp,
                       uint32_t delivered, uint32_t lost, bool app_limit, bool is_delay_ack,
                       uint32_t& snd_ssthresh, uint32_t& send_wnd, uint32_t& pacing_rate);
 
-        void bbr_init();
     };
 }
 

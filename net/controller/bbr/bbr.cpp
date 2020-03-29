@@ -81,7 +81,7 @@ uint32_t CBbr::bbr_min_tso_segs(uint32_t pacing_rate) {
 }
 
 void CBbr::bbr_save_cwnd(uint32_t send_wnd) {
-    if (prev_ca_state < TCP_CA_Recovery && mode != BBR_PROBE_RTT)
+    if (mode != BBR_PROBE_RTT)
         prior_cwnd = send_wnd;  /* this cwnd is good enough */
     else  /* loss recovery or BBR_PROBE_RTT have temporarily cut cwnd */
         prior_cwnd = prior_cwnd > send_wnd ? prior_cwnd : send_wnd;
@@ -343,7 +343,6 @@ void CBbr::bbr_update_bw(uint32_t rrt, uint64_t prior_delivered, uint64_t delive
         next_rtt_delivered = delivered;
         rtt_cnt++;
         round_start = 1;
-        packet_conservation = 0;
     }
 
     bbr_lt_bw_sampling(delivered_mstamp, delivered, lost, app_limit);
@@ -500,6 +499,30 @@ void CBbr::bbr_update_min_rtt(uint64_t delivered_mstamp, uint32_t inflight, uint
         idle_restart = 0;
 }
 
+void CBbr::bbr_init() {
+    prior_cwnd = 0;
+    rtt_cnt = 0;
+    next_rtt_delivered = 0;
+
+    probe_rtt_done_stamp = 0;
+    probe_rtt_round_done = 0;
+    min_rtt_us = 0;
+    min_rtt_stamp = GetCurTimeStamp();
+
+    minmax_reset(&bw, rtt_cnt, 0);  /* init max bw to 0 */
+
+    has_seen_rtt = 0;
+
+    round_start = 0;
+    idle_restart = 1;
+    full_bw_reached = 0;
+    full_bw = 0;
+    full_bw_cnt = 0;
+    cycle_mstamp = 0;
+    cycle_idx = 0;
+    bbr_reset_startup_mode();
+}
+
 void CBbr::bbr_update_model(uint32_t pacing_rate, uint32_t inflight, uint32_t rrt,
     uint64_t prior_delivered, uint64_t delivered_mstamp,
     uint32_t delivered, uint32_t lost, bool app_limit, bool is_delay_ack,
@@ -531,30 +554,4 @@ void CBbr::bbr_main(uint32_t inflight, uint32_t rrt, uint32_t acked,
     // 设置发送速度和窗体大小
     bbr_set_pacing_rate(rrt, send_wnd, bw, pacing_gain, pacing_rate);
     bbr_set_cwnd(pacing_rate, acked, bw, pacing_gain, send_wnd);
-}
-
-void CBbr::bbr_init() {
-    prior_cwnd = 0;
-    rtt_cnt = 0;
-    next_rtt_delivered = 0;
-    prev_ca_state = TCP_CA_Open;
-    packet_conservation = 0;
-
-    probe_rtt_done_stamp = 0;
-    probe_rtt_round_done = 0;
-    min_rtt_us = 0;
-    min_rtt_stamp = GetCurTimeStamp();
-
-    minmax_reset(&bw, rtt_cnt, 0);  /* init max bw to 0 */
-
-    has_seen_rtt = 0;
-
-    round_start = 0;
-    idle_restart = 0;
-    full_bw_reached = 0;
-    full_bw = 0;
-    full_bw_cnt = 0;
-    cycle_mstamp = 0;
-    cycle_idx = 0;
-    bbr_reset_startup_mode();
 }
