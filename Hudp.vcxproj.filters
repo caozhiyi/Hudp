@@ -153,7 +153,6 @@
     <ClCompile Include="filter\SnappyFilter.cpp">
       <Filter>filter</Filter>
     </ClCompile>
-    <ClCompile Include="net\controller\bbr\bbr.cpp" />
     <ClCompile Include="utest\Ut_BitStream.cpp">
       <Filter>utest</Filter>
     </ClCompile>
@@ -174,6 +173,9 @@
     </ClCompile>
     <ClCompile Include="utest\Ut_SnappyFilter.cpp">
       <Filter>utest</Filter>
+    </ClCompile>
+    <ClCompile Include="net\controller\bbr\bbr.cpp">
+      <Filter>net\controller\bbr</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -438,7 +440,9 @@
     <ClInclude Include="third\snappy\snappy-stubs-public.h">
       <Filter>third\snappy</Filter>
     </ClInclude>
-    <ClInclude Include="net\controller\bbr\bbr.h" />
+    <ClInclude Include="net\controller\bbr\bbr.h">
+      <Filter>net\controller\bbr</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="third\gtest\include\gmock\gmock-generated-function-mockers.h.pump">

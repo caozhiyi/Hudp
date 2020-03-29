@@ -326,7 +326,7 @@ void CBbr::bbr_lt_bw_sampling(uint64_t delivered_mstamp, uint32_t delivered, uin
     bbr_lt_bw_interval_done(bw, delivered_mstamp, delivered, lost);
 }
 
-void CBbr::bbr_update_bw(uint32_t rrt, uint64_t prior_delivered, uint64_t delivered_mstamp, uint32_t delivered, uint32_t lost, bool app_limit) {
+void CBbr::bbr_update_bw(uint32_t rrt, uint64_t delivered_mstamp, uint32_t delivered, uint32_t lost, bool app_limit) {
     uint32_t cur_bw;
     round_start = 0;
 
@@ -339,7 +339,7 @@ void CBbr::bbr_update_bw(uint32_t rrt, uint64_t prior_delivered, uint64_t delive
     /* rs->prior_delivered为周期开始处的tp->delivered, bbr->next_rtt_delivered为下一个周期的tp->delivered？？
     如果rs->priorr_delivered>=bbr->next_rtt_deliverd，即到了下一个周期，
         　　更新新的下一个周期的开始处的传输数据next_rtt_delivered和轮数rtt_cnt*/
-    if (prior_delivered > next_rtt_delivered) {
+    if (rtt_cnt > 1000/*TODO*/) {
         next_rtt_delivered = delivered;
         rtt_cnt++;
         round_start = 1;
@@ -435,7 +435,7 @@ void CBbr::bbr_check_probe_rtt_done(uint64_t delivered_mstamp, uint32_t& send_wn
     bbr_reset_mode(delivered_mstamp);
 }
 
-void CBbr::bbr_update_min_rtt(uint64_t delivered_mstamp, uint32_t inflight, uint64_t delivered, uint32_t rtt_us, bool is_ack_delayed, uint32_t& send_wnd) {
+void CBbr::bbr_update_min_rtt(uint64_t delivered_mstamp, uint32_t inflight, uint64_t delivered, uint32_t rtt_us, uint32_t& send_wnd) {
     bool filter_expired;
 
     /* Track min RTT seen in the min_rtt_win_sec filter window: */
@@ -446,7 +446,7 @@ void CBbr::bbr_update_min_rtt(uint64_t delivered_mstamp, uint32_t inflight, uint
     */
     filter_expired = GetCurTimeStamp() < min_rtt_stamp + bbr_min_rtt_win_sec * HZ;
     // 本次采集到rtt时间， 且比当前的最小rtt小，或者前最小rtt采集时间戳已经过期，本次ack不是延迟确认的ack
-    if (rtt_us >= 0 && (rtt_us <= min_rtt_us || (filter_expired && is_ack_delayed))) {
+    if (rtt_us >= 0 && (rtt_us <= min_rtt_us || (filter_expired))) {
         min_rtt_us = rtt_us;
         min_rtt_stamp = GetCurTimeStamp();
     }
@@ -524,11 +524,11 @@ void CBbr::bbr_init() {
 }
 
 void CBbr::bbr_update_model(uint32_t pacing_rate, uint32_t inflight, uint32_t rrt,
-    uint64_t prior_delivered, uint64_t delivered_mstamp,
-    uint32_t delivered, uint32_t lost, bool app_limit, bool is_delay_ack,
+    uint64_t delivered_mstamp,  uint32_t delivered, 
+    uint32_t lost, bool app_limit,
     uint32_t& snd_ssthresh, uint32_t& send_wnd) {
     //更新当前最大bw
-    bbr_update_bw(rrt, prior_delivered, delivered_mstamp, delivered, lost, app_limit);
+    bbr_update_bw(rrt, delivered_mstamp, delivered, lost, app_limit);
     // 更新增益因子
     bbr_update_cycle_phase(pacing_rate, delivered_mstamp, inflight, lost > 0);
     // 检测pipe已经满
@@ -536,18 +536,16 @@ void CBbr::bbr_update_model(uint32_t pacing_rate, uint32_t inflight, uint32_t rr
     // 如果队列已经满， 检测是否应该减小发送速度
     bbr_check_drain(delivered_mstamp, pacing_rate, inflight, snd_ssthresh);
     // 更新最小rtt时间
-    bbr_update_min_rtt(delivered_mstamp, inflight, delivered, rrt, is_delay_ack, send_wnd);
+    bbr_update_min_rtt(delivered_mstamp, inflight, delivered, rrt, send_wnd);
 }
 
 void CBbr::bbr_main(uint32_t inflight, uint32_t rrt, uint32_t acked,
-    uint64_t prior_delivered, uint64_t delivered_mstamp,
-    uint32_t delivered, uint32_t lost, bool app_limit, bool is_delay_ack,
+    uint64_t delivered_mstamp, uint32_t delivered, uint32_t lost, bool app_limit, 
     uint32_t& snd_ssthresh, uint32_t& send_wnd, uint32_t& pacing_rate) {
 
     uint32_t bw;
     bbr_update_model(pacing_rate, inflight, rrt,
-        prior_delivered, delivered_mstamp,
-        delivered, lost, app_limit, is_delay_ack,
+        delivered_mstamp, delivered, lost, app_limit,
         snd_ssthresh, send_wnd);
 
     bw = bbr_bw();

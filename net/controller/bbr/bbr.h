@@ -295,7 +295,7 @@ namespace hudp {
         void bbr_lt_bw_sampling(uint64_t delivered_mstamp, uint32_t delivered, uint32_t lost, bool is_app_limited);
 
         /* Estimate the bandwidth based on how fast packets are delivered */
-        void bbr_update_bw(uint32_t rrt, uint64_t prior_delivered, uint64_t delivered_mstamp, uint32_t delivered, uint32_t lost, bool app_limit);
+        void bbr_update_bw(uint32_t rrt, uint64_t delivered_mstamp, uint32_t delivered, uint32_t lost, bool app_limit);
 
         /* Estimate when the pipe is full, using the change in delivery rate: BBR
          * estimates that STARTUP filled the pipe if the estimated bw hasn't changed by
@@ -339,26 +339,29 @@ namespace hudp {
         * these min RTT measurements opportunistically with our min_rtt filter. :-)
         */
         // 检测是否该进入rtt探测状态以及相应参数更新
-        void bbr_update_min_rtt(uint64_t delivered_mstamp, uint32_t inflight, uint64_t delivered, uint32_t rtt_us, bool is_ack_delayed, uint32_t& send_wnd);
+        void bbr_update_min_rtt(uint64_t delivered_mstamp, uint32_t inflight, uint64_t delivered, uint32_t rtt_us, uint32_t& send_wnd);
         void bbr_init();
         void bbr_update_model(uint32_t pacing_rate, uint32_t inflight, uint32_t rrt,
-            uint64_t prior_delivered, uint64_t delivered_mstamp,
-            uint32_t delivered, uint32_t lost, bool app_limit, bool is_delay_ack,
+            uint64_t delivered_mstamp, uint32_t delivered, 
+            uint32_t lost, bool app_limit,
             uint32_t& snd_ssthresh, uint32_t& send_wnd);
 
     public:
         // BBR driven by incoming parameters, get snd_ssthresh, send_wnd and pacint_rate.
         // params:
-        // inflight : in flight before this ACK
-        // rtt      : nearly observed rtt time
-        // acked    : number of packets newly (S)ACKed upon ACK
-        // prior_delivered : delivered packets to receiver in recovery
-        // delivered: total data packets delivered incl // 到目前为止已经确认的数据包数量
-        // delivered_mstamp: time we reached "delivered"// 最后确认数据包时间戳
-        // 
+        // inflight : 接受本ack时网络中的数据量, 即发送之后未确认的数据量
+        // rtt      : 最近观测的rtt
+        // acked    : 本次ack确认的包数, ack会合并发送
+        // delivered: 本次ack确认的数据量
+        // delivered_mstamp: 本次ack确认时间戳
+        // lost     : 期间丢包个数
+        // app_limit: 是否应用层限制
+        // snd_ssthresh : 发送窗体限制
+        // send_wnd     ：发送窗体大小
+        // pacing_rate  ：发送速率
         void bbr_main(uint32_t inflight, uint32_t rrt, uint32_t acked,
-                      uint64_t prior_delivered, uint64_t delivered_mstamp,
-                      uint32_t delivered, uint32_t lost, bool app_limit, bool is_delay_ack,
+                      uint64_t delivered_mstamp, uint32_t delivered,
+                      uint32_t lost, bool app_limit,
                       uint32_t& snd_ssthresh, uint32_t& send_wnd, uint32_t& pacing_rate);
 
     };
