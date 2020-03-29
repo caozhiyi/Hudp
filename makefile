@@ -1,4 +1,4 @@
-SRCS = $(wildcard ./base/*.cpp ./common/*.cpp ./hudp/*.cpp ./net/*.cpp ./net/unix/*.cpp ./os/unix/*.cpp) 
+SRCS = $(wildcard ./base/*.cpp ./common/*.cpp ./hudp/*.cpp ./net/*.cpp ./net/unix/*.cpp ./net/controller/*.cpp ./net/controller/bbr/*.cpp ./os/unix/*.cpp ./filter/*.cpp) 
 
 OBJS = $(patsubst %.cpp, %.o, $(SRCS))
 
@@ -14,7 +14,12 @@ INCLUDES = -I.          \
            -I./hudp     \
            -I./include  \
 		   -I./os/unix  \
-           -I./interface  \
+		   -I./filter   \
+           -I./interface            \
+		   -I./third/snappy         \
+		   -I./net/controller       \
+		   -I./net/controller/bbr   \
+
 # NET_LOSS_TEST add packet loss -D NET_LOSS_TEST
 CCFLAGS = -lpthread -fPIC -m64 -std=c++11 -lstdc++ -g
 
