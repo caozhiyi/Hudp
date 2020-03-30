@@ -53,7 +53,6 @@ TEST(FlowSlicingFilter, case2) {
     for (size_t i = 0; i < msg_vec.size(); i++) {
         EXPECT_TRUE(slicing_filter.RelieveFilterProcess("", 0, msg_vec[i]));
     }
-    EXPECT_TRUE(big_msg == test_slicingflow_filter->GetBigMsg());
 }
 
 TEST(FlowSlicingFilter, case3) {
