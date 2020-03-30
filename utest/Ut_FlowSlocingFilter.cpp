@@ -6,7 +6,7 @@
 
 using namespace hudp;
 
-// the flow slicing filter
+// test flow slicing filter
 class CTestSlicingFlowFilter : public CFilter {
 public:
     CTestSlicingFlowFilter() {}
