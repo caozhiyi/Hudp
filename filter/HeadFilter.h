@@ -4,7 +4,7 @@
 #include "IFilter.h"
 
 namespace hudp {
-    // the firt filter
+    // the first filter
     // send msg to upper
     class CHeadFilter : public CFilter {
     public:

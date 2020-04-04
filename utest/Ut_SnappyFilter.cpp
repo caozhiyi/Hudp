@@ -6,7 +6,7 @@
 
 using namespace hudp;
 
-// the flow slicing filter
+//  test snappy filter
 class CTestSnappyFilter : public CFilter {
 public:
     CTestSnappyFilter() {}
@@ -21,7 +21,7 @@ public:
         _msg = body;
         return true;
     }
-    // get big msg
+    // get msg
     std::string& GetMsg() { return _msg; }
 private:
     std::string _msg;
