@@ -30,7 +30,7 @@ namespace hudp {
     };
 
     typedef std::string HudpHandle;
-    typedef std::function<void(const HudpHandle& handlle, const char* msg, uint32_t len)> recv_back;
+    typedef std::function<void(const HudpHandle& handle, const char* msg, uint32_t len)> recv_back;
 
 }
 
