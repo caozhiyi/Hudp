@@ -88,15 +88,15 @@ namespace hudp {
         BBR_PROBE_RTT,	/* cut inflight to min to probe min_rtt */
     };
 
-#define CYCLE_LEN	8	/* number of phases in a pacing gain cycle  ·¢ËÍËÙ¶ÈÔöÒæÒò×ÓÖÜÆÚÄÚµÄ½×¶ÎÊý*/
+#define CYCLE_LEN	8	/* number of phases in a pacing gain cycle  ï¿½ï¿½ï¿½ï¿½ï¿½Ù¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÚµÄ½×¶ï¿½ï¿½ï¿½*/
 
     /* Window length of bw filter (in rounds): */
     static const int bbr_bw_rtts = CYCLE_LEN + 2;
     /* Window length of min_rtt filter (in sec): */
-    // ×îÐ¡rtt²É¼¯Ê±¼ä´°¿Ú 10s
+    // ï¿½ï¿½Ð¡rttï¿½É¼ï¿½Ê±ï¿½ä´°ï¿½ï¿½ 10s
     static const uint32_t bbr_min_rtt_win_sec = 10;
     /* Minimum time (in ms) spent at bbr_cwnd_min_target in BBR_PROBE_RTT mode: */
-    // BBR_PROBE_RTT Ä£Ê½ÏÂÔÚbbr_cwnd_min_target ÉÏ»¨·ÑµÄ×î¶ÌÊ±¼ä£¨ºÁÃë£©
+    // BBR_PROBE_RTT Ä£Ê½ï¿½ï¿½ï¿½ï¿½bbr_cwnd_min_target ï¿½Ï»ï¿½ï¿½Ñµï¿½ï¿½ï¿½ï¿½Ê±ï¿½ä£¨ï¿½ï¿½ï¿½ë£©
     static const uint32_t bbr_probe_rtt_mode_ms = 200;
     /* Skip TSO below the following bandwidth (bits/sec): */
     static const int bbr_min_tso_rate = 1200000;
@@ -106,7 +106,7 @@ namespace hudp {
      * and send the same number of packets per RTT that an un-paced, slow-starting
      * Reno or CUBIC flow would:
      */
-     // ÔöÒæÒò×ÓÉÏÏÞÖµ
+     // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµ
     static const int bbr_high_gain = BBR_UNIT * 2885 / 1000 + 1;
     /* The pacing gain of 1/high_gain in BBR_DRAIN is calculated to typically drain
      * the queue created in BBR_STARTUP in a single round:
@@ -127,8 +127,8 @@ namespace hudp {
     /* Try to keep at least this many packets in flight, if things go smoothly. For
      * smooth functioning, a sliding window protocol ACKing every other packet
      * needs at least 4 packets in flight:
-     * Èç¹ûÒ»ÇÐË³ÀûµÄ»°£¬ÊÔ×ÅÔÚ·ÉÐÐÖÐÖÁÉÙ±£ÁôÕâÃ´¶à°ü¹ü¡£ÎªÁË
-     * Æ½»¬ÔËÐÐ£¬Ò»¸ö»¬¶¯´°¿ÚÐ­ÒéÔÚ·ÉÐÐÖÐÃ¿Ò»¸ö°üÐèÒªÖÁÉÙ4¸ö°ü£º
+     * ï¿½ï¿½ï¿½Ò»ï¿½ï¿½Ë³ï¿½ï¿½ï¿½Ä»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ù±ï¿½ï¿½ï¿½ï¿½ï¿½Ã´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½
+     * Æ½ï¿½ï¿½ï¿½ï¿½ï¿½Ð£ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð­ï¿½ï¿½ï¿½Ú·ï¿½ï¿½ï¿½ï¿½ï¿½Ã¿Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½4ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
      */
     static const uint32_t bbr_cwnd_min_target = 4;
 
@@ -153,37 +153,35 @@ namespace hudp {
     /* BBR congestion control block */
     class CBbr {
     private:
-        uint32_t min_rtt_us;	            /* min RTT in min_rtt_win_sec window, rtt²É¼¯Ê±¼äÄÚ×îÐ¡rtt */
-        uint64_t min_rtt_stamp;	            /* timestamp of min_rtt_us, min rtt ²É¼¯Ê±¼ä´Á*/
-        uint32_t probe_rtt_done_stamp;      /* end time for BBR_PROBE_RTT mode £¬ BBR_PROBE_RTT½áÊøÊ±¼ä´Á*/
-        struct minmax bw;	                /* Max recent delivery rate in pkts/uS << 24 ±¾´Îbw */
+        uint32_t min_rtt_us;	            /* min RTT in min_rtt_win_sec window, rttï¿½É¼ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¡rtt */
+        uint64_t min_rtt_stamp;	            /* timestamp of min_rtt_us, min rtt ï¿½É¼ï¿½Ê±ï¿½ï¿½ï¿½*/
+        uint64_t probe_rtt_done_stamp;      /* end time for BBR_PROBE_RTT mode ï¿½ï¿½ BBR_PROBE_RTTï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½*/
+        struct minmax bw;	                /* Max recent delivery rate in pkts/uS << 24 ï¿½ï¿½ï¿½ï¿½bw */
         uint32_t rtt_cnt;	                /* count of packet-timed rounds elapsed */
-        uint32_t next_rtt_delivered;        /* scb->tx.delivered at end of round, ÔÚ»ØºÏ½áÊøÊ±·¢ËÍµÄÊý¾ÝÁ¿ */
-        uint32_t cycle_mstamp;	            /* time of this cycle phase start ±¾ÂÖÖÜÆÚ¿ªÊ¼Ê±¼ä*/
+        uint64_t next_rtt_delivered;        /* scb->tx.delivered at end of round, ï¿½Ú»ØºÏ½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½Íµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
+        uint64_t cycle_mstamp;	            /* time of this cycle phase start ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú¿ï¿½Ê¼Ê±ï¿½ï¿½*/
         uint32_t mode : 3,		            /* current bbr_mode in state machine */
                  packet_conservation : 1,   /* use packet conservation? */
                  round_start : 1,	        /* start of packet-timed tx->ack round? */
-                 idle_restart : 1,	        /* restarting after idle? ¿ÕÏÐºóÖØÐÂÆô¶¯ */
-                 probe_rtt_round_done : 1,  /* a BBR_PROBE_RTT round at 4 pkts? BBR_PROBE_RTTÂÖÄÚ4¸öpkts? */
+                 idle_restart : 1,	        /* restarting after idle? ï¿½ï¿½ï¿½Ðºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
+                 probe_rtt_round_done : 1,  /* a BBR_PROBE_RTT round at 4 pkts? BBR_PROBE_RTTï¿½ï¿½ï¿½ï¿½4ï¿½ï¿½pkts? */
                  lt_is_sampling : 1,        /* taking long-term ("LT") samples now? */
                  lt_rtt_cnt : 7,	        /* round trips in long-term interval */
-                 lt_use_bw : 1;	            /* use lt_bw as our bw estimate? Ê¹ÓÃlt_bw×÷ÎªÎÒÃÇµÄbw¹À¼ÆÖµ*/
+                 lt_use_bw : 1;	            /* use lt_bw as our bw estimate? Ê¹ï¿½ï¿½lt_bwï¿½ï¿½Îªï¿½ï¿½ï¿½Çµï¿½bwï¿½ï¿½ï¿½ï¿½Öµ*/
         uint32_t lt_bw;		                /* LT est delivery rate in pkts/uS << 24 */
         uint32_t lt_last_delivered;         /* LT intvl start: tp->delivered */
-        uint32_t lt_last_stamp;	            /* LT intvl start: tp->delivered_mstamp */
+        uint64_t lt_last_stamp;	            /* LT intvl start: tp->delivered_mstamp */
         uint32_t lt_last_lost;	            /* LT intvl start: tp->lost */
-        uint32_t pacing_gain : 10,	        /* current gain for setting pacing rate£¬µ±Ç°·¢ËÍËÙÂÊµÄÔöÒæÒò×Ó */
-                 cwnd_gain : 10,	        /* current gain for setting cwnd £¬ µ±Ç°·¢ËÍ´°ÌåµÄÔöÒæÒò×Ó*/
-                 full_bw_reached : 1,       /* reached full bw in Startup? ÆðÊ¼½×¶Î´ïµ½ÁË×î´ó´ø¿í£¿ */
+        uint32_t pacing_gain : 10,	        /* current gain for setting pacing rateï¿½ï¿½ï¿½ï¿½Ç°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Êµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
+                 cwnd_gain : 10,	        /* current gain for setting cwnd ï¿½ï¿½ ï¿½ï¿½Ç°ï¿½ï¿½ï¿½Í´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/
+                 full_bw_reached : 1,       /* reached full bw in Startup? ï¿½ï¿½Ê¼ï¿½×¶Î´ïµ½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
                  full_bw_cnt : 2,	        /* number of rounds without large bw gains */
-                 cycle_idx : 3,	            /* current index in pacing_gain cycle array£¬ pacing_gainÖÜÆÚÄÚµÄµ±Ç°Ë÷Òý  */
+                 cycle_idx : 3,	            /* current index in pacing_gain cycle arrayï¿½ï¿½ pacing_gainï¿½ï¿½ï¿½ï¿½ï¿½ÚµÄµï¿½Ç°ï¿½ï¿½ï¿½ï¿½  */
                  has_seen_rtt : 1;          /* have we seen an RTT sample yet? */
-        uint32_t prior_cwnd;	            /* prior cwnd upon entering loss recovery  ÔÚ½øÈëËðÊ§»Ö¸´Ö®Ç°£¬×î´ó·¢ËÍ´°Ìå*/
-        uint32_t full_bw;	                /* recent bw, to estimate if pipe is full£¬ ×î½üµÄbw£¬ÓÃÓÚ¹À¼Æ¹ÜµÀÊÇ·ñÒÑÂú */
+        uint32_t prior_cwnd;	            /* prior cwnd upon entering loss recovery  ï¿½Ú½ï¿½ï¿½ï¿½ï¿½ï¿½Ê§ï¿½Ö¸ï¿½Ö®Ç°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í´ï¿½ï¿½ï¿½*/
+        uint32_t full_bw;	                /* recent bw, to estimate if pipe is fullï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½bwï¿½ï¿½ï¿½ï¿½ï¿½Ú¹ï¿½ï¿½Æ¹Üµï¿½ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½ */
 
     private:
-        CBbr() { bbr_init(); }
-        ~CBbr() {}
         /* Do we estimate that STARTUP filled the pipe? */
         bool bbr_full_bw_reached() { return full_bw_reached; }
         
@@ -227,8 +225,8 @@ namespace hudp {
         /* Save "last known good" cwnd so we can restore it after losses or PROBE_RTT */
         void bbr_save_cwnd(uint32_t send_wnd);
 
-        // Í¨¹ýÓÐÐ§µÄbwÖÜÆÚÐÔµÄ¼ÆËã gain
-        // ´ø¿íÌ½²â½×¶ÎÀûÓÃÔöÒæÏµÊýÊý×éÌ½²â´ø¿í£®
+        // Í¨ï¿½ï¿½ï¿½ï¿½Ð§ï¿½ï¿½bwï¿½ï¿½ï¿½ï¿½ï¿½ÔµÄ¼ï¿½ï¿½ï¿½ gain
+        // ï¿½ï¿½ï¿½ï¿½Ì½ï¿½ï¿½×¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ïµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         /* Gain cycling: cycle pacing gain to converge to fair share of available bw. */
         void bbr_update_cycle_phase(uint32_t pacing_rate, uint64_t delivered_mstamp, uint32_t inflight, bool loss_pkt);
 
@@ -254,7 +252,7 @@ namespace hudp {
         * which allows 2 outstanding 2-packet sequences, to try to keep pipe
         * full even with ACK-every-other-packet delayed ACKs.
         */
-        // Í¨¹ý bw ºÍ gain ¼ÆËã·¢ËÍ´°Ìå´óÐ¡
+        // Í¨ï¿½ï¿½ bw ï¿½ï¿½ gain ï¿½ï¿½ï¿½ã·¢ï¿½Í´ï¿½ï¿½ï¿½ï¿½Ð¡
         uint32_t bbr_target_cwnd(uint32_t pacing_rate, uint32_t bw, int gain);
 
         /* Slow-start up toward target cwnd (if bw estimate is growing, or packet loss
@@ -265,14 +263,14 @@ namespace hudp {
         /* End cycle phase if it's time and/or we hit the phase's in-flight target. */
         // bbr is next cycle phase
         /*
-        ÀûÓÃÔöÒæÏµÊýÊý×épacing_gain[5/4, 3/4, 1, 1, 1, 1, 1, 1]Ì½²â´ø¿í
-        Èç¹ûÊÇÎÈ¶¨½×¶Î,pacing_gain=1,Ê±³¤³¬¹ýmin_rtt_us¾Í½øÈëÏÂÒ»ÂÖ
-        Èç¹ûÊÇ¼¤½ø½×¶Î,pacing_gain>1,±ØÐëÊ±¼ä¹»ÁË£¬ÇÒÓÐ¶ª°ü»òinflight>Ä¿±ê´°¿Ú²Å½øÈëÏÂÒ»ÂÖ
-        Èç¹ûÊÇÅÅ¿Õ½×¶Î,pacing_gain<1,Ê±¼ä¹»ÁË£¬»òÕßinflight<=Ä¿±ê´°¿Ú¾Í½øÈëÏÂÒ»ÂÖ
+        ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ïµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½pacing_gain[5/4, 3/4, 1, 1, 1, 1, 1, 1]Ì½ï¿½ï¿½ï¿½ï¿½ï¿½
+        ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È¶ï¿½ï¿½×¶ï¿½,pacing_gain=1,Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½min_rtt_usï¿½Í½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½
+        ï¿½ï¿½ï¿½ï¿½Ç¼ï¿½ï¿½ï¿½ï¿½×¶ï¿½,pacing_gain>1,ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ä¹»ï¿½Ë£ï¿½ï¿½ï¿½ï¿½Ð¶ï¿½ï¿½ï¿½ï¿½ï¿½inflight>Ä¿ï¿½ê´°ï¿½Ú²Å½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½
+        ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Å¿Õ½×¶ï¿½,pacing_gain<1,Ê±ï¿½ä¹»ï¿½Ë£ï¿½ï¿½ï¿½ï¿½ï¿½inflight<=Ä¿ï¿½ê´°ï¿½Ú¾Í½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½
         */
         bool bbr_is_next_cycle_phase(uint32_t pacing_rate, uint64_t delivered_mstamp, uint32_t inflight, bool loss_pkt);
 
-        //ÉèÖÃÏÂÒ»ÂÖÔöÒæÒò×Ó
+        //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         void bbr_advance_cycle_phase(uint64_t delivered_mstamp);
         
         /* Start a new long-term sampling interval. */
@@ -282,7 +280,7 @@ namespace hudp {
         void bbr_reset_lt_bw_sampling(uint64_t delivered_mstamp, uint32_t delivered, uint32_t lost);
 
         /* Long-term bw sampling interval is done. Estimate whether we're policed. */
-        void bbr_lt_bw_interval_done(uint32_t bw, uint64_t delivered_mstamp, uint32_t delivered, uint32_t lost);
+        void bbr_lt_bw_interval_done(uint64_t bw, uint64_t delivered_mstamp, uint32_t delivered, uint32_t lost);
 
         /* Token-bucket traffic policers are common (see "An Internet-Wide Analysis of
         * Traffic Policing", SIGCOMM 2016). BBR detects token-bucket policers and
@@ -291,7 +289,7 @@ namespace hudp {
         * consistent throughput and high packet loss. If we think we're being policed,
         * set lt_bw to the "long-term" average delivery rate from those 2 intervals.
         */
-        // µ±¿´µ½Á½´ÎÁ¬Ðø²ÉÑù¼ä¸ô£¬ÍÌÍÂÁ¿²»±ä²¢ÓÐ´óÁ¿¶ª°ü£¬¾ÍÈÏÎªÓÐtraffic policersÖ÷¶¯¶ª°ü£¬½øÈëlong-term×´Ì¬£¬±ÜÃâ½øÒ»²½´óÁ¿¶ª°ü
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ä²¢ï¿½Ð´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½traffic policersï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½long-term×´Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         void bbr_lt_bw_sampling(uint64_t delivered_mstamp, uint32_t delivered, uint32_t lost, bool is_app_limited);
 
         /* Estimate the bandwidth based on how fast packets are delivered */
@@ -306,16 +304,16 @@ namespace hudp {
          * design goal, but uses delay and inter-ACK spacing instead of bandwidth.
          */
          /*
-           ¼ì²âÆô¶¯½×¶Î´ø¿íÊÇ·ñÒÑ¾­µ½ÁË×î´óÖµ£®
-           Èç¹ûÁ¬ÐøÈý´Î¼ì²éµ½´ø¿íÔö³¤ËÙ¶ÈÐ¡ÓÚbbr_full_bw_thresh(25%),
-           ¾ÍÈÏÎªpipeÂúÁË,´ø¿íµ½ÁË×î´óÖµ
+           ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×¶Î´ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½Ñ¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½
+           ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î¼ï¿½éµ½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ù¶ï¿½Ð¡ï¿½ï¿½bbr_full_bw_thresh(25%),
+           ï¿½ï¿½ï¿½ï¿½Îªpipeï¿½ï¿½ï¿½ï¿½,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµ
          */
         void bbr_check_full_bw_reached(bool app_limite);
 
         /* If pipe is probably full, drain the queue and then enter steady-state. */
-        // Èç¹ûpipeÒÑ¾­Âú£¬Ôò¼õÐ¡·¢ËÍËÙ¶È
-        // Èç¹ûSTARTUP×´Ì¬´ø¿íÔöµ½×î´ó£¬ÇÐ»»µ½DRAIN×´Ì¬£»Èç¹ûDRAIN½×¶Î ¶ÓÁÐÇå¿Õ£¬ÇÐ»»µ½BBR_PROBE_BW×´Ì¬
-        void bbr_check_drain(uint64_t delivered_mstamp, uint32_t pacing_rate, uint32_t inflight, uint32_t& snd_ssthresh);
+        // ï¿½ï¿½ï¿½pipeï¿½Ñ¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¡ï¿½ï¿½ï¿½ï¿½ï¿½Ù¶ï¿½
+        // ï¿½ï¿½ï¿½STARTUP×´Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð»ï¿½ï¿½ï¿½DRAIN×´Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½DRAINï¿½×¶ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ£ï¿½ï¿½Ð»ï¿½ï¿½ï¿½BBR_PROBE_BW×´Ì¬
+        void bbr_check_drain(uint64_t delivered_mstamp, uint32_t pacing_rate, uint32_t inflight);
 
         void bbr_check_probe_rtt_done(uint64_t delivered_mstamp, uint32_t& send_wnd);
 
@@ -338,31 +336,32 @@ namespace hudp {
         * enough for long enough to drain its queue in the bottleneck. We pick up
         * these min RTT measurements opportunistically with our min_rtt filter. :-)
         */
-        // ¼ì²âÊÇ·ñ¸Ã½øÈërttÌ½²â×´Ì¬ÒÔ¼°ÏàÓ¦²ÎÊý¸üÐÂ
+        // ï¿½ï¿½ï¿½ï¿½Ç·ï¿½Ã½ï¿½ï¿½ï¿½rttÌ½ï¿½ï¿½×´Ì¬ï¿½Ô¼ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         void bbr_update_min_rtt(uint64_t delivered_mstamp, uint32_t inflight, uint64_t delivered, uint32_t rtt_us, uint32_t& send_wnd);
         void bbr_init();
         void bbr_update_model(uint32_t pacing_rate, uint32_t inflight, uint32_t rrt,
             uint64_t delivered_mstamp, uint32_t delivered, 
             uint32_t lost, bool app_limit,
-            uint32_t& snd_ssthresh, uint32_t& send_wnd);
+            uint32_t& send_wnd);
 
     public:
-        // BBR driven by incoming parameters, get snd_ssthresh, send_wnd and pacint_rate.
+        CBbr() { bbr_init(); }
+        ~CBbr() {}
+        // BBR driven by incoming parameters, get send_wnd and pacint_rate.
         // params:
-        // inflight : ½ÓÊÜ±¾ackÊ±ÍøÂçÖÐµÄÊý¾ÝÁ¿, ¼´·¢ËÍÖ®ºóÎ´È·ÈÏµÄÊý¾ÝÁ¿
-        // rtt      : ×î½ü¹Û²âµÄrtt
-        // acked    : ±¾´ÎackÈ·ÈÏµÄ°üÊý, ack»áºÏ²¢·¢ËÍ
-        // delivered: ±¾´ÎackÈ·ÈÏµÄÊý¾ÝÁ¿
-        // delivered_mstamp: ±¾´ÎackÈ·ÈÏÊ±¼ä´Á
-        // lost     : ÆÚ¼ä¶ª°ü¸öÊý
-        // app_limit: ÊÇ·ñÓ¦ÓÃ²ãÏÞÖÆ
-        // snd_ssthresh : ·¢ËÍ´°ÌåÏÞÖÆ
-        // send_wnd     £º·¢ËÍ´°Ìå´óÐ¡
-        // pacing_rate  £º·¢ËÍËÙÂÊ
+        // inflight : ï¿½ï¿½ï¿½Ü±ï¿½ackÊ±ï¿½ï¿½ï¿½ï¿½ï¿½Ðµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö®ï¿½ï¿½Î´È·ï¿½Ïµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+        // rtt      : ï¿½ï¿½ï¿½ï¿½Û²ï¿½ï¿½rtt
+        // acked    : ï¿½ï¿½ï¿½ï¿½ackÈ·ï¿½ÏµÄ°ï¿½ï¿½ï¿½, ackï¿½ï¿½Ï²ï¿½ï¿½ï¿½ï¿½ï¿½
+        // delivered: ï¿½ï¿½ï¿½ï¿½ackÈ·ï¿½Ïµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+        // delivered_mstamp: ï¿½ï¿½ï¿½ï¿½ackÈ·ï¿½ï¿½Ê±ï¿½ï¿½ï¿½
+        // lost     : ï¿½Ú¼ä¶ªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+        // app_limit: ï¿½Ç·ï¿½Ó¦ï¿½Ã²ï¿½ï¿½ï¿½ï¿½ï¿½
+        // send_wnd     ï¿½ï¿½ï¿½ï¿½ï¿½Í´ï¿½ï¿½ï¿½ï¿½Ð¡
+        // pacing_rate  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         void bbr_main(uint32_t inflight, uint32_t rrt, uint32_t acked,
                       uint64_t delivered_mstamp, uint32_t delivered,
                       uint32_t lost, bool app_limit,
-                      uint32_t& snd_ssthresh, uint32_t& send_wnd, uint32_t& pacing_rate);
+                      uint32_t& send_wnd, uint32_t& pacing_rate);
 
     };
 }

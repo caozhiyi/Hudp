@@ -8,7 +8,7 @@
 
 namespace hudp {
 
-	class COsNetImpl : public CNetIO {
+    class COsNetImpl : public CNetIO {
         public:
         // net library init 
         bool Init();

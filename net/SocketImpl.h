@@ -19,6 +19,7 @@ namespace hudp {
         WI_RELIABLE_ORDERLY = 2
     };
 
+    class CBbr;
     class CRto;
     class CMsg;
     class CPacing;
@@ -77,6 +78,10 @@ namespace hudp {
         void CheckClose(uint32_t header_flag);
         // send msg by FQ and pacing
         void SendPacingMsg(std::shared_ptr<CMsg> msg, bool add_fq = true);
+        // controller algorithm process
+        void ControllerProcess(WndIndex index, uint32_t rtt, uint32_t acked, uint32_t delivered);
+        // pacing send msg call back
+        void PacingCallBack(std::shared_ptr<CMsg> msg);
 
     private:
         // reliable correlation
@@ -85,14 +90,18 @@ namespace hudp {
         CPendAck*            _pend_ack[__wnd_size];
  
         // about pend ack timer
-        std::atomic<bool>    _is_in_timer;
-        // rto
-        CRto*                _rto;
+        std::atomic<bool>      _is_in_timer;
+        // rto calc
+        std::shared_ptr <CRto> _rto;
         // socket handle
-        HudpHandle           _handle;
+        HudpHandle             _handle;
         // socket status
-        socket_status        _sk_status;
+        socket_status          _sk_status;
 
+        // count lost msg size while a ack turn
+        uint32_t               _lost_msg;
+        std::atomic<uint32_t>       _in_flight;
+        std::shared_ptr<CBbr>       _bbr_controller;
         std::shared_ptr<CPacing>    _pacing;
         std::shared_ptr<CFlowQueue> _flow_queue;
     };

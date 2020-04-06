@@ -1,5 +1,6 @@
 #include <cstring>		//for memset
 
+#include "Rto.h"
 #include "Log.h"
 #include "IMsg.h"
 #include "Timer.h"
@@ -14,6 +15,7 @@
 #include "PriorityQueue.h"
 #include "MsgPoolFactory.h"
 #include "controller/Pacing.h"
+#include "controller/bbr/bbr.h"
 #include "controller/FlowQueue.h"
 
 using namespace hudp;
@@ -26,8 +28,11 @@ CSocketImpl::CSocketImpl(const HudpHandle& handle) : _handle(handle), _sk_status
     memset(_recv_list, 0, sizeof(_recv_list));
     memset(_pend_ack, 0, sizeof(_pend_ack));
     _is_in_timer.store(false);
-    _pacing.reset(new CPacing());
+    _in_flight.store(0);
+    _pacing.reset(new CPacing(std::bind(&CSocketImpl::PacingCallBack, this, std::placeholders::_1)));
     _flow_queue.reset(new CFlowQueue());
+    _rto.reset(new CRtoImpl());
+    _bbr_controller.reset(new CBbr());
 }
 
 CSocketImpl::~CSocketImpl() {
@@ -158,6 +163,7 @@ void CSocketImpl::TimerOut(std::shared_ptr<CMsg> msg) {
         // msg resend, increase send delay
         msg->AddSendDelay();
         msg->SetFlag(msg_resend);
+        _lost_msg++;
 
     } else {
         _is_in_timer = false;
@@ -278,26 +284,26 @@ void CSocketImpl::GetAckToSendWnd(std::shared_ptr<CMsg> msg) {
     if (_sk_status == SS_CLOSE) {
         StatusChange(SS_READY);
     }
+
+    uint64_t rtt_time = 0;
+    uint32_t ack_msg_size = 0;
     if (msg->GetHeaderFlag() & HPF_WITH_RELIABLE_ORDERLY_ACK) {
         std::vector<uint16_t> vec;
         std::vector<uint64_t> time_vec;
         msg->GetAck(HPF_WITH_RELIABLE_ORDERLY_ACK, vec, time_vec);
         for (uint16_t index = 0; index < vec.size(); index++) {
-            _send_wnd[WI_RELIABLE_ORDERLY]->AcceptAck(vec[index]);
-
-            uint64_t rtt_time = 0;
+            uint32_t ack_msg_size = _send_wnd[WI_RELIABLE_ORDERLY]->AcceptAck(vec[index]);
+            _in_flight.fetch_sub(ack_msg_size);
+            
             if (__msg_with_time) {
                 rtt_time = GetRtt(time_vec[index]);
-                // TODO
-                // set rtt sample
-                // _rto.SetAckTime(index, time_stap);
+                _rto->SetRttTime(rtt_time);
             }
         }
+        ControllerProcess(WI_RELIABLE_ORDERLY, rtt_time, (uint32_t)vec.size(), ack_msg_size);
         if (!__msg_with_time) {
             uint64_t rtt_time = GetRtt(msg);
-            // TODO
-            // set rtt sample
-            // _rto.SetAckTime(index, time_stap);
+            _rto->SetRttTime(rtt_time);
         }
     }
 
@@ -306,20 +312,18 @@ void CSocketImpl::GetAckToSendWnd(std::shared_ptr<CMsg> msg) {
         std::vector<uint64_t> time_vec;
         msg->GetAck(HPF_WITH_RELIABLE_ACK, vec, time_vec);
         for (uint16_t index = 0; index < vec.size(); index++) {
-            _send_wnd[WI_RELIABLE]->AcceptAck(vec[index]);
+            uint32_t ack_msg_size = _send_wnd[WI_RELIABLE]->AcceptAck(vec[index]);
+            _in_flight.fetch_sub(ack_msg_size);
 
             if (__msg_with_time) {
                 uint64_t rtt_time = GetRtt(time_vec[index]);
-                // TODO
-                // set rtt sample
-                // _rto.SetAckTime(index, time_stap);
+                _rto->SetRttTime(rtt_time);
             }
         }
+        ControllerProcess(WI_RELIABLE, rtt_time, vec.size(), ack_msg_size);
         if (!__msg_with_time) {
             uint64_t rtt_time = GetRtt(msg);
-            // TODO
-            // set rtt sample
-            // _rto.SetAckTime(index, time_stap);
+            _rto->SetRttTime(rtt_time);
         }
     }
 }
@@ -545,4 +549,24 @@ void CSocketImpl::SendPacingMsg(std::shared_ptr<CMsg> msg, bool add_fq) {
     // set send msg time
     msg->SetSendTime(GetCurTimeStamp());
     CHudpImpl::Instance().SendMessageToNet(msg);    
+}
+
+void CSocketImpl::ControllerProcess(WndIndex index, uint32_t rtt, uint32_t acked, uint32_t delivered) {
+    uint64_t now = GetCurTimeStamp();
+    bool app_limit = _send_wnd[index] ? false : _send_wnd[index]->IsAppLimit();
+    uint32_t send_wnd = _send_wnd[index] ? 0 : _send_wnd[index]->GetWndSize();
+    uint32_t pacing = _pacing->GetPacingRate();
+
+    _bbr_controller->bbr_main(_in_flight.load(), rtt, acked, now, delivered, _lost_msg, app_limit, send_wnd, pacing);
+
+    _lost_msg = 0;
+    _send_wnd[index]->ChangeSendWndSize(send_wnd);
+    _pacing->SetPacingRate(pacing);
+}
+
+void CSocketImpl::PacingCallBack(std::shared_ptr<CMsg> msg) {
+    if (msg->GetHeaderFlag() & HTF_RELIABLE || msg->GetHeaderFlag() & HTF_RELIABLE_ORDERLY) {
+        _in_flight.fetch_add(msg->GetEstimateSize());
+    }
+    CHudpImpl::Instance().SendMessageToNet(msg);
 }

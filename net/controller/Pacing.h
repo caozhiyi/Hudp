@@ -2,6 +2,8 @@
 #define HEADER_NET_CONTROLLER_PACING
 
 #include <memory>
+#include <functional>
+
 #include "Timer.h"
 
 namespace hudp {
@@ -9,7 +11,7 @@ namespace hudp {
 class CMsg;
 class CPacing {
     public:
-    CPacing();
+    CPacing(std::function<void(std::shared_ptr<CMsg> msg)> cb);
     ~CPacing();
 
     void SetPacingRate(uint32_t pacing_rate);
@@ -24,6 +26,7 @@ class CPacing {
     static CTimer _timer;
     uint32_t _pacing_rate;
     uint64_t _next_time;
+    std::function<void(std::shared_ptr<CMsg> msg)> _msg_send_call_back;
 };
 
 }

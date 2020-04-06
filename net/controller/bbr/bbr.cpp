@@ -18,7 +18,7 @@ uint32_t CBbr::bbr_bw_to_pacing_rate(uint32_t bw, int gain) {
 
     rate = bbr_rate_bytes_per_sec(rate, gain);
     rate = (uint64_t)rate < (uint64_t)(MAX_PACING_RATE) ? (uint64_t)rate : (uint64_t)(MAX_PACING_RATE);
-    return rate;
+    return (uint32_t)rate;
 }
 
 void CBbr::bbr_init_pacing_rate_from_rtt(uint32_t rtt, uint32_t send_wnd, uint32_t& pacing_rate) {
@@ -48,14 +48,14 @@ void CBbr::bbr_set_pacing_rate(uint32_t rtt, uint32_t send_wnd, uint32_t bw, int
 }
 
 void CBbr::bbr_reset_startup_mode() {
-    // ÉèÖÃbbr µ½ BBR_STARTUP Ä£Ê½ ·¢ËÍËÙ¶ÈÔöÒæÒò×ÓºÍ´°ÌåÔöÒæÒò×ÓÉèÎªÉÏÏÞÖµ
+    // ï¿½ï¿½ï¿½ï¿½bbr ï¿½ï¿½ BBR_STARTUP Ä£Ê½ ï¿½ï¿½ï¿½ï¿½ï¿½Ù¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÓºÍ´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½Öµ
     mode = BBR_STARTUP;
     pacing_gain = bbr_high_gain;
     cwnd_gain = bbr_high_gain;
 }
 
 void CBbr::bbr_reset_probe_bw_mode(uint64_t delivered_mstamp) {
-    // ÉèÖÃbbr µ½ BBR_PROBE_BW Ä£Ê½£¬¼õÐ¡ ÔöÒæÒò×Ó
+    // ï¿½ï¿½ï¿½ï¿½bbr ï¿½ï¿½ BBR_PROBE_BW Ä£Ê½ï¿½ï¿½ï¿½ï¿½Ð¡ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     mode = BBR_PROBE_BW;
     pacing_gain = BBR_UNIT;
     cwnd_gain = bbr_cwnd_gain;
@@ -67,12 +67,12 @@ void CBbr::bbr_reset_probe_bw_mode(uint64_t delivered_mstamp) {
 }
 
 void CBbr::bbr_reset_mode(uint64_t delivered_mstamp) {
-    // ÆðÊ¼½×¶ÎÎ´´ïµ½×î´ó´ø¿í
+    // ï¿½ï¿½Ê¼ï¿½×¶ï¿½Î´ï¿½ïµ½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     if (!bbr_full_bw_reached())
-        // ÉèÖÃÎª BBR_STARTUP
+        // ï¿½ï¿½ï¿½ï¿½Îª BBR_STARTUP
         bbr_reset_startup_mode();
     else
-        // ÉèÖÃÎª BBR_PROBE_BW
+        // ï¿½ï¿½ï¿½ï¿½Îª BBR_PROBE_BW
         bbr_reset_probe_bw_mode(delivered_mstamp);
 }
 
@@ -88,7 +88,7 @@ void CBbr::bbr_save_cwnd(uint32_t send_wnd) {
 }
 
 void CBbr::bbr_update_cycle_phase(uint32_t pacing_rate, uint64_t delivered_mstamp, uint32_t inflight, bool loss_pkt) {
-    // ´¦ÓÚBBR_PROBE_BW ½×¶Î£¬ 
+    // ï¿½ï¿½ï¿½ï¿½BBR_PROBE_BW ï¿½×¶Î£ï¿½ 
     if (mode == BBR_PROBE_BW && bbr_is_next_cycle_phase(pacing_rate, delivered_mstamp, inflight, loss_pkt))
         bbr_advance_cycle_phase(delivered_mstamp);
 }
@@ -106,7 +106,7 @@ uint32_t CBbr::bbr_tso_segs_goal(uint32_t pacing_rate) {
 }
 
 uint32_t CBbr::bbr_target_cwnd(uint32_t pacing_rate, uint32_t bw, int gain) {
-    uint32_t cwnd;
+    uint64_t cwnd;
     uint64_t w;
     /* If we've never had a valid RTT sample, cap cwnd at the initial
         * default. This should only happen when the connection is not using TCP
@@ -114,7 +114,7 @@ uint32_t CBbr::bbr_target_cwnd(uint32_t pacing_rate, uint32_t bw, int gain) {
         * ACKed so far. In this case, an RTO can cut cwnd to 1, in which
         * case we need to slow-start up toward something safe: TCP_INIT_CWND.
         */
-        // Ã»ÓÐÓÐÐ§µÄrtt£¬ ·¢ËÍ³õÊ¼´°Ìå´óÐ¡
+        // Ã»ï¿½ï¿½ï¿½ï¿½Ð§ï¿½ï¿½rttï¿½ï¿½ ï¿½ï¿½ï¿½Í³ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½Ð¡
     if (min_rtt_us == ~0U)	    /* no valid RTT samples yet? */
         return TCP_INIT_CWND;   /* be safe: cap at default initial cwnd*/
 
@@ -127,7 +127,7 @@ uint32_t CBbr::bbr_target_cwnd(uint32_t pacing_rate, uint32_t bw, int gain) {
     cwnd += 3 * bbr_tso_segs_goal(pacing_rate);
 
     /* Reduce delayed ACKs by rounding up cwnd to the next even number. */
-    // Í¨¹ý½«cwndÉáÈëµ½ÏÂÒ»¸öÅ¼ÊýÀ´¼õÉÙÑÓ³Ùack
+    // Í¨ï¿½ï¿½ï¿½ï¿½cwndï¿½ï¿½ï¿½ëµ½ï¿½ï¿½Ò»ï¿½ï¿½Å¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó³ï¿½ack
     cwnd = (cwnd + 1) & ~1U;
 
     /* Ensure gain cycling gets inflight above BDP even for small BDPs. */
@@ -159,9 +159,9 @@ done:
 
 bool CBbr::bbr_is_next_cycle_phase(uint32_t pacing_rate, uint64_t delivered_mstamp, uint32_t inflight, bool loss_pkt) {
     /*
-        Èç¹ûdelivered_mstamp-cycle_mstamp>min_rtt_us£¬
-        ¼´ÕâÒ»ÂÖ´ø¿íÌ½²âÊ±³¤¹»ÁË.
-        ±ê¼Çis_full_length=true£¬·ñÔòis_full_length=false
+        ï¿½ï¿½ï¿½delivered_mstamp-cycle_mstamp>min_rtt_usï¿½ï¿½
+        ï¿½ï¿½ï¿½ï¿½Ò»ï¿½Ö´ï¿½ï¿½ï¿½Ì½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½.
+        ï¿½ï¿½ï¿½is_full_length=trueï¿½ï¿½ï¿½ï¿½ï¿½ï¿½is_full_length=false
     */
     bool is_full_length = delivered_mstamp - cycle_mstamp >
         min_rtt_us;
@@ -181,9 +181,9 @@ bool CBbr::bbr_is_next_cycle_phase(uint32_t pacing_rate, uint64_t delivered_msta
         * a path with small buffers may not hold that much.
         */
         /*
-        Èç¹û´¦ÓÚÌ½²â¸ü´ó´ø¿íµÄÖÜÆÚ(pacing_gain=5/4)
-        Èç¹ûÃ»ÓÐ¶ª°ü£¬
-        ³¢ÊÔÒ»Ö±´¦ÔÚ¸ÃÖÜÆÚÖ±µ½´°¿ÚÔö¼Óµ½Ä¿±ê´°¿Ú(pacing_gain*BDP)
+        ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½(pacing_gain=5/4)
+        ï¿½ï¿½ï¿½Ã»ï¿½Ð¶ï¿½ï¿½ï¿½ï¿½ï¿½
+        ï¿½ï¿½ï¿½ï¿½Ò»Ö±ï¿½ï¿½ï¿½Ú¸ï¿½ï¿½ï¿½ï¿½ï¿½Ö±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Óµï¿½Ä¿ï¿½ê´°ï¿½ï¿½(pacing_gain*BDP)
         */
     if (pacing_gain > BBR_UNIT)
         return is_full_length &&
@@ -195,8 +195,8 @@ bool CBbr::bbr_is_next_cycle_phase(uint32_t pacing_rate, uint64_t delivered_msta
         * estimate queue is drained; persisting would underutilize the pipe.
         */
         /*
-            Èç¹û´¦ÓÚÅÅ¿Õ¶ÓÁÐÖÜÆÚ(pacing_gain=3/4),Ì½²âÊ±³¤¹»ÁË»òÕß
-            inflightÐ¡ÓÚÄ¿±ê´°¿Ú¿ÉÒÔÌáÇ°ÍË³öÕâ¸öÖÜÆÚ
+            ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Å¿Õ¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½(pacing_gain=3/4),Ì½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½Ë»ï¿½ï¿½ï¿½
+            inflightÐ¡ï¿½ï¿½Ä¿ï¿½ê´°ï¿½Ú¿ï¿½ï¿½ï¿½ï¿½ï¿½Ç°ï¿½Ë³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         */
     return is_full_length ||
         inflight <= bbr_target_cwnd(pacing_rate, bw, BBR_UNIT);
@@ -205,7 +205,7 @@ bool CBbr::bbr_is_next_cycle_phase(uint32_t pacing_rate, uint64_t delivered_msta
 void CBbr::bbr_advance_cycle_phase(uint64_t delivered_mstamp) {
     cycle_idx = (cycle_idx + 1) & (CYCLE_LEN - 1);
     cycle_mstamp = delivered_mstamp;
-    // Ëæ»úÉèÖÃÔöÒæÒò×Ó
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     pacing_gain = lt_use_bw ? BBR_UNIT :
         bbr_pacing_gain[cycle_idx];
 }
@@ -224,7 +224,7 @@ void CBbr::bbr_reset_lt_bw_sampling(uint64_t delivered_mstamp, uint32_t delivere
     bbr_reset_lt_bw_sampling_interval(delivered_mstamp, delivered, lost);
 }
 
-void CBbr::bbr_lt_bw_interval_done(uint32_t bw, uint64_t delivered_mstamp, uint32_t delivered, uint32_t lost) {
+void CBbr::bbr_lt_bw_interval_done(uint64_t bw, uint64_t delivered_mstamp, uint32_t delivered, uint32_t lost) {
     uint32_t diff;
 
     if (lt_bw) {  /* do we have bw from a previous interval? */
@@ -247,12 +247,12 @@ void CBbr::bbr_lt_bw_interval_done(uint32_t bw, uint64_t delivered_mstamp, uint3
 
 void CBbr::bbr_lt_bw_sampling(uint64_t delivered_mstamp, uint32_t delivered, uint32_t lost, bool is_app_limited) {
     uint64_t bw;
-    uint32_t t;
+    uint64_t t;
 
     /*
-    Èç¹ûÒÑ¾­½øÈëlongterm×´Ì¬
-    Èç¹û´¦ÓÚbbr´ø¿íÌ½²â½×¶Î£¬ÇÒ½øÈëÐÂÖÜÆÚ£¬longtermÊ±¼äÒÑ¾­³¬¹ýÁË48¸öÖÜÆÚ£¬¾ÍÖØÖÃlt²ÉÑù£¬ÇÐ»»µ½bbr´ø¿íÌ½²â½×¶Î
-    ÍË³ölongterm×´Ì¬
+    ï¿½ï¿½ï¿½ï¿½Ñ¾ï¿½ï¿½ï¿½ï¿½ï¿½longterm×´Ì¬
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½bbrï¿½ï¿½ï¿½ï¿½Ì½ï¿½ï¿½×¶Î£ï¿½ï¿½Ò½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú£ï¿½longtermÊ±ï¿½ï¿½ï¿½Ñ¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½48ï¿½ï¿½ï¿½ï¿½ï¿½Ú£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ltï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð»ï¿½ï¿½ï¿½bbrï¿½ï¿½ï¿½ï¿½Ì½ï¿½ï¿½×¶ï¿½
+    ï¿½Ë³ï¿½longterm×´Ì¬
     */
     if (lt_use_bw) {	/* already using long-term rate, lt_bw? */
         if (mode == BBR_PROBE_BW && round_start &&
@@ -268,9 +268,9 @@ void CBbr::bbr_lt_bw_sampling(uint64_t delivered_mstamp, uint32_t delivered, uin
         * Starting samples earlier includes bursts that over-estimate the bw.
         */
         /*
-        Èç¹ûlt_is_sampling==fasle,¼´Ã»ÓÐ²ÉÑù
-        Èç¹ûrs->losses==0,¼´Ã»ÓÐ¶ª°ü£¬ÔòÍË³ölong-term¼ì²â
-        ¿ªÊ¼Ò»¸öÐÂµÄlong-term²ÉÑù£®¸üÐÂ²ÉÑù±êÇ©
+        ï¿½ï¿½ï¿½lt_is_sampling==fasle,ï¿½ï¿½Ã»ï¿½Ð²ï¿½ï¿½ï¿½
+        ï¿½ï¿½ï¿½rs->losses==0,ï¿½ï¿½Ã»ï¿½Ð¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ë³ï¿½long-termï¿½ï¿½ï¿½
+        ï¿½ï¿½Ê¼Ò»ï¿½ï¿½ï¿½Âµï¿½long-termï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â²ï¿½ï¿½ï¿½ï¿½ï¿½Ç©
         */
     if (!lt_is_sampling) {
         if (!lost)
@@ -280,13 +280,13 @@ void CBbr::bbr_lt_bw_sampling(uint64_t delivered_mstamp, uint32_t delivered, uin
     }
 
     /* To avoid underestimates, reset sampling if we run out of data. */
-    /* Èç¹ûÊÇÓ¦ÓÃ²ãÊý¾ÝÏÞÖÆ£¬¾ÍÖØÐÂ²ÉÑù */
+    /* ï¿½ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½Ã²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â²ï¿½ï¿½ï¿½ */
     if (is_app_limited) {
         bbr_reset_lt_bw_sampling(delivered_mstamp, delivered, lost);
         return;
     }
 
-    /* ²ÉÑùÖÜÆÚÊýÐèÒªÔÚ(4,16)Ö®¼ä */
+    /* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½(4,16)Ö®ï¿½ï¿½ */
     if (round_start)
         lt_rtt_cnt++;	/* count round trips in this interval */
     if (lt_rtt_cnt < bbr_lt_intvl_min_rtts)
@@ -300,7 +300,7 @@ void CBbr::bbr_lt_bw_sampling(uint64_t delivered_mstamp, uint32_t delivered, uin
         * policer tokens were exhausted. Stopping the sampling before the
         * tokens are exhausted under-estimates the policed rate.
         */
-        /* Èç¹ûrs->losses==0,¼´Ã»ÓÐ¶ª°ü£¬ÔòÍË³ölong-term¼ì²â */
+        /* ï¿½ï¿½ï¿½rs->losses==0,ï¿½ï¿½Ã»ï¿½Ð¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ë³ï¿½long-termï¿½ï¿½ï¿½ */
     if (!lost)
         return;
 
@@ -330,15 +330,15 @@ void CBbr::bbr_update_bw(uint32_t rrt, uint64_t delivered_mstamp, uint32_t deliv
     uint32_t cur_bw;
     round_start = 0;
 
-    // ±¾´Î²É¼¯Ñù±¾ÎÞÐ§
+    // ï¿½ï¿½ï¿½Î²É¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð§
     if (delivered < 0 || rrt <= 0)
         return; /* Not a valid observation */
 
     /* See if we've reached the next RTT */
-    // ¿´ÎÒÃÇÊÇ·ñµ½´ïÏÂÒ»¸öRTT
-    /* rs->prior_deliveredÎªÖÜÆÚ¿ªÊ¼´¦µÄtp->delivered, bbr->next_rtt_deliveredÎªÏÂÒ»¸öÖÜÆÚµÄtp->delivered£¿£¿
-    Èç¹ûrs->priorr_delivered>=bbr->next_rtt_deliverd£¬¼´µ½ÁËÏÂÒ»¸öÖÜÆÚ£¬
-        ¡¡¡¡¸üÐÂÐÂµÄÏÂÒ»¸öÖÜÆÚµÄ¿ªÊ¼´¦µÄ´«ÊäÊý¾Ýnext_rtt_deliveredºÍÂÖÊýrtt_cnt*/
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ñµ½´ï¿½ï¿½ï¿½Ò»ï¿½ï¿½RTT
+    /* rs->prior_deliveredÎªï¿½ï¿½ï¿½Ú¿ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½tp->delivered, bbr->next_rtt_deliveredÎªï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½Úµï¿½tp->deliveredï¿½ï¿½ï¿½ï¿½
+    ï¿½ï¿½ï¿½rs->priorr_delivered>=bbr->next_rtt_deliverdï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½Ú£ï¿½
+        ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Âµï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ÚµÄ¿ï¿½Ê¼ï¿½ï¿½ï¿½Ä´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½next_rtt_deliveredï¿½ï¿½ï¿½ï¿½ï¿½ï¿½rtt_cnt*/
     if (rtt_cnt > 1000/*TODO*/) {
         next_rtt_delivered = delivered;
         rtt_cnt++;
@@ -351,7 +351,7 @@ void CBbr::bbr_update_bw(uint32_t rrt, uint64_t delivered_mstamp, uint32_t deliv
         * bandwidth sample. Delivered is in packets and interval_us in uS and
         * ratio will be <<1 for most connections. So delivered is first scaled.
         */
-        // ¼ÆËãbw ´«ÊäÊýÁ¿/Ê±¼ä
+        // ï¿½ï¿½ï¿½ï¿½bw ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½/Ê±ï¿½ï¿½
     cur_bw = delivered * BW_UNIT;
     cur_bw = cur_bw / rrt;
 
@@ -366,7 +366,7 @@ void CBbr::bbr_update_bw(uint32_t rrt, uint64_t delivered_mstamp, uint32_t deliv
         * network rate no matter how long. We automatically leave this
         * phase when app writes faster than the network can deliver :)
         */
-        // ·ÇappÏÞÖÆÇÒ±ÈÖ®Ç°¹Û²âµ½µÄbw»¹´ó£¬¸üÐÂbw
+        // ï¿½ï¿½appï¿½ï¿½ï¿½ï¿½ï¿½Ò±ï¿½Ö®Ç°ï¿½Û²âµ½ï¿½ï¿½bwï¿½ï¿½ï¿½ó£¬¸ï¿½ï¿½ï¿½bw
     if (!app_limit || cur_bw >= bbr_max_bw()) {
         /* Incorporate new sample into our max bw filter. */
         minmax_running_max(&bw, bbr_bw_rtts, rtt_cnt, cur_bw);
@@ -377,16 +377,16 @@ void CBbr::bbr_check_full_bw_reached(bool app_limite) {
     uint32_t bw_thresh;
 
     /*
-        Èç¹ûÒÑ¾­±ê¼ÇÁË´ø¿íÂúÁË£¬»òÕßround_start=0,¼´»¹Î´¿ªÊ¼²â£¬»òÕßÓ¦ÓÃ²ãÏÞÖÆ×¡ÁË£¬Ö±½ÓÍË³ö
+        ï¿½ï¿½ï¿½ï¿½Ñ¾ï¿½ï¿½ï¿½ï¿½ï¿½Ë´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ë£ï¿½ï¿½ï¿½ï¿½ï¿½round_start=0,ï¿½ï¿½ï¿½ï¿½Î´ï¿½ï¿½Ê¼ï¿½â£¬ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½Ã²ï¿½ï¿½ï¿½ï¿½ï¿½×¡ï¿½Ë£ï¿½Ö±ï¿½ï¿½ï¿½Ë³ï¿½
     */
     if (bbr_full_bw_reached() || !round_start || app_limite)
         return;
 
-    // bwÃ»ÓÐÔö´ó bbr_full_bw_thresh 25%
+    // bwÃ»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ bbr_full_bw_thresh 25%
     /*
-        Èç¹ûbbrÏÖÔÚµÄ×î´ó´ø¿í±È×î½ü´ø¿í¶àÁËÉè¶¨µÄãÐÖµbbr_full_bw_thresh£¬
-        ¸üÐÂ×î½ü´ø¿íbbr->full_bw£¬²¢°Ñfull_bw_cntÇå0
-        ·ñÔòfull_bw_cnt+1£¬full_bw_cnt³¬¹ý3¾Í±íÊ¾´ø¿íÂúÁË
+        ï¿½ï¿½ï¿½bbrï¿½ï¿½ï¿½Úµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½è¶¨ï¿½ï¿½ï¿½ï¿½Öµbbr_full_bw_threshï¿½ï¿½
+        ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½bbr->full_bwï¿½ï¿½ï¿½ï¿½ï¿½ï¿½full_bw_cntï¿½ï¿½0
+        ï¿½ï¿½ï¿½ï¿½full_bw_cnt+1ï¿½ï¿½full_bw_cntï¿½ï¿½ï¿½ï¿½3ï¿½Í±ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     */
     bw_thresh = (uint64_t)full_bw * bbr_full_bw_thresh >> BBR_SCALE;
     if (bbr_max_bw() >= bw_thresh) {
@@ -394,43 +394,42 @@ void CBbr::bbr_check_full_bw_reached(bool app_limite) {
         full_bw_cnt = 0;
         return;
     }
-    // ÔòÈÏÎªpipeÒÑ¾­Âú
+    // ï¿½ï¿½ï¿½ï¿½Îªpipeï¿½Ñ¾ï¿½ï¿½ï¿½
     ++full_bw_cnt;
     full_bw_reached = full_bw_cnt >= bbr_full_bw_cnt;
 }
 
-void CBbr::bbr_check_drain(uint64_t delivered_mstamp, uint32_t pacing_rate, uint32_t inflight, uint32_t& snd_ssthresh) {
-    // Èç¹ûÊÇBBR_STARTUP½×¶Îpipe±äÂú¡£Ôò½øÈëBBR_DRAIN½×¶Î
+void CBbr::bbr_check_drain(uint64_t delivered_mstamp, uint32_t pacing_rate, uint32_t inflight) {
+    // ï¿½ï¿½ï¿½ï¿½ï¿½BBR_STARTUPï¿½×¶ï¿½pipeï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½BBR_DRAINï¿½×¶ï¿½
     /*
-        Èç¹ûÂýÆô¶¯½×¶Î´ø¿íÂúÁË(´°¿Ú²»±ä£¬ËÙ¶È¼õÐ¡)
-        ¸üÐÂ×´Ì¬»úµ½ÅÅ¿Õ×´Ì¬
-        ¸üÐÂpacing_gain
-        ±£³Öcwnd_gain
+        ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×¶Î´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½(ï¿½ï¿½ï¿½Ú²ï¿½ï¿½ä£¬ï¿½Ù¶È¼ï¿½Ð¡)
+        ï¿½ï¿½ï¿½ï¿½×´Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½Å¿ï¿½×´Ì¬
+        ï¿½ï¿½ï¿½ï¿½pacing_gain
+        ï¿½ï¿½ï¿½ï¿½cwnd_gain
     */
     if (mode == BBR_STARTUP && bbr_full_bw_reached()) {
         mode = BBR_DRAIN;	/* drain queue we created */
-        pacing_gain = bbr_drain_gain;	/* pace slow to drain »ºÂýµÄ¼õÐ¡*/
-        cwnd_gain = bbr_high_gain;	/* maintain cwnd ±£³Ö·¢ËÍ´°Ìå´óÐ¡*/
-        snd_ssthresh = bbr_target_cwnd(pacing_rate, bbr_max_bw(), BBR_UNIT);
+        pacing_gain = bbr_drain_gain;	/* pace slow to drain ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½Ð¡*/
+        cwnd_gain = bbr_high_gain;	/* maintain cwnd ï¿½ï¿½ï¿½Ö·ï¿½ï¿½Í´ï¿½ï¿½ï¿½ï¿½Ð¡*/
     }	/* fall through to check if in-flight is already small: */
 
-    // Èç¹ûÊÇBBR_DRAIN½×¶Î
+    // ï¿½ï¿½ï¿½ï¿½ï¿½BBR_DRAINï¿½×¶ï¿½
     /*
-        Èç¹ûÅÅ¿Õ½×¶Îinflight<=target£¬¼´¶ÓÁÐÒÑ¾­Çå¿Õ£¬ÇÐ»»µ½´ø¿íÌ½²â×´Ì¬»ú
+        ï¿½ï¿½ï¿½ï¿½Å¿Õ½×¶ï¿½inflight<=targetï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ñ¾ï¿½ï¿½ï¿½Õ£ï¿½ï¿½Ð»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì½ï¿½ï¿½×´Ì¬ï¿½ï¿½
     */
     if (mode == BBR_DRAIN && inflight <= bbr_target_cwnd(pacing_rate, bbr_max_bw(), BBR_UNIT))
-        bbr_reset_probe_bw_mode(delivered_mstamp);  /* we estimate queue is drained ÎÒÃÇ¹À¼Æ¶ÓÁÐÒÑºÄ¾¡*/
+        bbr_reset_probe_bw_mode(delivered_mstamp);  /* we estimate queue is drained ï¿½ï¿½ï¿½Ç¹ï¿½ï¿½Æ¶ï¿½ï¿½ï¿½ï¿½ÑºÄ¾ï¿½*/
 }
 
 void CBbr::bbr_check_probe_rtt_done(uint64_t delivered_mstamp, uint32_t& send_wnd) {
-    // probe_rtt_done_stampÎ´½áÊø
+    // probe_rtt_done_stampÎ´ï¿½ï¿½ï¿½ï¿½
     if (!(probe_rtt_done_stamp &&
         GetCurTimeStamp() < probe_rtt_done_stamp))
         return;
 
-    // µÈ´ýÒ»¶ÎÊ±¼ä£¬Ö±µ½Ì½²â½áÊø
+    // ï¿½È´ï¿½Ò»ï¿½ï¿½Ê±ï¿½ä£¬Ö±ï¿½ï¿½Ì½ï¿½ï¿½ï¿½ï¿½ï¿½
     min_rtt_stamp = GetCurTimeStamp();  /* wait a while until PROBE_RTT */
-    // ÉèÖÃ·¢ËÍ´°Ìå´óÐ¡
+    // ï¿½ï¿½ï¿½Ã·ï¿½ï¿½Í´ï¿½ï¿½ï¿½ï¿½Ð¡
     send_wnd = std::max(send_wnd, prior_cwnd);
     bbr_reset_mode(delivered_mstamp);
 }
@@ -439,27 +438,27 @@ void CBbr::bbr_update_min_rtt(uint64_t delivered_mstamp, uint32_t inflight, uint
     bool filter_expired;
 
     /* Track min RTT seen in the min_rtt_win_sec filter window: */
-    // µ±Ç°µÄ×îÐ¡rtt²É¼¯Ê±¼ä´ÁÊÇ·ñÒÑ¾­³¬¹ý 10s µÄÊ±¼ä´°¿Ú
+    // ï¿½ï¿½Ç°ï¿½ï¿½ï¿½ï¿½Ð¡rttï¿½É¼ï¿½Ê±ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½Ñ¾ï¿½ï¿½ï¿½ï¿½ï¿½ 10s ï¿½ï¿½Ê±ï¿½ä´°ï¿½ï¿½
     /*
-        ×îÐ¡rttÓÐÐ§Ê±¼äÎªbbr_min_rtt_win_sec*HZ, ¼´10s, Èç¹ûÓÐÐ§Ê±¼ä¹ýÁË»òÕßÐÂ²ÉµÄrtt¸üÐ¡£¬
-        ¸üÐÂ×îÐ¡rtt´óÐ¡ºÍ×îÐ¡rtt·¢ÉúµÄÊ±¼ä
+        ï¿½ï¿½Ð¡rttï¿½ï¿½Ð§Ê±ï¿½ï¿½Îªbbr_min_rtt_win_sec*HZ, ï¿½ï¿½10s, ï¿½ï¿½ï¿½ï¿½ï¿½Ð§Ê±ï¿½ï¿½ï¿½ï¿½Ë»ï¿½ï¿½ï¿½ï¿½Â²Éµï¿½rttï¿½ï¿½Ð¡ï¿½ï¿½
+        ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¡rttï¿½ï¿½Ð¡ï¿½ï¿½ï¿½ï¿½Ð¡rttï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½
     */
     filter_expired = GetCurTimeStamp() < min_rtt_stamp + bbr_min_rtt_win_sec * HZ;
-    // ±¾´Î²É¼¯µ½rttÊ±¼ä£¬ ÇÒ±Èµ±Ç°µÄ×îÐ¡rttÐ¡£¬»òÕßÇ°×îÐ¡rtt²É¼¯Ê±¼ä´ÁÒÑ¾­¹ýÆÚ£¬±¾´Îack²»ÊÇÑÓ³ÙÈ·ÈÏµÄack
+    // ï¿½ï¿½ï¿½Î²É¼ï¿½ï¿½ï¿½rttÊ±ï¿½ä£¬ ï¿½Ò±Èµï¿½Ç°ï¿½ï¿½ï¿½ï¿½Ð¡rttÐ¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç°ï¿½ï¿½Ð¡rttï¿½É¼ï¿½Ê±ï¿½ï¿½ï¿½ï¿½Ñ¾ï¿½ï¿½ï¿½ï¿½Ú£ï¿½ï¿½ï¿½ï¿½ï¿½ackï¿½ï¿½ï¿½ï¿½ï¿½Ó³ï¿½È·ï¿½Ïµï¿½ack
     if (rtt_us >= 0 && (rtt_us <= min_rtt_us || (filter_expired))) {
         min_rtt_us = rtt_us;
         min_rtt_stamp = GetCurTimeStamp();
     }
 
-    // filter_expiredÒÑ¾­¹ýÈ¥
+    // filter_expiredï¿½Ñ¾ï¿½ï¿½ï¿½È¥
     /*
-        Èç¹û¿ªÆôÁËrttÌ½²â¹¦ÄÜ£¬ÇÒ×îÐ¡rttÓÐÐ§Ê±¼ä¹ýÁË(Ò²¿ÉÒÔÀí½âÎªrttÌ½²âÖÜÆÚµ½ÁË)£¬
-        ÇÒidle_restart==0£¨²»ÊÇ´Ó¿ÕÏÐ×´Ì¬ÖØÆôµÄ£©£¬ÇÒµ±Ç°²»´¦ÔÚrttÌ½²â×´Ì¬BBR_PROBE_RTT£º
-        ÉèÖÃ×´Ì¬»úÎªBBR_PROBE_RTT£¬¼õÐ¡·¢ËÍËÙ¶ÈºÍ·¢ËÍ´°¿Ú£¬±£ÁôÖ®Ç°´°¿ÚÓÃÀ´»Ö¸´£¬
-        rttÌ½²â½áÊøÊ±¼ä±ê¼ÇÎªÎÞÐ§Öµ0£¨ºóÃæ»áÉèÖÃ¾ßÌåÓÐÐ§Öµ£©
+        ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½rttÌ½ï¿½â¹¦ï¿½Ü£ï¿½ï¿½ï¿½ï¿½ï¿½Ð¡rttï¿½ï¿½Ð§Ê±ï¿½ï¿½ï¿½ï¿½ï¿½(Ò²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÎªrttÌ½ï¿½ï¿½ï¿½ï¿½ï¿½Úµï¿½ï¿½ï¿½)ï¿½ï¿½
+        ï¿½ï¿½idle_restart==0ï¿½ï¿½ï¿½ï¿½ï¿½Ç´Ó¿ï¿½ï¿½ï¿½×´Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½Ä£ï¿½ï¿½ï¿½ï¿½Òµï¿½Ç°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½rttÌ½ï¿½ï¿½×´Ì¬BBR_PROBE_RTTï¿½ï¿½
+        ï¿½ï¿½ï¿½ï¿½×´Ì¬ï¿½ï¿½ÎªBBR_PROBE_RTTï¿½ï¿½ï¿½ï¿½Ð¡ï¿½ï¿½ï¿½ï¿½ï¿½Ù¶ÈºÍ·ï¿½ï¿½Í´ï¿½ï¿½Ú£ï¿½ï¿½ï¿½ï¿½ï¿½Ö®Ç°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½
+        rttÌ½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½Ð§Öµ0ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã¾ï¿½ï¿½ï¿½ï¿½ï¿½Ð§Öµï¿½ï¿½
     */
     if (bbr_probe_rtt_mode_ms > 0 && filter_expired && !idle_restart && mode != BBR_PROBE_RTT) {
-        // ½øÈëBBR_PROBE_RTTÄ£Ê½
+        // ï¿½ï¿½ï¿½ï¿½BBR_PROBE_RTTÄ£Ê½
         mode = BBR_PROBE_RTT;  /* dip, drain queue */
         pacing_gain = BBR_UNIT;
         cwnd_gain = BBR_UNIT;
@@ -467,20 +466,20 @@ void CBbr::bbr_update_min_rtt(uint64_t delivered_mstamp, uint32_t inflight, uint
         probe_rtt_done_stamp = 0;
     }
     /*
-    Èç¹û´¦ÓÚrttÌ½²â×´Ì¬£¬¸üÐÂÏÞÖÆ
-    Èç¹ûprobe_rtt_done_stamp=0£¨½áÊø±ê¼ÇÎÞÐ§£©£¬ÇÒÍøÂçÖÐµÄ°üÉÙÓÚbbr_cwnd_min_target
-        ¸üÐÂrttÌ½²â½áÊøÊ±¼ä,ÉèÖÃprobe_rtt_round_done=0(±ê¼ÇrttÌ½²â»¹Ã»ÓÐ¿ªÊ¼×ö¹ý),¸üÐÂÏÂÒ»¸örttµÄdelivered
-    ·ñÔòÈç¹ûprobe_rtt_done_stamp!=0£¨½áÊø±ê¼ÇÓÐÐ§£©
-        Èç¹ûround_start=1
-            ±ê¼Çprobe_rtt_round_done=1£¨rttÌ½²âÒÑ¾­¿ªÊ¼×öÁË£©
-        Èç¹ûrttÌ½²âÒÑ¾­Éú×ö¹ýÁË£¬¶øÇÒÌ½²âÊ±³¤µ½ÁË
-            ¸üÐÂ×îÐ¡rtt¼ÆËãµÄÊ±¼ä£¨ÓÃÓÚÅÐ¶ÏÓÐÃ»ÓÐ¹ýÆÚ£¬ÒÔÖØÐÂ½øÈërttÌ½²âÖÜÆÚ£©
-            ±ê¼Ç»Ö¸´´°¿Ú
-            ÖØÖÃÄ£ÐÍ
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½rttÌ½ï¿½ï¿½×´Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    ï¿½ï¿½ï¿½probe_rtt_done_stamp=0ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð§ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÐµÄ°ï¿½ï¿½ï¿½ï¿½ï¿½bbr_cwnd_min_target
+        ï¿½ï¿½ï¿½ï¿½rttÌ½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½,ï¿½ï¿½ï¿½ï¿½probe_rtt_round_done=0(ï¿½ï¿½ï¿½rttÌ½ï¿½â»¹Ã»ï¿½Ð¿ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½),ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½rttï¿½ï¿½delivered
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½probe_rtt_done_stamp!=0ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð§ï¿½ï¿½
+        ï¿½ï¿½ï¿½round_start=1
+            ï¿½ï¿½ï¿½probe_rtt_round_done=1ï¿½ï¿½rttÌ½ï¿½ï¿½ï¿½Ñ¾ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½Ë£ï¿½
+        ï¿½ï¿½ï¿½rttÌ½ï¿½ï¿½ï¿½Ñ¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ë£ï¿½ï¿½ï¿½ï¿½ï¿½Ì½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+            ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¡rttï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ä£¨ï¿½ï¿½ï¿½ï¿½ï¿½Ð¶ï¿½ï¿½ï¿½Ã»ï¿½Ð¹ï¿½ï¿½Ú£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â½ï¿½ï¿½ï¿½rttÌ½ï¿½ï¿½ï¿½ï¿½ï¿½Ú£ï¿½
+            ï¿½ï¿½Ç»Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½
+            ï¿½ï¿½ï¿½ï¿½Ä£ï¿½ï¿½
     */
     if (mode == BBR_PROBE_RTT) {
         /* Maintain min packets in flight for max(200 ms, 1 round). */
-        // ÔÚ·ÉÐÐÖÐ±£³Ö×î¶ÌÊý¾Ý°ü£¨200ºÁÃë£¬1ÂÖ£©
+        // ï¿½Ú·ï¿½ï¿½ï¿½ï¿½Ð±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý°ï¿½ï¿½ï¿½200ï¿½ï¿½ï¿½ë£¬1ï¿½Ö£ï¿½
         if (!probe_rtt_done_stamp &&
             inflight <= bbr_cwnd_min_target) {
             probe_rtt_done_stamp = GetCurTimeStamp() + bbr_probe_rtt_mode_ms;
@@ -526,30 +525,30 @@ void CBbr::bbr_init() {
 void CBbr::bbr_update_model(uint32_t pacing_rate, uint32_t inflight, uint32_t rrt,
     uint64_t delivered_mstamp,  uint32_t delivered, 
     uint32_t lost, bool app_limit,
-    uint32_t& snd_ssthresh, uint32_t& send_wnd) {
-    //¸üÐÂµ±Ç°×î´óbw
+    uint32_t& send_wnd) {
+    //ï¿½ï¿½ï¿½Âµï¿½Ç°ï¿½ï¿½ï¿½bw
     bbr_update_bw(rrt, delivered_mstamp, delivered, lost, app_limit);
-    // ¸üÐÂÔöÒæÒò×Ó
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     bbr_update_cycle_phase(pacing_rate, delivered_mstamp, inflight, lost > 0);
-    // ¼ì²âpipeÒÑ¾­Âú
+    // ï¿½ï¿½ï¿½pipeï¿½Ñ¾ï¿½ï¿½ï¿½
     bbr_check_full_bw_reached(app_limit);
-    // Èç¹û¶ÓÁÐÒÑ¾­Âú£¬ ¼ì²âÊÇ·ñÓ¦¸Ã¼õÐ¡·¢ËÍËÙ¶È
-    bbr_check_drain(delivered_mstamp, pacing_rate, inflight, snd_ssthresh);
-    // ¸üÐÂ×îÐ¡rttÊ±¼ä
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ñ¾ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ç·ï¿½Ó¦ï¿½Ã¼ï¿½Ð¡ï¿½ï¿½ï¿½ï¿½ï¿½Ù¶ï¿½
+    bbr_check_drain(delivered_mstamp, pacing_rate, inflight);
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¡rttÊ±ï¿½ï¿½
     bbr_update_min_rtt(delivered_mstamp, inflight, delivered, rrt, send_wnd);
 }
 
 void CBbr::bbr_main(uint32_t inflight, uint32_t rrt, uint32_t acked,
     uint64_t delivered_mstamp, uint32_t delivered, uint32_t lost, bool app_limit, 
-    uint32_t& snd_ssthresh, uint32_t& send_wnd, uint32_t& pacing_rate) {
+    uint32_t& send_wnd, uint32_t& pacing_rate) {
 
     uint32_t bw;
     bbr_update_model(pacing_rate, inflight, rrt,
         delivered_mstamp, delivered, lost, app_limit,
-        snd_ssthresh, send_wnd);
+        send_wnd);
 
     bw = bbr_bw();
-    // ÉèÖÃ·¢ËÍËÙ¶ÈºÍ´°Ìå´óÐ¡
+    // ï¿½ï¿½ï¿½Ã·ï¿½ï¿½ï¿½ï¿½Ù¶ÈºÍ´ï¿½ï¿½ï¿½ï¿½Ð¡
     bbr_set_pacing_rate(rrt, send_wnd, bw, pacing_gain, pacing_rate);
     bbr_set_cwnd(pacing_rate, acked, bw, pacing_gain, send_wnd);
 }

@@ -9,7 +9,9 @@ using namespace hudp;
 
 CTimer CPacing::_timer;
 
-CPacing::CPacing() :_next_time(0) {
+CPacing::CPacing(std::function<void(std::shared_ptr<CMsg>)> cb) :
+            _next_time(0),
+            _msg_send_call_back(cb) {
     
 }
 
@@ -59,7 +61,7 @@ void CPacing::SendMessage(std::shared_ptr<CMsg> msg) {
 
     // set send msg time
     msg->SetSendTime(now);
-    CHudpImpl::Instance().SendMessageToNet(msg);
+    _msg_send_call_back(msg);
 }
 
 void CPacing::RemoveMsg(std::shared_ptr<CMsg> msg) {
