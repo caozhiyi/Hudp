@@ -54,7 +54,7 @@ namespace hudp {
     // 15ms. so min rto = 60ms
     static const uint32_t __init_mdev_max = 15;
     // 1000ms.
-    static const uint32_t __init_cur_rto = 1000;
+    static const uint32_t __init_cur_rto = __resend_time;
     // msg with send time stamp, to calculation rtt time
     static const bool     __msg_with_time = true;
 

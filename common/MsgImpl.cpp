@@ -51,8 +51,8 @@ void CMsgImpl::AddSendDelay() {
     _backoff_factor = _backoff_factor >> 2;
 }
 
-uint16_t CMsgImpl::GetReSendTime() {
-    return __resend_time * _backoff_factor;
+uint16_t CMsgImpl::GetReSendTime(uint32_t rto) {
+    return rto * _backoff_factor;
 }
 
 void CMsgImpl::SetHeaderFlag(uint32_t flag) {

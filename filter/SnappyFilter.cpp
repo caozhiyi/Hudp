@@ -19,7 +19,6 @@ bool CSnappyFilter::RelieveFilterProcess(const HudpHandle& handle, uint16_t flag
 
 bool CSnappyFilter::SnappyCompress(std::string &in_put, std::string &output) {
     char* input_pt = (char*)in_put.data();
-    int size = in_put.size();
     size_t out_size = snappy_max_compressed_length(in_put.size());
 
     output.clear();

@@ -133,7 +133,7 @@ void CSocketImpl::ToRecv(std::shared_ptr<CMsg> msg) {
 void CSocketImpl::ToSend(std::shared_ptr<CMsg> msg) {
     // add to timer
     if (msg->GetHeaderFlag() & HTF_RELIABLE_ORDERLY || msg->GetHeaderFlag() & HTF_RELIABLE) {
-        CTimer::Instance().AddTimer(msg->GetReSendTime(), msg);
+        CTimer::Instance().AddTimer(msg->GetReSendTime(_rto->GetRto()), msg);
     }
 
     // set send msg time
@@ -300,7 +300,7 @@ void CSocketImpl::GetAckToSendWnd(std::shared_ptr<CMsg> msg) {
                 _rto->SetRttTime(rtt_time);
             }
         }
-        ControllerProcess(WI_RELIABLE_ORDERLY, rtt_time, (uint32_t)vec.size(), ack_msg_size);
+        ControllerProcess(WI_RELIABLE_ORDERLY, (uint32_t)rtt_time, (uint32_t)vec.size(), ack_msg_size);
         if (!__msg_with_time) {
             uint64_t rtt_time = GetRtt(msg);
             _rto->SetRttTime(rtt_time);
@@ -320,7 +320,7 @@ void CSocketImpl::GetAckToSendWnd(std::shared_ptr<CMsg> msg) {
                 _rto->SetRttTime(rtt_time);
             }
         }
-        ControllerProcess(WI_RELIABLE, rtt_time, vec.size(), ack_msg_size);
+        ControllerProcess(WI_RELIABLE, (uint32_t)rtt_time, (uint32_t)vec.size(), ack_msg_size);
         if (!__msg_with_time) {
             uint64_t rtt_time = GetRtt(msg);
             _rto->SetRttTime(rtt_time);

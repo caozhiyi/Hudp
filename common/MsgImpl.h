@@ -26,7 +26,7 @@ namespace hudp {
 
         // add send delay time
         void AddSendDelay();
-        uint16_t GetReSendTime();
+        uint16_t GetReSendTime(uint32_t rto);
 
         void SetHeaderFlag(uint32_t flag);
         uint32_t GetHeaderFlag();

@@ -38,7 +38,7 @@ namespace hudp {
 
         // add send delay time
         virtual void AddSendDelay() = 0;
-        virtual uint16_t GetReSendTime() = 0;
+        virtual uint16_t GetReSendTime(uint32_t rto) = 0;
 
         virtual void SetHeaderFlag(uint32_t flag) = 0;
         virtual uint32_t GetHeaderFlag() = 0;

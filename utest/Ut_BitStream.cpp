@@ -36,14 +36,14 @@ TEST(BitStream, case5) {
     
 TEST(BitStream, case6) {
     char buf[] = "12345678910";
-    EXPECT_TRUE(bit_stream.Write(buf, strlen(buf)));
-    length_1 += strlen(buf);
+    EXPECT_TRUE(bit_stream.Write(buf, (uint16_t)strlen(buf)));
+    length_1 += (int)strlen(buf);
 }
 
 TEST(BitStream, case7) {
     std::string str = "BasdadasdasdadasB";
     EXPECT_TRUE(bit_stream.Write(str));
-    length_1 += str.length();
+    length_1 += (int)str.length();
 }
  
 TEST(BitStream, case8) {
@@ -82,13 +82,13 @@ TEST(BitStream, case14) {
 
 TEST(BitStream, case15) {
     char buf[16] = {0};
-    EXPECT_TRUE(bit_stream_2.Read(buf, strlen("12345678910")));
+    EXPECT_TRUE(bit_stream_2.Read(buf, (uint16_t)strlen("12345678910")));
     EXPECT_STREQ("12345678910", buf);
 }
 
 TEST(BitStream, case16) {
     std::string str;
-    EXPECT_TRUE(bit_stream_2.Read(str, strlen("BasdadasdasdadasB")));
+    EXPECT_TRUE(bit_stream_2.Read(str, (uint16_t)strlen("BasdadasdasdadasB")));
     EXPECT_STREQ("BasdadasdasdadasB", str.c_str());
 }
 
@@ -120,7 +120,7 @@ TEST(BitStream, case21) {
 
 TEST(BitStream, case22) {
     char buf[16] = { 0 };
-    EXPECT_TRUE(bit_stream_3.Read(buf, strlen("12345678910")));
+    EXPECT_TRUE(bit_stream_3.Read(buf, (uint16_t)strlen("12345678910")));
     EXPECT_STREQ("12345678910", buf);
 }
 
