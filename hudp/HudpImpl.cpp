@@ -44,12 +44,12 @@ void CHudpImpl::Init() {
             base::CLog::Instance().Start();
         }
     }
-	/*******************add body filter here.********************/
+    /*******************add body filter here.********************/
     _filter_process->AddFilter(std::shared_ptr<CFilter>(new CHeadFilter()));
-	_filter_process->AddFilter(std::shared_ptr<CFilter>(new CSnappyFilter()));
-	_filter_process->AddFilter(std::shared_ptr<CFilter>(new CFlowSlicingFilter()));
+    _filter_process->AddFilter(std::shared_ptr<CFilter>(new CSnappyFilter()));
+    _filter_process->AddFilter(std::shared_ptr<CFilter>(new CFlowSlicingFilter()));
     _filter_process->AddFilter(std::shared_ptr<CFilter>(new CEndFilter()));
-	/*******************add body filter here.********************/
+    /*******************add body filter here.********************/
 }
 
 bool CHudpImpl::Start(const std::string& ip, uint16_t port, const recv_back& func) {
