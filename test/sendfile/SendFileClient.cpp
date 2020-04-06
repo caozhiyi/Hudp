@@ -51,12 +51,12 @@ public:
     }
 
     void StartSendFile(const HudpHandle& handle) {        
-		std::cout << "start to header ..." << std::endl;
-		GetFileHeader();
-		std::cout << "get file name   : " << _header._name << std::endl;
-		std::cout << "get file length : " << _header._length << std::endl;
-		std::cout << "get file md5    : " << _header._md5 << std::endl;
-		SendTo(handle, __send_flag, (char*)&_header, sizeof(_header));
+        std::cout << "start to header ..." << std::endl;
+        GetFileHeader();
+        std::cout << "get file name   : " << _header._name << std::endl;
+        std::cout << "get file length : " << _header._length << std::endl;
+        std::cout << "get file md5    : " << _header._md5 << std::endl;
+        SendTo(handle, __send_flag, (char*)&_header, sizeof(_header));
     }
 
 private:
@@ -104,11 +104,11 @@ int main(int argc, char *argv[]) {
 
     hudp::Init();
 
-	hudp::Start("0.0.0.0", 8922, std::bind(&CSendFile::OnRecv, &file, std::placeholders::_1, std::placeholders::_2,
-		std::placeholders::_3));
+    hudp::Start("0.0.0.0", 8922, std::bind(&CSendFile::OnRecv, &file, std::placeholders::_1, std::placeholders::_2,
+        std::placeholders::_3));
 
-	file.StartSendFile("127.0.0.1:8921");
+    file.StartSendFile("127.0.0.1:8921");
     
-	hudp::Join();
+    hudp::Join();
     return 0;
 }
