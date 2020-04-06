@@ -7,18 +7,19 @@
 
 namespace hudp {
     class CMsg;
-    class CSendWnd
-    {
+    class CSendWnd {
     public:
         CSendWnd() {}
         virtual ~CSendWnd() {}
 
         virtual void PushBack(std::shared_ptr<CMsg> msg) = 0;
         // receive a ack
-        virtual void AcceptAck(uint16_t id) = 0;
-        virtual void AcceptAck(uint16_t start_id, uint16_t len) = 0;
-        virtual void AcceptAck(std::vector<uint16_t>& vec_id, uint16_t start_index, uint16_t len) = 0;
+        virtual uint32_t AcceptAck(uint16_t id) = 0;
+        virtual uint32_t AcceptAck(uint16_t start_id, uint16_t len) = 0;
+        virtual uint32_t AcceptAck(std::vector<uint16_t>& vec_id, uint16_t start_index, uint16_t len) = 0;
 
+        virtual bool IsAppLimit() = 0;
+        virtual uint16_t GetWndSize() = 0;
         // change send window size
         virtual void ChangeSendWndSize(uint16_t size) = 0;
 

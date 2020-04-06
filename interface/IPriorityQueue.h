@@ -7,8 +7,7 @@
 namespace hudp {
 
     class CMsg;
-    class CPriorityQueue
-    {
+    class CPriorityQueue {
     public:
         CPriorityQueue() {}
         virtual ~CPriorityQueue() {}

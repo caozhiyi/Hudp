@@ -6,8 +6,7 @@
 
 namespace hudp {
     class CMsg;
-    class CSocket
-    {
+    class CSocket {
     public:
         CSocket() {}
         virtual ~CSocket() {}
