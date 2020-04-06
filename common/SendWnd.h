@@ -22,10 +22,12 @@ namespace hudp {
 
         void PushBack(std::shared_ptr<CMsg> msg);
         // receive a ack
-        void AcceptAck(uint16_t id);
-        void AcceptAck(uint16_t start_id, uint16_t len);
-        void AcceptAck(std::vector<uint16_t>& vec_id, uint16_t start_index, uint16_t len);
+        uint32_t AcceptAck(uint16_t id);
+        uint32_t AcceptAck(uint16_t start_id, uint16_t len);
+        uint32_t AcceptAck(std::vector<uint16_t>& vec_id, uint16_t start_index, uint16_t len);
 
+        bool IsAppLimit();
+        uint16_t GetWndSize();
         // change send window size
         void ChangeSendWndSize(uint16_t size);
 

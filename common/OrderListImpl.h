@@ -10,9 +10,9 @@
 
 namespace hudp {
     
-	class CMsg;
+    class CMsg;
     // order list base class
-	class CRecvList : public COrderList {
+    class CRecvList : public COrderList {
     public:
         CRecvList();
         virtual ~CRecvList();
@@ -21,7 +21,7 @@ namespace hudp {
         // return 0, msg is normal
         // return 1, repeat msg
         // return 2, continuously disordered messages
-		virtual uint16_t Insert(std::shared_ptr<CMsg> msg) = 0;
+        virtual uint16_t Insert(std::shared_ptr<CMsg> msg) = 0;
 
         // make id little than order list max size
         uint16_t HashFunc(uint16_t id);
@@ -37,7 +37,7 @@ namespace hudp {
         // add a item to order list
         // return 0 if success
         // return 1 if msg is repeat
-		virtual uint16_t Insert(std::shared_ptr<CMsg> msg);
+        virtual uint16_t Insert(std::shared_ptr<CMsg> msg);
     private:
         std::mutex _mutex;
         uint16_t _expect_id;
@@ -54,7 +54,7 @@ namespace hudp {
         // add a item to order list
         // return 0 if success
         // return 1 if msg is repeat
-		virtual uint16_t Insert(std::shared_ptr<CMsg> msg);
+        virtual uint16_t Insert(std::shared_ptr<CMsg> msg);
     private:
         std::mutex _mutex;
         uint16_t   _order_list[__msx_cache_msg_num];
@@ -68,7 +68,7 @@ namespace hudp {
         virtual ~COrderlyList();
         // add a item to order list
         // always return 0
-		virtual uint16_t Insert(std::shared_ptr<CMsg> msg);
+        virtual uint16_t Insert(std::shared_ptr<CMsg> msg);
     private:
         uint16_t _expect_id;
     };

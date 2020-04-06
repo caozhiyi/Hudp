@@ -34,7 +34,7 @@ CReliableOrderlyList::~CReliableOrderlyList() {
 }
 
 uint16_t CReliableOrderlyList::Insert(std::shared_ptr<CMsg> msg) {
-	auto id = msg->GetId();
+    auto id = msg->GetId();
     uint16_t index = HashFunc(id);
 
     // too farm, discard this msg
@@ -51,7 +51,7 @@ uint16_t CReliableOrderlyList::Insert(std::shared_ptr<CMsg> msg) {
         std::unique_lock<std::mutex> lock(_mutex);
 
         if (id == _expect_id) {
-			_order_list[index] = msg;
+            _order_list[index] = msg;
             while (_order_list[index]) {
                 _expect_id++;
                 _recv_list.Push(_order_list[index]);
@@ -69,7 +69,7 @@ uint16_t CReliableOrderlyList::Insert(std::shared_ptr<CMsg> msg) {
             if (_order_list[index]) {
                 return 1;
             } else {
-				_order_list[index] = msg;
+                _order_list[index] = msg;
             }
             
         }
@@ -79,8 +79,8 @@ uint16_t CReliableOrderlyList::Insert(std::shared_ptr<CMsg> msg) {
         std::shared_ptr<CMsg> item;
 
         while (_recv_list.Pop(item)) {
-			auto sock = item->GetSocket();
-			sock->ToRecv(item);
+            auto sock = item->GetSocket();
+            sock->ToRecv(item);
         }
         _recv_list.Clear();
     }
@@ -97,7 +97,7 @@ CReliableList::~CReliableList() {
 
 // reliable list, only judgement repetition in msg cache
 uint16_t CReliableList::Insert(std::shared_ptr<CMsg> msg) {
-	auto id = msg->GetId();
+    auto id = msg->GetId();
     uint16_t index = HashFunc(id);
     // too farm, discard this msg
     if (std::abs(id - _expect_id) > __max_compare_num ||
@@ -122,7 +122,7 @@ uint16_t CReliableList::Insert(std::shared_ptr<CMsg> msg) {
     }
     _expect_id = id;
     auto sock = msg->GetSocket();
-	sock->ToRecv(msg);
+    sock->ToRecv(msg);
     return 0;
 }
 
@@ -136,7 +136,7 @@ COrderlyList::~COrderlyList() {
 
 // orderly list, if msg id is bigger than expect id, recv it.
 uint16_t COrderlyList::Insert(std::shared_ptr<CMsg> msg) {
-	auto id = msg->GetId();
+    auto id = msg->GetId();
     // too farm, discard this msg
     if (std::abs(id - _expect_id) > __max_compare_num ||
         (_expect_id > (__max_id - __max_compare_num / 2) && id < __max_compare_num / 2)) {
@@ -151,7 +151,7 @@ uint16_t COrderlyList::Insert(std::shared_ptr<CMsg> msg) {
     }
 
     _expect_id = id;
-	auto sock = msg->GetSocket();
+    auto sock = msg->GetSocket();
     sock->ToRecv(msg);
     return 0;
 }

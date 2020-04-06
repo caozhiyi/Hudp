@@ -43,13 +43,13 @@ void CSendWndImpl::PushBack(std::shared_ptr<CMsg> msg) {
     }
 }
 // receive a ack
-void CSendWndImpl::AcceptAck(uint16_t id) {
+uint32_t CSendWndImpl::AcceptAck(uint16_t id) {
 
     base::LOG_DEBUG("send wnd recv a ack. id : %d", id);
     std::unique_lock<std::mutex> lock(_mutex);
     auto iter = _id_msg_map.find(id);
     if (iter == _id_msg_map.end()) {
-        return;
+        return 0;
     }
 
     if (iter->second == _start) {
@@ -85,22 +85,36 @@ void CSendWndImpl::AcceptAck(uint16_t id) {
     // send next bag
     SendNext();
 
+    uint32_t ret = iter->second->GetEstimateSize();
     _id_msg_map.erase(iter);
  
     SendAndAck();
+    return ret;
 }
 
-void CSendWndImpl::AcceptAck(uint16_t start_id, uint16_t len) {
+uint32_t CSendWndImpl::AcceptAck(uint16_t start_id, uint16_t len) {
+    uint32_t ret = 0;
     for (uint16_t index = start_id, i = 0; i < len; index++, i++) {
-        AcceptAck(index);
+        ret += AcceptAck(index);
     }
+    return ret;
 }
 
-void CSendWndImpl::AcceptAck(std::vector<uint16_t>& vec_id, uint16_t start_index, uint16_t len) {
+uint32_t CSendWndImpl::AcceptAck(std::vector<uint16_t>& vec_id, uint16_t start_index, uint16_t len) {
     len = start_index + len;
+    uint32_t ret = 0;
     for (; start_index < len; start_index++) {
-        AcceptAck(vec_id[start_index]);
+        ret += AcceptAck(vec_id[start_index]);
     }
+    return ret;
+}
+
+bool CSendWndImpl::IsAppLimit() {
+    return _send_wnd_size == (uint16_t)_id_msg_map.size();
+}
+
+uint16_t CSendWndImpl::GetWndSize() {
+    return _send_wnd_size;
 }
 
 // change send window size
