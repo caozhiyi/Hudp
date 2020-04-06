@@ -14,11 +14,12 @@ bool CSnappyFilter::FilterProcess(const HudpHandle& handle, uint16_t flag, std::
 bool CSnappyFilter::RelieveFilterProcess(const HudpHandle& handle, uint16_t flag, std::string& body) {
     std::string recv_msg;
     SnappyUncompress(body, recv_msg);
-    return _next_filter->FilterProcess(handle, flag, recv_msg);
+    return _prev_filter->RelieveFilterProcess(handle, flag, recv_msg);
 }
 
 bool CSnappyFilter::SnappyCompress(std::string &in_put, std::string &output) {
     char* input_pt = (char*)in_put.data();
+    int size = in_put.size();
     size_t out_size = snappy_max_compressed_length(in_put.size());
 
     output.clear();
@@ -27,6 +28,7 @@ bool CSnappyFilter::SnappyCompress(std::string &in_put, std::string &output) {
         base::LOG_ERROR("compress failed.");
         return false;
     }
+    output.resize(out_size);
     return true;
 }
 
@@ -38,7 +40,7 @@ bool CSnappyFilter::SnappyUncompress(std::string &in_put, std::string &output) {
     }
     output.clear();
     output.resize(out_size);
-    if (snappy_uncompress(in_put.data(), in_put.length(), (char*)&*output.begin(), &out_size) != SNAPPY_OK) {
+    if (snappy_uncompress((char*)in_put.data(), in_put.length(), (char*)&*output.begin(), &out_size) != SNAPPY_OK) {
         base::LOG_ERROR(" snappy uncompress failed");
         return false;
     }
