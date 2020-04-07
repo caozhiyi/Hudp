@@ -1,4 +1,12 @@
-SRCS = $(wildcard ./base/*.cpp ./common/*.cpp ./hudp/*.cpp ./net/*.cpp ./net/unix/*.cpp ./net/controller/*.cpp ./net/controller/bbr/*.cpp ./os/unix/*.cpp ./filter/*.cpp) 
+SRCS = $(wildcard ./base/*.cpp           \
+                  ./common/*.cpp         \
+				  ./hudp/*.cpp           \
+				  ./net/*.cpp            \
+				  ./net/unix/*.cpp       \
+				  ./net/controller/*.cpp       \
+				  ./net/controller/bbr/*.cpp   \
+				  ./os/unix/*.cpp              \
+				  ./filter/*.cpp) 
 
 OBJS = $(patsubst %.cpp, %.o, $(SRCS))
 
