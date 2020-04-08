@@ -19,8 +19,8 @@ std::shared_ptr<CMsg> CFlowQueue::Get() {
         ret = _resend_head;
         _resend_head = _resend_head->GetNext();
         Remove(ret);
-    }
-    if (_normal_head) {
+        
+    } else if (_normal_head) {
         ret = _normal_head;
         _normal_head = _normal_head->GetNext();
         Remove(ret);
@@ -32,6 +32,9 @@ void CFlowQueue::Remove(std::shared_ptr<CMsg> msg) {
     if (!msg) {
         return;
     }
+
+    std::unique_lock<std::mutex> lock_normal(_normal_mutex);
+    std::unique_lock<std::mutex> lock_resend(_resend_mutex);
     if (msg == _normal_head) {
         _normal_head = _normal_head->GetNext();
     }
@@ -56,6 +59,8 @@ void CFlowQueue::Remove(std::shared_ptr<CMsg> msg) {
 void CFlowQueue::AddToNormalHead(std::shared_ptr<CMsg> msg) {
     msg->SetNext(_normal_head);
     msg->SetPrev(nullptr);
+
+    std::unique_lock<std::mutex> lock(_normal_mutex);
     if (_normal_head) {
         _normal_head->SetPrev(msg);
     }
@@ -68,6 +73,8 @@ void CFlowQueue::AddToNormalHead(std::shared_ptr<CMsg> msg) {
 void CFlowQueue::AddToNormalTail(std::shared_ptr<CMsg> msg) {
     msg->SetPrev(_normal_end);
     msg->SetNext(nullptr);
+
+    std::unique_lock<std::mutex> lock(_normal_mutex);
     if (_normal_end) {
         _normal_end->SetNext(msg);
     }
@@ -80,6 +87,8 @@ void CFlowQueue::AddToNormalTail(std::shared_ptr<CMsg> msg) {
 void CFlowQueue::AddToResendHead(std::shared_ptr<CMsg> msg) {
     msg->SetNext(_resend_head);
     msg->SetPrev(nullptr);
+
+    std::unique_lock<std::mutex> lock(_resend_mutex);
     if (_resend_head) {
         _resend_head->SetPrev(msg);
     }
@@ -92,6 +101,8 @@ void CFlowQueue::AddToResendHead(std::shared_ptr<CMsg> msg) {
 void CFlowQueue::AddToResendTail(std::shared_ptr<CMsg> msg) {
     msg->SetPrev(_resend_end);
     msg->SetNext(nullptr);
+
+    std::unique_lock<std::mutex> lock(_resend_mutex);
     if (_resend_end) {
         _resend_end->SetNext(msg);
     }

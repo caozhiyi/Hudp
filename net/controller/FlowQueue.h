@@ -1,6 +1,7 @@
 #ifndef HEADER_NET_CONTROLLER_FLOWQUEUE
 #define HEADER_NET_CONTROLLER_FLOWQUEUE
 
+#include <mutex>
 #include <memory>
 
 namespace hudp {
@@ -40,6 +41,8 @@ namespace hudp {
         std::shared_ptr<CMsg> _resend_head;
         std::shared_ptr<CMsg> _normal_end;
         std::shared_ptr<CMsg> _resend_end;
+        std::mutex            _normal_mutex;
+        std::mutex            _resend_mutex;
     };
 }
 #endif

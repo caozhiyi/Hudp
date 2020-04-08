@@ -34,11 +34,11 @@ namespace hudp {
     public:
         CSocketImpl(const HudpHandle& handle);
         ~CSocketImpl();
-
+        // get scocket handle. as "ip:port"
         HudpHandle GetHandle();
-
+        // send message to the socket
         void SendMessage(std::shared_ptr<CMsg> msg);
-
+        // recv msg from net
         void RecvMessage(std::shared_ptr<CMsg> msg);
 
         // called back by order list when msg recv to upper.
@@ -51,6 +51,7 @@ namespace hudp {
         void TimerOut(std::shared_ptr<CMsg> msg);
         // send fin msg to close connection
         void SendFinMessage();
+        // check socket status can send message now?
         bool CanSendMessage();
     private:
         // add a ack msg timer to remote 
@@ -59,9 +60,13 @@ namespace hudp {
         void AddQuicklyAck(std::shared_ptr<CMsg> msg);
         // return ture if add ack to msg, otherwise return false
         bool AddAckToMsg(std::shared_ptr<CMsg> msg);
+        // get ack info from msg and add to send wnd.
         void GetAckToSendWnd(std::shared_ptr<CMsg> msg);
+        // add msg to send wnd
         void AddToSendWnd(WndIndex index, std::shared_ptr<CMsg> msg);
+        // add msg to recv order list
         void AddToRecvList(WndIndex index, std::shared_ptr<CMsg> msg);
+        // add msg ack to pend queue
         void AddToPendAck(WndIndex index, std::shared_ptr<CMsg> msg);
         // calculation rtt time
         uint64_t GetRtt(std::shared_ptr<CMsg> msg);
@@ -99,8 +104,10 @@ namespace hudp {
         socket_status          _sk_status;
 
         // count lost msg size while a ack turn
-        uint32_t               _lost_msg;
+        std::atomic<uint32_t>       _lost_msg;
+        // count msg size in flight
         std::atomic<uint32_t>       _in_flight;
+        // flow conntroller about
         std::shared_ptr<CBbr>       _bbr_controller;
         std::shared_ptr<CPacing>    _pacing;
         std::shared_ptr<CFlowQueue> _flow_queue;

@@ -29,6 +29,7 @@ CSocketImpl::CSocketImpl(const HudpHandle& handle) : _handle(handle), _sk_status
     memset(_pend_ack, 0, sizeof(_pend_ack));
     _is_in_timer.store(false);
     _in_flight.store(0);
+    _lost_msg.store(0);
     _pacing.reset(new CPacing(std::bind(&CSocketImpl::PacingCallBack, this, std::placeholders::_1)));
     _flow_queue.reset(new CFlowQueue());
     _rto.reset(new CRtoImpl());
@@ -163,7 +164,7 @@ void CSocketImpl::TimerOut(std::shared_ptr<CMsg> msg) {
         // msg resend, increase send delay
         msg->AddSendDelay();
         msg->SetFlag(msg_resend);
-        _lost_msg++;
+        _lost_msg.fetch_add(1);
 
     } else {
         _is_in_timer = false;
@@ -557,9 +558,9 @@ void CSocketImpl::ControllerProcess(WndIndex index, uint32_t rtt, uint32_t acked
     uint32_t send_wnd = _send_wnd[index] ? 0 : _send_wnd[index]->GetWndSize();
     uint32_t pacing = _pacing->GetPacingRate();
 
-    _bbr_controller->bbr_main(_in_flight.load(), rtt, acked, now, delivered, _lost_msg, app_limit, send_wnd, pacing);
+    _bbr_controller->bbr_main(_in_flight.load(), rtt, acked, now, delivered, _lost_msg.load(), app_limit, send_wnd, pacing);
 
-    _lost_msg = 0;
+    _lost_msg.store(0);
     _send_wnd[index]->ChangeSendWndSize(send_wnd);
     _pacing->SetPacingRate(pacing);
 }
