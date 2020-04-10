@@ -36,10 +36,7 @@ CMsg* CMsgPoolFactory::CreateMsg() {
         net_msg = new CMsgImpl();
     }
 
-    if (net_msg) {
-        return net_msg;
-    }
-    return nullptr;
+    return net_msg;
 }
 
 void CMsgPoolFactory::DeleteMsg(CMsg* msg) {
