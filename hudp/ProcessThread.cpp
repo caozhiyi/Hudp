@@ -36,7 +36,10 @@ void CProcessThread::Run() {
                 }
 
             } else {
-                _filter_process->PushSendMsg(msg->GetHandle(), msg->GetHeaderFlag(), msg->GetBody());
+                auto sock = msg->GetSocket();
+                if (sock) {
+                    sock->SendMessage(msg);
+                }
             }
 
         } else {

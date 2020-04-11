@@ -52,7 +52,10 @@ public:
 
     void StartSendFile(const HudpHandle& handle) {        
         std::cout << "start to header ..." << std::endl;
-        GetFileHeader();
+        if (!GetFileHeader()) {
+            std::cout << "get file header failed." << std::endl;
+            return;
+        }
         std::cout << "get file name   : " << _header._name << std::endl;
         std::cout << "get file length : " << _header._length << std::endl;
         std::cout << "get file md5    : " << _header._md5 << std::endl;
@@ -68,7 +71,7 @@ private:
      
         sprintf(_header._name, "%s", _file_name.c_str());
         _file.seekg(0, _file.end);
-        _header._length = _file.tellg();
+        _header._length = (int)_file.tellg();
         _file.seekg(0, _file.beg);
 
         Compute_file_md5(_file_name.c_str(), _header._md5);
@@ -79,7 +82,7 @@ private:
         char buf[__read_len];
         while (!_file.eof()) {
             _file.read(buf, __read_len);
-            int len =  _file.gcount();
+            int len =  (int)_file.gcount();
             SendTo(handle, __send_flag, buf, len);
         }
         _file.close();

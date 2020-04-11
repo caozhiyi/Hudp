@@ -4,8 +4,8 @@
 
 using namespace hudp;
 
-static const uint16_t __slice_limit = __mtu;
 static const uint16_t __slice_header_size = sizeof(SliceHead);
+static const uint16_t __slice_limit = __msg_body_size - __slice_header_size;
 
 static bool SliceBagComparer(const SliceBag& bag1, const SliceBag& bag2) {
     return bag1._head._index < bag2._head._index;

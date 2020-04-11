@@ -102,7 +102,7 @@ bool CHudpImpl::SendTo(const HudpHandle& handle, uint16_t flag, const std::strin
     net_msg->SetBody(msg);
     net_msg->SetSocket(sock);
 
-    sock->SendMessage(net_msg);
+    _process_thread->Push(net_msg);
     return true;
 }
 

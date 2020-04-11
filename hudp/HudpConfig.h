@@ -7,7 +7,9 @@
 namespace hudp {
 
     // msg mtu size, hudp may print out error when msg body's size is bigger than it.
-    static const uint16_t __mtu = 400;
+    static const uint16_t __mtu = 440;
+    // msg hudp header size
+    static const uint16_t __hudp_header_size = 40;
 
     // bitstream will return false when length of bag is bigger than __mtu.
     static const bool     __must_less_mtu = true;
@@ -22,7 +24,7 @@ namespace hudp {
     static const uint16_t __max_compare_num = 100;
 
     // msg of body'size, must littler than mtu.
-    static const uint16_t __msg_body_size = __mtu;
+    static const uint16_t __msg_body_size = __mtu - __hudp_header_size;
 
     // priority queue send __pri_surplus high-level packages and one low-level package when busy.
     static const uint8_t  __pri_surplus = 2;
