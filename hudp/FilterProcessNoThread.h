@@ -1,16 +1,17 @@
-#ifndef HEADER_HUDP_FILTERPROCESS
-#define HEADER_HUDP_FILTERPROCESS
+#ifndef HEADER_HUDP_FILTERPROCESSNOTHREAD
+#define HEADER_HUDP_FILTERPROCESSNOTHREAD
 
 #include <string> // for string
 #include <memory> // for share_ptr
 #include <vector> // for vector
 
+#include "CommonType.h"
 #include "IFilterProcess.h"
 
 namespace hudp {
 
-    class CFilter;
     class CMsg;
+    class CFilter;
     class CFilterProcessNoThread: public CFilterProcess {
     public:
         CFilterProcessNoThread();

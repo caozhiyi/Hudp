@@ -77,6 +77,9 @@ namespace hudp {
     // use pacing and flow queue control send flow?
     static const bool     __use_fq_and_pacing = true;
 
+    // filter process with a thread?
+    static const bool     __filter_whit_thread = true;
+
     // about log setting
     // log level.
     static const base::LogLevel __log_level = base::LOG_WARN_LEVEL;

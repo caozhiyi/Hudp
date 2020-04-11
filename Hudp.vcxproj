@@ -158,6 +158,7 @@
     <ClCompile Include="filter\HeadFilter.cpp" />
     <ClCompile Include="filter\SnappyFilter.cpp" />
     <ClCompile Include="hudp\FilterProcessNoThread.cpp" />
+    <ClCompile Include="hudp\FilterProcessWithThread.cpp" />
     <ClCompile Include="hudp\Hudp.cpp" />
     <ClCompile Include="hudp\HudpImpl.cpp" />
     <ClCompile Include="hudp\MsgPoolFactory.cpp" />
@@ -215,6 +216,7 @@
     <ClInclude Include="filter\HeadFilter.h" />
     <ClInclude Include="filter\SnappyFilter.h" />
     <ClInclude Include="hudp\FilterProcessNoThread.h" />
+    <ClInclude Include="hudp\FilterProcessWithThread.h" />
     <ClInclude Include="hudp\HudpConfig.h" />
     <ClInclude Include="hudp\HudpImpl.h" />
     <ClInclude Include="hudp\MsgPoolFactory.h" />

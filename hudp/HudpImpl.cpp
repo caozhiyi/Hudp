@@ -17,6 +17,7 @@
 #include "MsgPoolFactory.h"
 #include "FlowSlicingFilter.h"
 #include "FilterProcessNoThread.h"
+#include "FilterProcessWithThread.h"
 
 using namespace hudp;
 
@@ -25,7 +26,11 @@ CHudpImpl::CHudpImpl() {
     _recv_thread     = std::make_shared<CRecvThread>();
     _process_thread  = std::make_shared<CProcessThread>();
     _socket_mananger = std::make_shared<CSocketManagerImpl>();
-    _filter_process  = std::make_shared<CFilterProcessNoThread>();
+    if (__filter_whit_thread) {
+        _filter_process  = std::make_shared<CFilterProcessWithThread>();
+    } else {
+        _filter_process  = std::make_shared<CFilterProcessNoThread>();
+    }
 }
 
 CHudpImpl::~CHudpImpl() {

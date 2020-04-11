@@ -177,6 +177,9 @@
     <ClCompile Include="net\controller\bbr\bbr.cpp">
       <Filter>net\controller\bbr</Filter>
     </ClCompile>
+    <ClCompile Include="hudp\FilterProcessWithThread.cpp">
+      <Filter>hudp</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="base\Any.h">
@@ -442,6 +445,9 @@
     </ClInclude>
     <ClInclude Include="net\controller\bbr\bbr.h">
       <Filter>net\controller\bbr</Filter>
+    </ClInclude>
+    <ClInclude Include="hudp\FilterProcessWithThread.h">
+      <Filter>hudp</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
