@@ -53,26 +53,23 @@ uint32_t CSendWndImpl::AcceptAck(uint16_t id) {
     }
 
     if (iter->second == _start) {
-        // only one node
-        if (_start == _end) {
-            _end = nullptr;
-        }
-        _start = _start->GetNext();
-        if (_start) {
-            _start->SetPrev(nullptr);
-        }
         _out_of_order_count = 0;
-
-    } else if (iter->second == _end) {
-        _end = _end->GetPrev();
-        if (_end) {
-            _end->SetNext(nullptr);
-        }
-        _out_of_order_count++;
 
     } else {
         _out_of_order_count++;
-        Remove(iter->second);
+    }
+
+    _ack_queue.push(iter->second);
+    _cur_send_size--;
+
+    uint32_t ret = iter->second->GetEstimateSize();
+    _id_msg_map.erase(iter);
+
+    if (!_id_msg_map.empty()) {
+        _start = _id_msg_map.begin()->second;
+    }
+    else {
+        _start.reset();
     }
 
     if (_out_of_order_count >= __quick_resend_limit && _start) {
@@ -80,14 +77,8 @@ uint32_t CSendWndImpl::AcceptAck(uint16_t id) {
         _out_of_order_count = 0;
     }
 
-    _ack_queue.push(iter->second);
-    _cur_send_size--;
     // send next bag
     SendNext();
-
-    uint32_t ret = iter->second->GetEstimateSize();
-    _id_msg_map.erase(iter);
- 
     SendAndAck();
     return ret;
 }
@@ -166,10 +157,7 @@ void CSendWndImpl::SendNext() {
         std::shared_ptr<CMsg> temp = _priority_queue->Pop();
         if (temp) {
             PushBackToSendWnd(temp);
-            if (!_always_send) {
-                _cur_send_size++;
-            }
-
+            
         } else {
             break;
         }
@@ -192,31 +180,18 @@ void CSendWndImpl::PushBackToSendWnd(std::shared_ptr<CMsg> msg) {
 }
 
 void CSendWndImpl::AddToEnd(std::shared_ptr<CMsg> msg) {
-    // list is empty
-    if (!_end) {
-        _start = _end = msg;
+    if (!msg) {
         return;
     }
-
-    _end->SetNext(msg);
-    msg->SetPrev(_end);
-    _end = msg;
+    _id_msg_map[msg->GetId()] = msg;
+    if (!_start) {
+        _start = _id_msg_map.begin()->second;
+    }
 }
 
 void CSendWndImpl::Remove(std::shared_ptr<CMsg> msg) {
     if (!msg) {
         return;
     }
-    if (msg == _start) {
-        _start = _start->GetNext();
-    }
-    if (msg == _end) {
-        _end = _end->GetPrev();
-    }
-    if (msg->GetPrev()) {
-        msg->GetPrev()->SetNext(msg->GetNext());
-    }
-    if (msg->GetNext()) {
-        msg->GetNext()->SetPrev(msg->GetPrev());
-    }
+    _id_msg_map.erase(msg->GetId());
 }

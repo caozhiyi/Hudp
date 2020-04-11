@@ -15,6 +15,7 @@
 #include "SocketManager.h"
 #include "ProcessThread.h"
 #include "MsgPoolFactory.h"
+#include "UpperThreadFilter.h"
 #include "FlowSlicingFilter.h"
 #include "FilterProcessNoThread.h"
 #include "FilterProcessWithThread.h"
@@ -50,6 +51,9 @@ void CHudpImpl::Init() {
         }
     }
     /*******************add body filter here.********************/
+    if (__upper_with_thread) {
+        _filter_process->AddFilter(std::shared_ptr<CFilter>(new CUpperThreadFilter()));
+    }
     _filter_process->AddFilter(std::shared_ptr<CFilter>(new CHeadFilter()));
     _filter_process->AddFilter(std::shared_ptr<CFilter>(new CSnappyFilter()));
     _filter_process->AddFilter(std::shared_ptr<CFilter>(new CFlowSlicingFilter()));

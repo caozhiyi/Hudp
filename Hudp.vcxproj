@@ -157,6 +157,7 @@
     <ClCompile Include="filter\FlowSlicingFilter.cpp" />
     <ClCompile Include="filter\HeadFilter.cpp" />
     <ClCompile Include="filter\SnappyFilter.cpp" />
+    <ClCompile Include="filter\UpperThreadFilter.cpp" />
     <ClCompile Include="hudp\FilterProcessNoThread.cpp" />
     <ClCompile Include="hudp\FilterProcessWithThread.cpp" />
     <ClCompile Include="hudp\Hudp.cpp" />
@@ -215,7 +216,9 @@
     <ClInclude Include="filter\FlowSlicingFilter.h" />
     <ClInclude Include="filter\HeadFilter.h" />
     <ClInclude Include="filter\SnappyFilter.h" />
+    <ClInclude Include="filter\UpperThreadFilter.h" />
     <ClInclude Include="hudp\FilterProcessNoThread.h" />
+    <ClInclude Include="hudp\FilterProcessParam.h" />
     <ClInclude Include="hudp\FilterProcessWithThread.h" />
     <ClInclude Include="hudp\HudpConfig.h" />
     <ClInclude Include="hudp\HudpImpl.h" />

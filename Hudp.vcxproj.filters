@@ -180,6 +180,9 @@
     <ClCompile Include="hudp\FilterProcessWithThread.cpp">
       <Filter>hudp</Filter>
     </ClCompile>
+    <ClCompile Include="filter\UpperThreadFilter.cpp">
+      <Filter>filter</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="base\Any.h">
@@ -447,6 +450,12 @@
       <Filter>net\controller\bbr</Filter>
     </ClInclude>
     <ClInclude Include="hudp\FilterProcessWithThread.h">
+      <Filter>hudp</Filter>
+    </ClInclude>
+    <ClInclude Include="filter\UpperThreadFilter.h">
+      <Filter>filter</Filter>
+    </ClInclude>
+    <ClInclude Include="hudp\FilterProcessParam.h">
       <Filter>hudp</Filter>
     </ClInclude>
   </ItemGroup>

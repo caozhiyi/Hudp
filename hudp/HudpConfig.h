@@ -80,6 +80,9 @@ namespace hudp {
     // filter process with a thread?
     static const bool     __filter_whit_thread = true;
 
+    // upper call back in other thread?
+    static const bool     __upper_with_thread = true;
+
     // about log setting
     // log level.
     static const base::LogLevel __log_level = base::LOG_WARN_LEVEL;
