@@ -9,6 +9,10 @@ bool CHeadFilter::FilterProcess(const HudpHandle& handle, uint16_t flag, std::st
 }
 
 bool CHeadFilter::RelieveFilterProcess(const HudpHandle& handle, uint16_t flag, std::string& body) {
-    CHudpImpl::Instance().RecvMessageToUpper(handle, body);
+    if (_prev_filter) {
+        _prev_filter->RelieveFilterProcess(handle, flag, body);
+    } else {
+        CHudpImpl::Instance().RecvMessageToUpper(handle, body);
+    }
     return true;
 }
