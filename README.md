@@ -50,6 +50,7 @@ Hudp provides four priority options：
         // the highest priority.
         HPF_HIGHEST_PRI      = 0x80
     };
+```
 Priority increases in turn.    
 When the priority messages at all levels are not empty, the sending process is executed according to the rule of sending two high priority messages and one low priority message.    
 This means each sending two HPF_HIGHEST_PRI, send one HPF_HIGH_PRI, each sending eight HPF_HIGHEST_PRI, send one HPF_LOW_PRI are sent.   
