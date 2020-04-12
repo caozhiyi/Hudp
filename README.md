@@ -71,7 +71,7 @@ Hudp provides a minimum number of interfaces for users to use, which is like usi
     // destory socket. release resources
     void Close(const HudpHandle& handle);
 ```
-The annotations of interface can be see[Hudp](/include/Hudp.h).   
+The annotations of interface can be see [Hudp](/include/Hudp.h).   
 The Start interface opens listening on the port and receives notification in the callback function when a message arrives.   
 The SendTo interface sends messages to the remote. Flag parameters can control the reliability and priority of this message, you need to choose one of the combinations to send this message, like：HPF_NROMAL_PRI | HTF_RELIABLE_ORDERLY.   
 
