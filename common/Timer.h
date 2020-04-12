@@ -41,8 +41,8 @@ namespace hudp {
         base::CTimeTool              _time_tool;
 
         // thread safe
-        std::mutex					 _mutex;
-        std::condition_variable  	 _notify;
+        std::mutex                   _mutex;
+        std::condition_variable      _notify;
     };
 }
 
