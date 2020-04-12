@@ -12,21 +12,23 @@ Hudp 提供选项宏来供上层使用，以控制消息传输实现不同的可
 Hudp 并不在初始化库和连接时限定传输可靠性，用户可以在发送每个消息的时候选择不同的可靠性选项，实现最细粒度的控制。   
 Hudp 只有在用到相应资源时才进行初始化，比如发送窗体和接收顺序队列，以保证使用时最少的资源消耗。   
 Hudp 通过一个消息池来控制消息的创建和销毁， 实现常用资源的快速创建。   
-Hudp 通过一个责任链控制发送消息的包体处理过程(类似nginx)，可以快速便捷的嵌入额外的处理过程。   
-Hudp 还在进一步完善。。。   
+Hudp 通过一个责任链控制发送消息的包体处理过程(类似nginx)，可以快速便捷的嵌入额外的处理过程。
+Hudp 使用bbr算法来进行拥塞控制。   
+Hudp 还在进一步完善。  
 
 ## 选项
 Hudp提供四种关于可靠性的选项：
 ```c++
- enum hudp_tran_flag {
+    // Transmission reliability control
+    enum hudp_tran_flag {
         // only orderly. may lost some bag
-        HTF_ORDERLY          = 0x0001，
+        HTF_ORDERLY          = 0x01,
         // only reliable. may be disorder
-        HTF_RELIABLE         = 0x0002，
+        HTF_RELIABLE         = 0x02,
         // reliable and orderly like tcp
-        HTF_RELIABLE_ORDERLY = 0x0004，
+        HTF_RELIABLE_ORDERLY = 0x04,
         // no other contral. only udp
-        HTF_NORMAL           = 0x0008
+        HTF_NORMAL           = 0x08
     };
 ```
 HTF_ORDERLY : 只保证顺序性不保证可靠性，这意味着在接收端接收到网络抖动延迟到达的包时，可能直接丢弃不通知上层。   
@@ -36,15 +38,16 @@ HTF_NORMAL : 普通udp传输，没有任何控制的udp传输。
 
 Hudp提供四种优先级选项：
 ```c++
-enum hudp_pri_flag {
+    // about priority. Send two high-level packages and one low-level package when busy
+    enum hudp_pri_flag {
         // the lowest priority.
-        HPF_LOW_PRI          = 0x0010，
+        HPF_LOW_PRI          = 0x10,
         // the normal priority.
-        HPF_NROMAL_PRI       = 0x0020，
+        HPF_NROMAL_PRI       = 0x20,
         // the high priority.
-        HPF_HIGH_PRI         = 0x0040，
+        HPF_HIGH_PRI         = 0x40,
         // the highest priority.
-        HPF_HIGHEST_PRI      = 0x0080
+        HPF_HIGHEST_PRI      = 0x80
     };
 ```
 优先级依次递增，发送时当所有级别的优先级消息不为空，按照发送两个高优先级消息一个低优先级消息的规则执行发送过程。   
@@ -54,13 +57,17 @@ enum hudp_pri_flag {
 ## 接口
 Hudp提供了最少的接口供用户使用，使用起来就像是在用原始的udp接口
 ```c++
-    void Init(bool log = false);
-    bool Start(uint16_t port， const recv_back& func);
-    bool Start(const std::string& ip，uint16_t port， const recv_back& func);
+    // init library
+    void Init();
+    
+    // start thread and recv with ip and port
+    bool Start(const std::string& ip,uint16_t port, const recv_back& func);
     void Join();
-    void SendTo(const HudpHandle& handlle， uint16_t flag， const std::string& msg);
-    void SendTo(const HudpHandle& handlle， uint16_t flag， const char* msg， uint16_t len);
-    void Close(const HudpHandle& handlle);
+    // send msg
+    bool SendTo(const HudpHandle& handle, uint16_t flag, std::string& msg);
+    bool SendTo(const HudpHandle& handle, uint16_t flag, const char* msg, uint32_t len);
+    // destory socket. release resources
+    void Close(const HudpHandle& handle);
 ```
 对应的接口注释可以查看[Hudp](/include/Hudp.h)。   
 Start接口会开启对应端口的监听，有消息到达时会在回调函数中收到通知。   

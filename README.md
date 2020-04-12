@@ -14,20 +14,22 @@ Hudp doesn't limit transmission reliability when initializing libraries and conn
 Hudp is initialized only when resources are used, such as  send form and receive order queue, to ensure the minimum resource consumption in use.   
 Hudp controls the creation and destruction of messages by a message pool to achieve rapid creation of common resources.   
 Hudp controls the package processing of sending messages through a chain of responsibility (similar to nginx), which can quickly and conveniently embed additional processing.   
-Hudp is still improving...   
+Hudp use BBR algorithm to control congestion.   
+Hudp is still improving.   
 
 ## Options
 Hudp offers four options for reliability：
 ```cpp
- enum hudp_tran_flag {
+    // Transmission reliability control
+    enum hudp_tran_flag {
         // only orderly. may lost some bag
-        HTF_ORDERLY          = 0x0001,
+        HTF_ORDERLY          = 0x01,
         // only reliable. may be disorder
-        HTF_RELIABLE         = 0x0002,
+        HTF_RELIABLE         = 0x02,
         // reliable and orderly like tcp
-        HTF_RELIABLE_ORDERLY = 0x0004,
+        HTF_RELIABLE_ORDERLY = 0x04,
         // no other contral. only udp
-        HTF_NORMAL           = 0x0008
+        HTF_NORMAL           = 0x08
     };
 ```
 HTF_ORDERLY : Only sequentiality is guaranteed, which means that when the remote receives the packet arrival delay because of network jitter, it may directly discard and not notification upper layer.   
@@ -37,17 +39,17 @@ HTF_NORMAL : Ordinary UDP transmission, without any control.
 
 Hudp provides four priority options： 
 ```cpp
-enum hudp_pri_flag {
+    // about priority. Send two high-level packages and one low-level package when busy
+    enum hudp_pri_flag {
         // the lowest priority.
-        HPF_LOW_PRI          = 0x0010,
+        HPF_LOW_PRI          = 0x10,
         // the normal priority.
-        HPF_NROMAL_PRI       = 0x0020,
+        HPF_NROMAL_PRI       = 0x20,
         // the high priority.
-        HPF_HIGH_PRI         = 0x0040,
+        HPF_HIGH_PRI         = 0x40,
         // the highest priority.
-        HPF_HIGHEST_PRI      = 0x0080
+        HPF_HIGHEST_PRI      = 0x80
     };
-```
 Priority increases in turn.    
 When the priority messages at all levels are not empty, the sending process is executed according to the rule of sending two high priority messages and one low priority message.    
 This means each sending two HPF_HIGHEST_PRI, send one HPF_HIGH_PRI, each sending eight HPF_HIGHEST_PRI, send one HPF_LOW_PRI are sent.   
@@ -55,14 +57,18 @@ Of course, if there is only one message, any priority will be sent.
 
 ## Interface
 Hudp provides a minimum number of interfaces for users to use, which is like using the original UDP interface.
-```cpp
-    void Init(bool log = false);
-    bool Start(uint16_t port, const recv_back& func);
+```c++
+    // init library
+    void Init();
+    
+    // start thread and recv with ip and port
     bool Start(const std::string& ip,uint16_t port, const recv_back& func);
     void Join();
-    void SendTo(const HudpHandle& handlle, uint16_t flag, const std::string& msg);
-    void SendTo(const HudpHandle& handlle, uint16_t flag, const char* msg, uint16_t len);
-    void Close(const HudpHandle& handlle);
+    // send msg
+    bool SendTo(const HudpHandle& handle, uint16_t flag, std::string& msg);
+    bool SendTo(const HudpHandle& handle, uint16_t flag, const char* msg, uint32_t len);
+    // destory socket. release resources
+    void Close(const HudpHandle& handle);
 ```
 The annotations of interface can be see[Hudp](/include/Hudp.h).   
 The Start interface opens listening on the port and receives notification in the callback function when a message arrives.   
