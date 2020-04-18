@@ -13,6 +13,7 @@ CSocketManagerImpl::~CSocketManagerImpl() {
 }
 
 bool CSocketManagerImpl::IsSocketExist(const HudpHandle& handle) {
+    std::unique_lock<std::mutex> lock(_mutex);
     auto iter = _socket_map.find(handle);
     if (iter == _socket_map.end()) {
         return false;
@@ -21,6 +22,7 @@ bool CSocketManagerImpl::IsSocketExist(const HudpHandle& handle) {
 }
 
 std::shared_ptr<CSocket> CSocketManagerImpl::GetSocket(const HudpHandle& handle) {
+    std::unique_lock<std::mutex> lock(_mutex);
     auto iter = _socket_map.find(handle);
     if (iter != _socket_map.end()) {
         return iter->second;
@@ -32,6 +34,7 @@ std::shared_ptr<CSocket> CSocketManagerImpl::GetSocket(const HudpHandle& handle)
 }
 
 void CSocketManagerImpl::DeleteSocket(const HudpHandle& handle) {
+    std::unique_lock<std::mutex> lock(_mutex);
     auto iter = _socket_map.find(handle);
     if (iter == _socket_map.end()) {
         return;
@@ -43,10 +46,15 @@ void CSocketManagerImpl::DeleteSocket(const HudpHandle& handle) {
 
 void CSocketManagerImpl::CloseSocket(const HudpHandle& handle) {
     // send close msg to remote here
-    auto iter = _socket_map.find(handle);
-    if (iter == _socket_map.end()) {
-        return;
+    std::shared_ptr<CSocket> sock;
+    {
+        std::unique_lock<std::mutex> lock(_mutex);
+        auto iter = _socket_map.find(handle);
+        if (iter == _socket_map.end()) {
+            return;
+        }
+        sock = iter->second;
     }
-
-    iter->second->SendFinMessage();
+    
+    sock->SendFinMessage();
 }

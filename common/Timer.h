@@ -2,6 +2,7 @@
 #define HEADER_COMMON_TIMER
 
 #include <map>
+#include <list>
 #include <mutex>
 #include <condition_variable>
 
@@ -32,7 +33,7 @@ namespace hudp {
         
     private:
         // all expiration in list
-        std::map<uint64_t, std::shared_ptr<CMsg>> _timer_map;
+        std::map<uint64_t, std::list<std::shared_ptr<CMsg>>> _timer_map;
 
         // cur wait time
         uint64_t                     _wait_time;

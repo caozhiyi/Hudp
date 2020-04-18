@@ -20,8 +20,8 @@
 
 using namespace hudp;
 
-// this size may be a dynamic algorithm control
-static const uint16_t __send_wnd_size = 5;
+// reserved time stamp
+static const uint16_t __msg_length_limit = __mtu - sizeof(uint64_t);
 
 CSocketImpl::CSocketImpl(const HudpHandle& handle) : _handle(handle), _sk_status(SS_CLOSE){
     memset(_send_wnd, 0, sizeof(_send_wnd));
@@ -264,7 +264,7 @@ bool CSocketImpl::AddAckToMsg(std::shared_ptr<CMsg> msg) {
         bool continuity = false;
         std::vector<uint16_t> ack_vec;
         std::vector<uint64_t> time_vec;
-        _pend_ack[WI_RELIABLE_ORDERLY]->GetAllAck(ack_vec, time_vec, continuity);
+        _pend_ack[WI_RELIABLE_ORDERLY]->GetAck(ack_vec, time_vec, continuity, __msg_length_limit - msg->GetEstimateSize());
         msg->SetAck(HPF_WITH_RELIABLE_ORDERLY_ACK, ack_vec, time_vec, continuity);
         ret = true;
     }
@@ -273,7 +273,7 @@ bool CSocketImpl::AddAckToMsg(std::shared_ptr<CMsg> msg) {
         bool continuity = false;
         std::vector<uint16_t> ack_vec;
         std::vector<uint64_t> time_vec;
-        _pend_ack[WI_RELIABLE]->GetAllAck(ack_vec, time_vec, continuity);
+        _pend_ack[WI_RELIABLE]->GetAck(ack_vec, time_vec, continuity, __msg_length_limit - msg->GetEstimateSize());
         msg->SetAck(HPF_WITH_RELIABLE_ACK, ack_vec, time_vec, continuity);
         ret = true;
     }
@@ -374,6 +374,7 @@ void CSocketImpl::AddToRecvList(WndIndex index, std::shared_ptr<CMsg> msg) {
 void CSocketImpl::AddToPendAck(WndIndex index, std::shared_ptr<CMsg> msg) {
     if (!_pend_ack[index]) {
         _pend_ack[index] = new CPendAck();
+        _pend_ack[index]->SetSendAckNowCallBack(std::bind(&CSocketImpl::SendAckNowCallBack, this));
     }
     if (__msg_with_time) {
         _pend_ack[index]->AddAck(msg->GetId(), msg->GetSendTime());
@@ -548,7 +549,9 @@ void CSocketImpl::SendPacingMsg(std::shared_ptr<CMsg> msg, bool add_fq) {
         return;
     }
     // set send msg time
-    msg->SetSendTime(GetCurTimeStamp());
+    if (!(msg->GetFlag() & msg_is_only_ack)) {
+        msg->SetSendTime(GetCurTimeStamp());
+    }
     CHudpImpl::Instance().SendMessageToNet(msg);    
 }
 
@@ -570,4 +573,23 @@ void CSocketImpl::PacingCallBack(std::shared_ptr<CMsg> msg) {
         _in_flight.fetch_add(msg->GetEstimateSize());
     }
     CHudpImpl::Instance().SendMessageToNet(msg);
+}
+
+void CSocketImpl::SendAckNowCallBack() {
+    // get a msg
+    std::shared_ptr<CMsg> ack_msg = CMsgPoolFactory::Instance().CreateSharedMsg();
+    ack_msg->SetFlag(msg_is_only_ack);
+    std::shared_ptr<CSocket> sock = shared_from_this();
+    ack_msg->SetSocket(sock);
+    ack_msg->SetHandle(_handle);
+
+    // add ack 
+    bool add_ack = AddAckToMsg(ack_msg);
+    // not need send ack msg
+    if (!add_ack && ack_msg->GetFlag() & msg_is_only_ack) {
+        return;
+    }
+
+    // resend to net
+    SendPacingMsg(ack_msg);
 }

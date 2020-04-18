@@ -15,99 +15,64 @@ void CFlowQueue::Add(std::shared_ptr<CMsg> msg) {
 
 std::shared_ptr<CMsg> CFlowQueue::Get() {
     std::shared_ptr<CMsg> ret = nullptr;
-    if (_resend_head) {
-        ret = _resend_head;
-        _resend_head = _resend_head->GetNext();
-        Remove(ret);
+
+    std::unique_lock<std::mutex> lock_normal(_normal_mutex);
+    std::unique_lock<std::mutex> lock_resend(_resend_mutex);
+
+    if (!_resend_list.empty()) {
+        ret = _resend_list.front();
+        _resend_list.pop_front();
         
-    } else if (_normal_head) {
-        ret = _normal_head;
-        _normal_head = _normal_head->GetNext();
-        Remove(ret);
+    } else if (!_normal_list.empty()) {
+        ret = _normal_list.front();
+        _normal_list.pop_front();
     }
     return ret;
 }
 
 void CFlowQueue::Remove(std::shared_ptr<CMsg> msg) {
+    std::unique_lock<std::mutex> lock_normal(_normal_mutex);
+    std::unique_lock<std::mutex> lock_resend(_resend_mutex);
+
+    RemoveUnLock(msg);
+}
+
+void CFlowQueue::RemoveUnLock(std::shared_ptr<CMsg> msg) {
     if (!msg) {
         return;
     }
 
-    std::unique_lock<std::mutex> lock_normal(_normal_mutex);
-    std::unique_lock<std::mutex> lock_resend(_resend_mutex);
-    if (msg == _normal_head) {
-        _normal_head = _normal_head->GetNext();
+    for (auto iter = _resend_list.begin(); iter != _resend_list.end(); ++iter) {
+        if (*iter == msg) {
+            _resend_list.erase(iter);
+            return;
+        }
     }
-    if (msg == _normal_end) {
-        _normal_end = _normal_end->GetPrev();
-    }
-    if (msg == _normal_head) {
-        _normal_head = _normal_head->GetPrev();
-    }
-    if (msg == _resend_end) {
-        _resend_end = _resend_end->GetPrev();
-    }
-    
-    if (msg->GetPrev()) {
-        msg->GetPrev()->SetNext(msg->GetNext());
-    }
-    if (msg->GetNext()) {
-        msg->GetNext()->SetPrev(msg->GetPrev());
+
+    for (auto iter = _normal_list.begin(); iter != _normal_list.end(); ++iter) {
+        if (*iter == msg) {
+            _normal_list.erase(iter);
+            return;
+        }
     }
 }
 
 void CFlowQueue::AddToNormalHead(std::shared_ptr<CMsg> msg) {
-    msg->SetNext(_normal_head);
-    msg->SetPrev(nullptr);
-
     std::unique_lock<std::mutex> lock(_normal_mutex);
-    if (_normal_head) {
-        _normal_head->SetPrev(msg);
-    }
-    _normal_head = msg;
-    if (!_normal_end) {
-        _normal_end = _normal_head;
-    }
+    _normal_list.push_front(msg);
 }
 
 void CFlowQueue::AddToNormalTail(std::shared_ptr<CMsg> msg) {
-    msg->SetPrev(_normal_end);
-    msg->SetNext(nullptr);
-
     std::unique_lock<std::mutex> lock(_normal_mutex);
-    if (_normal_end) {
-        _normal_end->SetNext(msg);
-    }
-    _normal_end = msg;
-    if (!_normal_head) {
-        _normal_head = _normal_end;
-    }
+    _normal_list.push_back(msg);
 }
 
 void CFlowQueue::AddToResendHead(std::shared_ptr<CMsg> msg) {
-    msg->SetNext(_resend_head);
-    msg->SetPrev(nullptr);
-
-    std::unique_lock<std::mutex> lock(_resend_mutex);
-    if (_resend_head) {
-        _resend_head->SetPrev(msg);
-    }
-    _resend_head = msg;
-    if (!_resend_end) {
-        _resend_end = _resend_head;
-    }
+    std::unique_lock<std::mutex> lock(_normal_mutex);
+    _resend_list.push_front(msg);
 }
 
 void CFlowQueue::AddToResendTail(std::shared_ptr<CMsg> msg) {
-    msg->SetPrev(_resend_end);
-    msg->SetNext(nullptr);
-
-    std::unique_lock<std::mutex> lock(_resend_mutex);
-    if (_resend_end) {
-        _resend_end->SetNext(msg);
-    }
-    _resend_end = msg;
-    if (!_resend_head) {
-        _resend_head = _resend_end;
-    }
+    std::unique_lock<std::mutex> lock(_normal_mutex);
+    _resend_list.push_back(msg);
 }

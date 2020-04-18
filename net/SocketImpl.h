@@ -87,6 +87,8 @@ namespace hudp {
         void ControllerProcess(WndIndex index, uint32_t rtt, uint32_t acked, uint32_t delivered);
         // pacing send msg call back
         void PacingCallBack(std::shared_ptr<CMsg> msg);
+        // send ack now call back
+        void SendAckNowCallBack();
 
     private:
         // reliable correlation

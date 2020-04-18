@@ -1,8 +1,11 @@
 #ifndef HEADER_NET_CONTROLLER_FLOWQUEUE
 #define HEADER_NET_CONTROLLER_FLOWQUEUE
 
+#include <list>
 #include <mutex>
 #include <memory>
+
+#include "CommonFlag.h"
 
 namespace hudp {
 
@@ -27,6 +30,8 @@ namespace hudp {
         // remove msg from list any where
         void Remove(std::shared_ptr<CMsg> msg);
     private:
+        // remove not lock
+        void RemoveUnLock(std::shared_ptr<CMsg> msg);
         // add msg to normal list head
         void AddToNormalHead(std::shared_ptr<CMsg> msg);
         // add msg to normal list tail
@@ -37,12 +42,10 @@ namespace hudp {
         void AddToResendTail(std::shared_ptr<CMsg> msg);
 
     private:
-        std::shared_ptr<CMsg> _normal_head;
-        std::shared_ptr<CMsg> _resend_head;
-        std::shared_ptr<CMsg> _normal_end;
-        std::shared_ptr<CMsg> _resend_end;
         std::mutex            _normal_mutex;
         std::mutex            _resend_mutex;
+        std::list<std::shared_ptr<CMsg>>    _resend_list;
+        std::list<std::shared_ptr<CMsg>>    _normal_list;
     };
 }
 #endif

@@ -19,34 +19,13 @@ uint64_t CTimer::AddTimer(uint32_t ms, std::shared_ptr<CMsg> ti) {
     _time_tool.Now();
     uint64_t expiration_time = ms + _time_tool.GetMsec();
 
-    std::unique_lock<std::mutex> lock(_mutex);
-    auto iter = _timer_map.find(expiration_time);
-    ti->SetNext(nullptr);
-    // add to timer map
-    if (iter == _timer_map.end()) {
-        _timer_map[expiration_time] = ti;
-
-    // add same time
-    } else {
-        // check same item
-        std::shared_ptr<CMsg> tmp = iter->second;
-        while (tmp->GetNext()) {
-            // the same item
-            if (tmp == ti) {
-                return _time_tool.GetMsec();
-            } else {
-                tmp = tmp->GetNext();
-            }
-        }
-        // the same item
-        if (tmp == ti) {
-            return _time_tool.GetMsec();
-        }
-
-        // add to list
-        tmp->SetNext(ti);
+    {
+        std::unique_lock<std::mutex> lock(_mutex);
+        auto iter = _timer_map.find(expiration_time);
+        _timer_map[expiration_time].push_back(ti);
+        ti->SetTimerId(expiration_time);
     }
-    ti->SetTimerId(expiration_time);
+
     // wake up timer thread
     if (ms < _wait_time) {
         _notify.notify_one();
@@ -79,21 +58,23 @@ uint64_t CTimer::GetTimeStamp() {
 
 void CTimer::Run() {
     std::vector<std::shared_ptr<CMsg>> timer_vec;
-    std::map<uint64_t, std::shared_ptr<CMsg>>::iterator iter;
-    std::shared_ptr<CMsg> cur_solt;
+    std::list<std::shared_ptr<CMsg>> *cur_list = nullptr;
+    uint64_t cur_timestemp = 0;
     bool timer_out = false;
+
     while (!_stop) {
         {
-            cur_solt.reset();
+            cur_list = nullptr;
             timer_out = false;
             std::unique_lock<std::mutex> lock(_mutex);
             if (_timer_map.empty()) {
                 _wait_time = __timer_empty_wait;
 
             } else {
-                iter = _timer_map.begin();
+                auto iter = _timer_map.begin();
+                cur_timestemp = iter->first;
                 _time_tool.Now();
-                cur_solt = iter->second;
+                cur_list = &iter->second;
                 if (iter->first > (uint64_t)_time_tool.GetMsec()) {
                     _wait_time = iter->first - _time_tool.GetMsec();
 
@@ -108,16 +89,16 @@ void CTimer::Run() {
             }
 
             // if timer out
-            if (timer_out && cur_solt && cur_solt->GetTimerId() > 0 && cur_solt->GetTimerId() <= (uint64_t)_time_tool.GetMsec()) {
-                while (cur_solt) {
-                    timer_vec.push_back(cur_solt);
-                    cur_solt = cur_solt->GetNext();
+            if (timer_out && cur_list && cur_timestemp > 0 && cur_timestemp <= (uint64_t)_time_tool.GetMsec()) {
+                while (!cur_list->empty()) {
+                    timer_vec.push_back(cur_list->front());
+                    cur_list->pop_front();
                 }
-                _timer_map.erase(iter);
+                _timer_map.erase(cur_timestemp);
 
             // timer is removed
-            } else if (timer_out && cur_solt && cur_solt->GetTimerId() == 0 && iter != _timer_map.end()) {
-                _timer_map.erase(iter);
+            } else if (timer_out && cur_list && cur_timestemp == 0) {
+                _timer_map.erase(cur_timestemp);
             }
         }
 

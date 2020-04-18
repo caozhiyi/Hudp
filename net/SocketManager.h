@@ -26,6 +26,7 @@ namespace hudp {
         void CloseSocket(const HudpHandle& handle);
 
     private:
+        std::mutex _mutex;
         std::unordered_map<HudpHandle, std::shared_ptr<CSocket>> _socket_map;
     };
 }

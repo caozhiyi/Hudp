@@ -51,8 +51,9 @@ void CMsgPoolFactory::ReduceFree() {
         size = size / 2;
         CMsg* net_msg;
         for (size_t i = 0; i < size; i++) {
-            _free_net_msg_queue.Pop(net_msg);
-            delete net_msg;
+            if (_free_net_msg_queue.Pop(net_msg)) {
+                delete net_msg;
+            }
         }
     }
 }

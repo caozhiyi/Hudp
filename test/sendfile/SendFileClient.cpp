@@ -1,4 +1,5 @@
 #include <string>
+#include <thread>
 #include <fstream>
 #include <string.h> // for memset
 #include <iostream>
@@ -83,7 +84,9 @@ private:
         while (!_file.eof()) {
             _file.read(buf, __read_len);
             int len =  (int)_file.gcount();
+
             SendTo(handle, __send_flag, buf, len);
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
         _file.close();
     }
