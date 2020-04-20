@@ -33,6 +33,12 @@ CReliableOrderlyList::~CReliableOrderlyList() {
     }
 }
 
+ void CReliableOrderlyList::Clear() {
+     std::unique_lock<std::mutex> lock(_mutex);
+     memset(_order_list, 0, sizeof(_order_list));
+     _recv_list.Clear();
+ }
+
 uint16_t CReliableOrderlyList::Insert(std::shared_ptr<CMsg> msg) {
     auto id = msg->GetId();
     uint16_t index = HashFunc(id);

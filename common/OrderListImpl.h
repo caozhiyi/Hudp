@@ -17,6 +17,7 @@ namespace hudp {
         CRecvList();
         virtual ~CRecvList();
 
+        virtual void Clear() {}
         // add a item to order list
         // return 0, msg is normal
         // return 1, repeat msg
@@ -34,6 +35,7 @@ namespace hudp {
     public:
         CReliableOrderlyList(uint16_t start_id);
         virtual ~CReliableOrderlyList();
+        virtual void Clear();
         // add a item to order list
         // return 0 if success
         // return 1 if msg is repeat

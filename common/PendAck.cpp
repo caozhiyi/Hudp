@@ -20,7 +20,7 @@ void CPendAck::AddAck(uint16_t ack_id) {
     base::LOG_DEBUG("[ACK] : pend ack add a msg. id : %d", ack_id);
     {
         std::unique_lock<std::mutex> lock(_mutex);
-        _ack_set[ack_id] = 0;
+        _ack_map[ack_id] = 0;
         _cur_size += __id_length;
     }
     if (_cur_size >= __ack_length_limit) {
@@ -32,7 +32,7 @@ void CPendAck::AddAck(uint16_t ack_id, uint64_t send_time) {
     base::LOG_DEBUG("[ACK] : pend ack add a msg. id : %d", ack_id);
     {
         std::unique_lock<std::mutex> lock(_mutex);
-        _ack_set[ack_id] = send_time;
+        _ack_map[ack_id] = send_time;
         _cur_size += __id_length + __time_length;
     }
     if (_cur_size >= __ack_length_limit) {
@@ -40,22 +40,27 @@ void CPendAck::AddAck(uint16_t ack_id, uint64_t send_time) {
     }
 }
 
+void CPendAck::Clear() {
+    std::unique_lock<std::mutex> lock(_mutex);
+    _ack_map.clear();
+}
+
 bool CPendAck::GetAck(std::vector<uint16_t>& ack_vec, std::vector<uint64_t>& time_vec, bool& continuity, uint16_t size_limit) {
     uint16_t ack_count = 0;
     {
         std::unique_lock<std::mutex> lock(_mutex);
-        if (_ack_set.empty()) {
+        if (_ack_map.empty()) {
             return false;
         }
-        ack_count = (uint16_t)_ack_set.size();
+        ack_count = (uint16_t)_ack_map.size();
     }
     
     std::unique_lock<std::mutex> lock(_mutex);
     uint16_t prev_tmp = 0;
     uint16_t cur_szie = 0;
     while (1) {
-        auto iter = _ack_set.begin();
-        if (iter == _ack_set.end()) {
+        auto iter = _ack_map.begin();
+        if (iter == _ack_map.end()) {
             break;
         }
         
@@ -83,7 +88,7 @@ bool CPendAck::GetAck(std::vector<uint16_t>& ack_vec, std::vector<uint64_t>& tim
             continuity = false;
         }
         prev_tmp = iter->first;
-        _ack_set.erase(iter);
+        _ack_map.erase(iter);
     }
 
     // only ack don't need continuity
@@ -102,17 +107,17 @@ bool CPendAck::GetAllAck(std::vector<uint16_t>& ack_vec, bool& continuity) {
 
 bool CPendAck::GetAllAck(std::vector<uint16_t>& ack_vec, std::vector<uint64_t>& time_vec, bool& continuity) {
     std::unique_lock<std::mutex> lock(_mutex);
-    if (_ack_set.empty()) {
+    if (_ack_map.empty()) {
         return false;
     }
 
     continuity = true;
 
-    uint16_t len = (uint16_t)_ack_set.size();
+    uint16_t len = (uint16_t)_ack_map.size();
     uint16_t prev_tmp = 0;
     while (1) {
-        auto iter = _ack_set.begin();
-        if (iter == _ack_set.end()) {
+        auto iter = _ack_map.begin();
+        if (iter == _ack_map.end()) {
             break;
         }
 
@@ -126,7 +131,7 @@ bool CPendAck::GetAllAck(std::vector<uint16_t>& ack_vec, std::vector<uint64_t>& 
             continuity = false;
         }
         prev_tmp = iter->first;
-        _ack_set.erase(iter);
+        _ack_map.erase(iter);
     }
 
     // only ack don't need continuity
@@ -134,13 +139,13 @@ bool CPendAck::GetAllAck(std::vector<uint16_t>& ack_vec, std::vector<uint64_t>& 
         continuity = false;
     }
     base::LOG_DEBUG("[ACK] : attach ack msg. id : %d, size : %d", ack_vec[0], ack_vec.size());
-    _ack_set.clear();
+    _ack_map.clear();
     _cur_size = 0;
     return true;
 }
 
 bool CPendAck::HasAck() {
-    return !_ack_set.empty();
+    return !_ack_map.empty();
 }
 
 void CPendAck::SetSendAckNowCallBack(std::function<void()> cb) {

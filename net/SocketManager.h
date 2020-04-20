@@ -21,9 +21,9 @@ namespace hudp {
         // return a socket, create one if not exist.
         std::shared_ptr<CSocket> GetSocket(const HudpHandle& handle);
         // remove a socket directly
-        void DeleteSocket(const HudpHandle& handle);
+        bool DeleteSocket(const HudpHandle& handle);
         // send close msg to remote
-        void CloseSocket(const HudpHandle& handle);
+        bool CloseSocket(const HudpHandle& handle);
 
     private:
         std::mutex _mutex;

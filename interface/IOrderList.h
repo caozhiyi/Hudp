@@ -13,6 +13,9 @@ namespace hudp {
         COrderList() {}
         virtual ~COrderList() {}
 
+        // clear all msg
+        virtual void Clear() = 0;
+
         // add a item to order list
         virtual uint16_t Insert(std::shared_ptr<CMsg> msg) = 0;
 

@@ -16,6 +16,9 @@ namespace hudp {
         void AddAck(uint16_t ack_id);
         void AddAck(uint16_t ack_id, uint64_t send_time);
 
+        // clear all msg
+        void Clear();
+
         // get ack under size
         bool GetAck(std::vector<uint16_t>& ack_vec, std::vector<uint64_t>& time_vec, bool& continuity, uint16_t size_limit);
 
@@ -31,7 +34,7 @@ namespace hudp {
         std::mutex  _mutex;
         // all ack id cache
         uint32_t    _cur_size;
-        std::map<uint16_t, uint64_t> _ack_set;
+        std::map<uint16_t, uint64_t> _ack_map;
         std::function<void()>        _ack_now_call_back;
     };
 }

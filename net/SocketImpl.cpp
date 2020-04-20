@@ -37,14 +37,18 @@ CSocketImpl::CSocketImpl(const HudpHandle& handle) : _handle(handle), _sk_status
 }
 
 CSocketImpl::~CSocketImpl() {
+    _sk_status = SS_CLOSE;
     for (uint16_t i = 0; i < __wnd_size; i++) {
         if (_send_wnd[i]) {
+            _send_wnd[i]->Clear();
             delete _send_wnd[i];
         }
         if (_recv_list[i]) {
+            _recv_list[i]->Clear();
             delete _recv_list[i];
         }
         if (_pend_ack[i]) {
+            _pend_ack[i]->Clear();
             delete _pend_ack[i];
         }
     }
@@ -95,6 +99,7 @@ void CSocketImpl::RecvMessage(std::shared_ptr<CMsg> msg) {
     // if recv rst msg, close this connection now
     if (header_flag & HPF_RST) {
         // release socket
+        _sk_status = SS_CLOSE;
         CHudpImpl::Instance().ReleaseSocket(_handle);
         return;
     }
