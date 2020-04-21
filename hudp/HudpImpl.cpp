@@ -39,7 +39,7 @@ CHudpImpl::~CHudpImpl() {
     _net_io->Close(_listen_socket);
 }
 
-void CHudpImpl::Init() {
+hudp_error_code CHudpImpl::Init() {
     static bool init_once = true; 
     if (init_once) {
         _net_io->Init();
@@ -59,49 +59,54 @@ void CHudpImpl::Init() {
     _filter_process->AddFilter(std::shared_ptr<CFilter>(new CFlowSlicingFilter()));
     _filter_process->AddFilter(std::shared_ptr<CFilter>(new CEndFilter()));
     /*******************add body filter here.********************/
+
+    return HEC_SUCCESS;
 }
 
-bool CHudpImpl::Start(const std::string& ip, uint16_t port, const recv_back& func) {
-    if (!func) {
-        base::LOG_ERROR("recv call back is null");
-        return false;
+hudp_error_code CHudpImpl::Start(const std::string& ip, uint16_t port, const recv_back& recv_func, 
+                                 const can_write_back& can_write_func) {
+    if (!recv_func || !can_write_func) {
+        base::LOG_ERROR("call back is null");
+        return HEC_INVALID_PARAM;
     }
-    _recv_call_back = func;
-
+    _recv_call_back      = recv_func;
+    _can_write_call_back = can_write_func;
     // create udp socket
     _listen_socket = _net_io->UdpSocket();
     if (_listen_socket == 0) {
-        return false;
+        return HEC_FAILED;
     }
 
     if (!_net_io->Bind(_listen_socket, ip, port)) {
-        return false;
+        return HEC_FAILED;
     }
 
     _process_thread->Start(_filter_process);
     _recv_thread->Start(_listen_socket, _net_io);
     CTimer::Instance().Start();
 
-    return true;
+    return HEC_SUCCESS;
 }
 
-void CHudpImpl::Join() {
+hudp_error_code CHudpImpl::Join() {
     _process_thread->Join();
     _recv_thread->Join();
     CTimer::Instance().Join();
+
+    return HEC_SUCCESS;
 }
 
-bool CHudpImpl::SendTo(const HudpHandle& handle, uint16_t flag, const std::string& msg) {
+hudp_error_code CHudpImpl::SendTo(const HudpHandle& handle, uint16_t flag, const std::string& msg) {
     if (msg.length() > __msg_body_size) {
         base::LOG_ERROR("msg size is bigger than msg body size.");
-        return false;
+        return HEC_INVALID_PARAM;
     }
 
     //get a socket. 
     std::shared_ptr<CSocket> sock = _socket_mananger->GetSocket(handle);
     if (!sock->CanSendMessage()) {
         base::LOG_ERROR("the socket is not ready.");
-        return false;
+        return HEC_FAILED;
     }
 
     std::shared_ptr<CMsg> net_msg = CMsgPoolFactory::Instance().CreateSharedMsg();
@@ -112,7 +117,29 @@ bool CHudpImpl::SendTo(const HudpHandle& handle, uint16_t flag, const std::strin
     net_msg->SetSocket(sock);
 
     _process_thread->Push(net_msg);
-    return true;
+    return HEC_SUCCESS;
+}
+
+hudp_error_code CHudpImpl::CheckCanSend(const HudpHandle& handle) {
+    //get a socket. 
+    std::shared_ptr<CSocket> sock = _socket_mananger->GetSocket(handle);
+    if (!sock->CanSendMessage()) {
+        base::LOG_ERROR("the socket is not ready.");
+        return HEC_FAILED;
+    }
+    return HEC_SUCCESS;
+}
+
+hudp_error_code CHudpImpl::ConnectTo(const std::string& ip, uint16_t port) {
+    return HEC_SUCCESS;
+}
+
+hudp_error_code CHudpImpl::Close(const HudpHandle& handle) {
+    // send close msg to remote
+    if (_socket_mananger->CloseSocket(handle)) {
+        return HEC_SUCCESS;
+    }
+    return HEC_FAILED;
 }
 
 void CHudpImpl::RecvMsgFromNet(const HudpHandle& handle, const std::string& msg) {
@@ -129,11 +156,6 @@ void CHudpImpl::RecvMsgFromNet(const HudpHandle& handle, const std::string& msg)
     net_msg->SetSocket(sock);
     // push msg to process thread
     _process_thread->Push(net_msg);
-}
-
-void CHudpImpl::Close(const HudpHandle& handle) {
-    // send close msg to remote
-    _socket_mananger->CloseSocket(handle);
 }
 
 void CHudpImpl::RecvMessageToUpper(const HudpHandle& handle, std::string& body) {

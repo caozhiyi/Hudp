@@ -17,6 +17,9 @@ namespace hudp {
     // max length of bitstream bag.
     static const uint16_t __max_length = (uint16_t)0xFFFF;
 
+    // msx length of send wnd
+    static const uint16_t __max_send_wnd_size = 65535;
+
     // bitstream pool expand size every times.
     static const uint16_t _stream_pool_expand_size = 100;
 
@@ -54,7 +57,7 @@ namespace hudp {
     static const uint16_t __quick_resend_limit = 3;
 
     // 15ms. so min rto = 60ms
-    static const uint32_t __init_mdev_max = 15;
+;    static const uint32_t __init_mdev_max = 15;
     // 1000ms.
     static const uint32_t __init_cur_rto = __resend_time;
     // msg with send time stamp, to calculation rtt time

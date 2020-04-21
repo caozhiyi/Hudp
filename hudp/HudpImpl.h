@@ -22,20 +22,27 @@ namespace hudp {
         CHudpImpl();
         ~CHudpImpl();
         // init library
-        void Init();
+        hudp_error_code Init();
         // start thread and recv
-        bool Start(const std::string& ip, uint16_t port, const recv_back& func);
+        hudp_error_code Start(const std::string& ip, uint16_t port, const recv_back& recv_func, 
+                              const can_write_back& can_write_func);
 
-        void Join();
+        hudp_error_code Join();
 
         // send msg
-        bool SendTo(const HudpHandle& handle, uint16_t flag, const std::string& msg);
+        hudp_error_code SendTo(const HudpHandle& handle, uint16_t flag, const std::string& msg);
+
+        // check socket can send?
+        hudp_error_code CheckCanSend(const HudpHandle& handle);
+
+        // connect to remote
+        hudp_error_code ConnectTo(const std::string& ip, uint16_t port);
+
+        // destroy socket. release resources
+        hudp_error_code Close(const HudpHandle& handle);
 
         // recv msg
         void RecvMsgFromNet(const HudpHandle& handle, const std::string& msg);
-
-        // destroy socket. release resources
-        void Close(const HudpHandle& handle);
 
     public:
         // notify supper recv a message.
@@ -55,7 +62,10 @@ namespace hudp {
         std::shared_ptr<CNetIO>                    _net_io;
         std::shared_ptr<CFilterProcess>            _filter_process;
         std::shared_ptr<CSocketManager>            _socket_mananger;
+
         recv_back                                  _recv_call_back;
+        can_write_back                             _can_write_call_back;
+
         uint64_t                                   _listen_socket;
 
         std::shared_ptr<CProcessThread>            _process_thread;

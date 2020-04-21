@@ -29,8 +29,18 @@ namespace hudp {
         HPF_HIGHEST_PRI      = 0x80
     };
 
+    enum hudp_error_code {
+        HEC_SUCCESS          = 1,
+        HEC_CLOSED           = 2,
+        HEC_INVALID_HANDLE   = 3,
+        HEC_FAILED           = 4,
+        HEC_BREAK            = 5,
+        HEC_INVALID_PARAM    = 6
+    };
+
     typedef std::string HudpHandle;
     typedef std::function<void(const HudpHandle& handle, const char* msg, uint32_t len)> recv_back;
+    typedef std::function<void(const HudpHandle& handle, hudp_error_code err)>           can_write_back;
 
 }
 
