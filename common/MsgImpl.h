@@ -24,6 +24,9 @@ namespace hudp {
         void SetId(const uint16_t& id);
         uint16_t GetId();
 
+        void SetUpperId(uint32_t upper_id);
+        uint32_t GetUpperId();
+
         // add send delay time
         void AddSendDelay();
         uint16_t GetReSendTime(uint32_t rto);
@@ -76,6 +79,7 @@ namespace hudp {
         // other 
         std::string     _ip_port;
         int16_t         _flag;      // recv or send message. only use in self, won't be send
+        uint32_t        _upper_id;  // Only the upper layer is used as a mark, not to the opposite end   
 
         // two way linked list
         std::shared_ptr<CMsg> _next;

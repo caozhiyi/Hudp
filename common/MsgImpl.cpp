@@ -10,6 +10,7 @@ CSerializes* CMsgImpl::_serializes = new CSerializesNormal();
 
 CMsgImpl::CMsgImpl() : _backoff_factor(1),
                        _flag(msg_with_out_id),
+                       _upper_id(0),
                        _next(nullptr),
                        _prev(nullptr),
                        _time_id(0) {
@@ -28,6 +29,7 @@ void CMsgImpl::Clear() {
     _backoff_factor = 1;
     _time_id = 0;
     _body.clear();
+    _upper_id = 0;
 }
 
 void CMsgImpl::ClearAck() {
@@ -45,6 +47,14 @@ void CMsgImpl::SetId(const uint16_t& id) {
 
 uint16_t CMsgImpl::GetId() {
     return _head._id;
+}
+
+void CMsgImpl::SetUpperId(uint32_t upper_id) {
+    _upper_id = upper_id;
+}
+
+uint32_t CMsgImpl::GetUpperId() {
+    return _upper_id;
 }
 
 void CMsgImpl::AddSendDelay() {

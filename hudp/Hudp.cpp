@@ -7,11 +7,19 @@ hudp::hudp_error_code hudp::Init() {
 }
 
 hudp::hudp_error_code hudp::Start(const std::string& ip, uint16_t port, const recv_back& recv_func, 
-                                  const can_write_back& can_write_func) {
-    if (CHudpImpl::Instance().Start(ip, port, recv_func, can_write_func)) {
+                                  const send_back& write_func) {
+    if (CHudpImpl::Instance().Start(ip, port, recv_func, write_func)) {
         return HEC_SUCCESS;
     }
     return HEC_FAILED;
+}
+
+void hudp::SetConnectCallBack(const connect_back& conn_func) {
+
+}
+
+void hudp::SetResendCallBack(const resend_back& resend_func) {
+
 }
 
 hudp::hudp_error_code hudp::Join() {
@@ -19,7 +27,7 @@ hudp::hudp_error_code hudp::Join() {
     return HEC_SUCCESS;
 }
 
-hudp::hudp_error_code hudp::SendTo(const HudpHandle& handle, uint16_t flag, std::string& msg) {
+hudp::hudp_error_code hudp::SendTo(const HudpHandle& handle, uint16_t flag, std::string& msg,  uint32_t upper_id) {
     auto ret = CHudpImpl::Instance().CheckCanSend(handle);
     if (ret != HEC_SUCCESS) {
         return ret;
@@ -29,7 +37,7 @@ hudp::hudp_error_code hudp::SendTo(const HudpHandle& handle, uint16_t flag, std:
     return HEC_SUCCESS;
 }
 
-hudp::hudp_error_code hudp::SendTo(const HudpHandle& handle, uint16_t flag, const char* msg, uint32_t len) {
+hudp::hudp_error_code hudp::SendTo(const HudpHandle& handle, uint16_t flag, const char* msg, uint32_t len,  uint32_t upper_id) {
     auto ret = CHudpImpl::Instance().CheckCanSend(handle);
     if (ret != HEC_SUCCESS) {
         return ret;

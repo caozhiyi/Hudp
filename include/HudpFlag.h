@@ -38,9 +38,11 @@ namespace hudp {
         HEC_INVALID_PARAM    = 6
     };
 
-    typedef std::string HudpHandle;
-    typedef std::function<void(const HudpHandle& handle, const char* msg, uint32_t len)> recv_back;
-    typedef std::function<void(const HudpHandle& handle, hudp_error_code err)>           can_write_back;
+    typedef std::string HudpHandle; /*ip:port*/
+    typedef std::function<void(const HudpHandle& handle, const char* msg, uint32_t len, hudp_error_code err)> recv_back;
+    typedef std::function<void(const HudpHandle& handle, const char* msg, uint32_t len, hudp_error_code err)> send_back;
+    typedef std::function<void(const HudpHandle& handle, const char* msg, uint32_t len, bool& continue_send)> resend_back;
+    typedef std::function<void(const HudpHandle& handle, hudp_error_code err)>                                connect_back;
 
 }
 

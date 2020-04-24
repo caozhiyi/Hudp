@@ -64,13 +64,13 @@ hudp_error_code CHudpImpl::Init() {
 }
 
 hudp_error_code CHudpImpl::Start(const std::string& ip, uint16_t port, const recv_back& recv_func, 
-                                 const can_write_back& can_write_func) {
-    if (!recv_func || !can_write_func) {
+                                 const send_back& write_func) {
+    if (!recv_func || !write_func) {
         base::LOG_ERROR("call back is null");
         return HEC_INVALID_PARAM;
     }
-    _recv_call_back      = recv_func;
-    _can_write_call_back = can_write_func;
+    _recv_call_back = recv_func;
+    _send_call_back = write_func;
     // create udp socket
     _listen_socket = _net_io->UdpSocket();
     if (_listen_socket == 0) {
@@ -120,20 +120,6 @@ hudp_error_code CHudpImpl::SendTo(const HudpHandle& handle, uint16_t flag, const
     return HEC_SUCCESS;
 }
 
-hudp_error_code CHudpImpl::CheckCanSend(const HudpHandle& handle) {
-    //get a socket. 
-    std::shared_ptr<CSocket> sock = _socket_mananger->GetSocket(handle);
-    if (!sock->CanSendMessage()) {
-        base::LOG_ERROR("the socket is not ready.");
-        return HEC_FAILED;
-    }
-    return HEC_SUCCESS;
-}
-
-hudp_error_code CHudpImpl::ConnectTo(const std::string& ip, uint16_t port) {
-    return HEC_SUCCESS;
-}
-
 hudp_error_code CHudpImpl::Close(const HudpHandle& handle) {
     // send close msg to remote
     if (_socket_mananger->CloseSocket(handle)) {
@@ -158,8 +144,24 @@ void CHudpImpl::RecvMsgFromNet(const HudpHandle& handle, const std::string& msg)
     _process_thread->Push(net_msg);
 }
 
-void CHudpImpl::RecvMessageToUpper(const HudpHandle& handle, std::string& body) {
-    _recv_call_back(handle, body.c_str(), (uint16_t)body.length());
+void CHudpImpl::RecvMessageToUpper(const HudpHandle& handle, std::string& body, hudp_error_code err) {
+    _recv_call_back(handle, body.c_str(), (uint16_t)body.length(), err);
+}
+
+void CHudpImpl::NewConnectToUpper(const HudpHandle& handle, hudp_error_code err) {
+    if (_connect_call_back) {
+        _connect_call_back(handle, err);
+    }
+}
+
+void CHudpImpl::ResendBackToUpper(const HudpHandle& handle, const char* msg, uint32_t len, bool& continue_send) {
+    if (_resend_call_back) {
+        _resend_call_back(handle, msg, len, continue_send);
+    }
+}
+
+void CHudpImpl::SendBackToUpper(const HudpHandle& handle, const char* msg, uint32_t len, hudp_error_code err) {
+    _send_call_back(handle, msg, len, err);
 }
 
 void CHudpImpl::SendMessageToNet(std::shared_ptr<CMsg> msg) {
@@ -182,4 +184,22 @@ bool CHudpImpl::SendMsgToFilter(const HudpHandle& handle, uint16_t flag, std::st
 
 bool CHudpImpl::RecvMsgToFilter(const HudpHandle& handle, uint16_t flag, std::string& msg) {
     return _filter_process->PushRecvMsg(handle, flag, msg);
+}
+
+void CHudpImpl::SetConnectCallBack(const connect_back& conn_func) {
+    _connect_call_back = conn_func;
+}
+
+void CHudpImpl::SetResendCallBack(const resend_back& resend_func) {
+    _resend_call_back = resend_func;
+}
+
+hudp_error_code CHudpImpl::CheckCanSend(const HudpHandle& handle) {
+    //get a socket. 
+    std::shared_ptr<CSocket> sock = _socket_mananger->GetSocket(handle);
+    if (!sock->CanSendMessage()) {
+        base::LOG_ERROR("the socket is not ready.");
+        return HEC_FAILED;
+    }
+    return HEC_SUCCESS;
 }

@@ -85,6 +85,7 @@ void CSocketImpl::RecvMessage(std::shared_ptr<CMsg> msg) {
 
     // first time recv msg
     if (_sk_status == SS_CLOSE) {
+        CHudpImpl::Instance().NewConnectToUpper(_handle, HEC_SUCCESS);
         StatusChange(SS_READY);
     }
 
@@ -98,6 +99,7 @@ void CSocketImpl::RecvMessage(std::shared_ptr<CMsg> msg) {
 
     // if recv rst msg, close this connection now
     if (header_flag & HPF_RST) {
+        CHudpImpl::Instance().NewConnectToUpper(_handle, HEC_BREAK);
         // release socket
         _sk_status = SS_CLOSE;
         CHudpImpl::Instance().ReleaseSocket(_handle);
@@ -208,6 +210,7 @@ void CSocketImpl::SendFinMessage() {
     fin_msg->SetSocket(sock);
     fin_msg->SetHandle(_handle);
 
+    CHudpImpl::Instance().NewConnectToUpper(_handle, HEC_CLOSED);
     StatusChange(_sk_status == SS_READY ? SS_FIN_WAIT_1 : SS_LAST_ACK);
     SendMessage(fin_msg);
 }

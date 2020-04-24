@@ -36,6 +36,10 @@ namespace hudp {
         virtual void SetId(const uint16_t& id) = 0;
         virtual uint16_t GetId() = 0;
 
+        // set upper identification
+        virtual void SetUpperId(uint32_t upper_id) = 0;
+        virtual uint32_t GetUpperId() = 0;
+
         // add send delay time
         virtual void AddSendDelay() = 0;
         virtual uint16_t GetReSendTime(uint32_t rto) = 0;
