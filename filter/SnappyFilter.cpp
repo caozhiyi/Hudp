@@ -5,10 +5,10 @@
 
 using namespace hudp;
 
-bool CSnappyFilter::FilterProcess(const HudpHandle& handle, uint16_t flag, std::string& body) {
+bool CSnappyFilter::FilterProcess(const HudpHandle& handle, uint16_t flag, std::string& body, uint32_t upper_id) {
     std::string send_msg;
     SnappyCompress(body, send_msg);
-    return _next_filter->FilterProcess(handle, flag, send_msg);
+    return _next_filter->FilterProcess(handle, flag, send_msg, upper_id);
 }
 
 bool CSnappyFilter::RelieveFilterProcess(const HudpHandle& handle, uint16_t flag, std::string& body) {

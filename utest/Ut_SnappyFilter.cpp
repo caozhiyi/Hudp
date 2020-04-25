@@ -12,7 +12,7 @@ public:
     CTestSnappyFilter() {}
     virtual ~CTestSnappyFilter() {}
     // when send msg filter process
-    bool FilterProcess(const HudpHandle& handle, uint16_t flag, std::string& body) {
+    bool FilterProcess(const HudpHandle& handle, uint16_t flag, std::string& body, uint32_t upper_id = 0) {
         _msg = body;
         return true;
     }
@@ -38,7 +38,7 @@ TEST(SnappyFilter, case1) {
     }
     snappy_filter.SetNextFilter(test_snappy_filter);
     snappy_filter.SetPrevFilter(test_snappy_filter);
-    EXPECT_TRUE(snappy_filter.FilterProcess("", 0, msg));
+    EXPECT_TRUE(snappy_filter.FilterProcess("", 0, msg, 0));
 }
 
 TEST(SnappyFilter, case2) {

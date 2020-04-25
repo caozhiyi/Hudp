@@ -96,7 +96,7 @@ hudp_error_code CHudpImpl::Join() {
     return HEC_SUCCESS;
 }
 
-hudp_error_code CHudpImpl::SendTo(const HudpHandle& handle, uint16_t flag, const std::string& msg) {
+hudp_error_code CHudpImpl::SendTo(const HudpHandle& handle, uint16_t flag, const std::string& msg, uint32_t upper_id) {
     if (msg.length() > __msg_body_size) {
         base::LOG_ERROR("msg size is bigger than msg body size.");
         return HEC_INVALID_PARAM;
@@ -110,8 +110,9 @@ hudp_error_code CHudpImpl::SendTo(const HudpHandle& handle, uint16_t flag, const
     }
 
     std::shared_ptr<CMsg> net_msg = CMsgPoolFactory::Instance().CreateSharedMsg();
+    net_msg->SetUpperId(upper_id);
     net_msg->SetFlag(msg_send);
-    net_msg->SetHeaderFlag(flag);
+    net_msg->SetHeaderFlag(flag | HPF_UPPER);
     net_msg->SetHandle(handle);
     net_msg->SetBody(msg);
     net_msg->SetSocket(sock);
@@ -154,14 +155,14 @@ void CHudpImpl::NewConnectToUpper(const HudpHandle& handle, hudp_error_code err)
     }
 }
 
-void CHudpImpl::ResendBackToUpper(const HudpHandle& handle, const char* msg, uint32_t len, bool& continue_send) {
+void CHudpImpl::ResendBackToUpper(const HudpHandle& handle, uint32_t upper_id, bool& continue_send) {
     if (_resend_call_back) {
-        _resend_call_back(handle, msg, len, continue_send);
+        _resend_call_back(handle, upper_id, continue_send);
     }
 }
 
-void CHudpImpl::SendBackToUpper(const HudpHandle& handle, const char* msg, uint32_t len, hudp_error_code err) {
-    _send_call_back(handle, msg, len, err);
+void CHudpImpl::SendBackToUpper(const HudpHandle& handle, uint32_t upper_id, hudp_error_code err) {
+    _send_call_back(handle, upper_id, err);
 }
 
 void CHudpImpl::SendMessageToNet(std::shared_ptr<CMsg> msg) {
@@ -178,8 +179,8 @@ void CHudpImpl::ReleaseSocket(const HudpHandle& handle) {
     _socket_mananger->DeleteSocket(handle);
 }
 
-bool CHudpImpl::SendMsgToFilter(const HudpHandle& handle, uint16_t flag, std::string& msg) {
-    return _filter_process->PushSendMsg(handle, flag, msg);
+bool CHudpImpl::SendMsgToFilter(const HudpHandle& handle, uint16_t flag, std::string& msg, uint32_t upper_id) {
+    return _filter_process->PushSendMsg(handle, flag, msg, upper_id);
 }
 
 bool CHudpImpl::RecvMsgToFilter(const HudpHandle& handle, uint16_t flag, std::string& msg) {

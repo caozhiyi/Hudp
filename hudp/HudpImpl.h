@@ -30,7 +30,7 @@ namespace hudp {
         hudp_error_code Join();
 
         // send msg
-        hudp_error_code SendTo(const HudpHandle& handle, uint16_t flag, const std::string& msg);
+        hudp_error_code SendTo(const HudpHandle& handle, uint16_t flag, const std::string& msg, uint32_t upper_id);
 
         // recv msg
         void RecvMsgFromNet(const HudpHandle& handle, const std::string& msg);
@@ -42,8 +42,8 @@ namespace hudp {
         // notify supper about.
         void RecvMessageToUpper(const HudpHandle& handle, std::string& msg, hudp_error_code err = HEC_SUCCESS);
         void NewConnectToUpper(const HudpHandle& handle, hudp_error_code err);
-        void ResendBackToUpper(const HudpHandle& handle, const char* msg, uint32_t len, bool& continue_send);
-        void SendBackToUpper(const HudpHandle& handle, const char* msg, uint32_t len, hudp_error_code err);
+        void ResendBackToUpper(const HudpHandle& handle, uint32_t upper_id, bool& continue_send);
+        void SendBackToUpper(const HudpHandle& handle, uint32_t upper_id, hudp_error_code err);
 
         // send message to net
         void SendMessageToNet(std::shared_ptr<CMsg> msg);
@@ -52,7 +52,7 @@ namespace hudp {
         // release socket
         void ReleaseSocket(const HudpHandle& handle);
         // send msg to send filter, final will send msg to socket
-        bool SendMsgToFilter(const HudpHandle& handle, uint16_t flag, std::string& msg);
+        bool SendMsgToFilter(const HudpHandle& handle, uint16_t flag, std::string& msg, uint32_t upper_id);
         // recv msg to recv filter, filal will recv msg to upper
         bool RecvMsgToFilter(const HudpHandle& handle, uint16_t flag, std::string& msg);
         // call back about

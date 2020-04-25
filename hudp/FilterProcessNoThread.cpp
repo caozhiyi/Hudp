@@ -32,8 +32,8 @@ void CFilterProcessNoThread::AddFilter(std::shared_ptr<CFilter> filter) {
     }
 }
 
-bool CFilterProcessNoThread::PushSendMsg(const HudpHandle& handle, uint16_t flag, std::string& body) {
-    return _filter_head->FilterProcess(handle, flag, body);
+bool CFilterProcessNoThread::PushSendMsg(const HudpHandle& handle, uint16_t flag, std::string& body, uint32_t upper_id) {
+    return _filter_head->FilterProcess(handle, flag, body, upper_id);
 }
 
 bool CFilterProcessNoThread::PushRecvMsg(const HudpHandle& handle, uint16_t flag, std::string& body) {

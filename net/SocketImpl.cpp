@@ -153,6 +153,11 @@ void CSocketImpl::ToSend(std::shared_ptr<CMsg> msg) {
 }
 
 void CSocketImpl::AckDone(std::shared_ptr<CMsg> msg) {
+    // send back upper
+    if (msg->GetHeaderFlag() & HPF_UPPER) {
+        CHudpImpl::Instance().SendBackToUpper(_handle, msg->GetUpperId(), HEC_SUCCESS);
+    }
+
     // release msg here
     CTimer::Instance().RemoveTimer(msg);
     if (__use_fq_and_pacing) {
@@ -168,11 +173,18 @@ void CSocketImpl::TimerOut(std::shared_ptr<CMsg> msg) {
     }
 
     if (!(msg->GetFlag() & msg_is_only_ack)) {
+        // continue resend call back
+        bool continue_resend = true;
+        CHudpImpl::Instance().ResendBackToUpper(_handle, msg->GetUpperId(), continue_resend);
+        if (!continue_resend) {
+            return;
+        }
+
         // msg resend, increase send delay
         msg->AddSendDelay();
         msg->SetFlag(msg_resend);
         _lost_msg.fetch_add(1);
-
+       
     } else {
         _is_in_timer = false;
     }
@@ -363,6 +375,8 @@ void CSocketImpl::AddToRecvList(WndIndex index, std::shared_ptr<CMsg> msg) {
 
     // continuously disordered messages
     if (ret == 2) {
+
+        CHudpImpl::Instance().RecvMessageToUpper(_handle, __empty_str, HEC_BREAK);
         SendResetMsg();
         return;
     }

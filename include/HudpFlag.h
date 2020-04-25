@@ -40,8 +40,8 @@ namespace hudp {
 
     typedef std::string HudpHandle; /*ip:port*/
     typedef std::function<void(const HudpHandle& handle, const char* msg, uint32_t len, hudp_error_code err)> recv_back;
-    typedef std::function<void(const HudpHandle& handle, const char* msg, uint32_t len, hudp_error_code err)> send_back;
-    typedef std::function<void(const HudpHandle& handle, const char* msg, uint32_t len, bool& continue_send)> resend_back;
+    typedef std::function<void(const HudpHandle& handle, uint32_t upper_id, hudp_error_code err)>             send_back;
+    typedef std::function<void(const HudpHandle& handle, uint32_t upper_id, bool& continue_send)>             resend_back;
     typedef std::function<void(const HudpHandle& handle, hudp_error_code err)>                                connect_back;
 
 }

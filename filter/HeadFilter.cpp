@@ -3,9 +3,9 @@
 
 using namespace hudp;
 
-bool CHeadFilter::FilterProcess(const HudpHandle& handle, uint16_t flag, std::string& body) {
+bool CHeadFilter::FilterProcess(const HudpHandle& handle, uint16_t flag, std::string& body, uint32_t upper_id) {
     // do nothing
-    return _next_filter->FilterProcess(handle, flag, body);
+    return _next_filter->FilterProcess(handle, flag, body, upper_id);
 }
 
 bool CHeadFilter::RelieveFilterProcess(const HudpHandle& handle, uint16_t flag, std::string& body) {

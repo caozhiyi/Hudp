@@ -13,7 +13,7 @@ namespace hudp {
         CFilter() : _next_filter(nullptr), _prev_filter(nullptr) {}
         virtual ~CFilter() { _next_filter.reset(); _prev_filter.reset(); }
         // when send msg filter process
-        virtual bool FilterProcess(const HudpHandle& handle, uint16_t flag, std::string& body) = 0;
+        virtual bool FilterProcess(const HudpHandle& handle, uint16_t flag, std::string& body, uint32_t upper_id) = 0;
         // when recv msg filter process
         virtual bool RelieveFilterProcess(const HudpHandle& handle, uint16_t flag, std::string& body) = 0;
         // two way linked list about

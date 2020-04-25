@@ -37,6 +37,8 @@ namespace hudp {
         HPF_MSG_WITH_TIME_STAMP        = 0x010000,
         // reset the connection
         HPF_RST                        = 0x020000,
+        // msg from upper
+        HPF_UPPER                      = 0x040000,
     };
 
     /*
@@ -88,5 +90,7 @@ namespace hudp {
         SS_CLOSE_WIAT = 6,
         SS_LAST_ACK   = 7,
     };
+
+    static std::string __empty_str;
 }
 #endif

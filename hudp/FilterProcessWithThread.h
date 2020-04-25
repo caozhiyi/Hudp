@@ -20,7 +20,7 @@ namespace hudp {
         
         void AddFilter(std::shared_ptr<CFilter> filter);
         // push message to send process
-        bool PushSendMsg(const HudpHandle& handle, uint16_t flag, std::string& body);
+        bool PushSendMsg(const HudpHandle& handle, uint16_t flag, std::string& body, uint32_t upper_id = 0);
         // push message to recv process
         bool PushRecvMsg(const HudpHandle& handle, uint16_t flag, std::string& body);
 

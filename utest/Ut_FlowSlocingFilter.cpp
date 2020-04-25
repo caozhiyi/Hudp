@@ -12,7 +12,7 @@ public:
     CTestSlicingFlowFilter() {}
     virtual ~CTestSlicingFlowFilter() {}
     // when send msg filter process
-    bool FilterProcess(const HudpHandle& handle, uint16_t flag, std::string& body) {
+    bool FilterProcess(const HudpHandle& handle, uint16_t flag, std::string& body, uint32_t upper_id = 0) {
         _msg_vec.push_back(body);
         return true;
     }
@@ -44,7 +44,7 @@ TEST(FlowSlicingFilter, case1) {
     }
     slicing_filter.SetNextFilter(test_slicingflow_filter);
     slicing_filter.SetPrevFilter(test_slicingflow_filter);
-    EXPECT_TRUE(slicing_filter.FilterProcess("", 0, big_msg));
+    EXPECT_TRUE(slicing_filter.FilterProcess("", 0, big_msg, 0));
 }
 
 TEST(FlowSlicingFilter, case2) {

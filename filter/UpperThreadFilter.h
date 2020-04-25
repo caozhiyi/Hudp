@@ -14,7 +14,7 @@ namespace hudp {
         CUpperThreadFilter();
         virtual ~CUpperThreadFilter();
         // when send msg filter process
-        bool FilterProcess(const HudpHandle& handle, uint16_t flag, std::string& body);
+        bool FilterProcess(const HudpHandle& handle, uint16_t flag, std::string& body, uint32_t upper_id);
         // when recv msg filter process
         bool RelieveFilterProcess(const HudpHandle& handle, uint16_t flag, std::string& body);
         // thread about

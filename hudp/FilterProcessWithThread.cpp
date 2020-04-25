@@ -37,8 +37,8 @@ void CFilterProcessWithThread::AddFilter(std::shared_ptr<CFilter> filter) {
     }
 }
 
-bool CFilterProcessWithThread::PushSendMsg(const HudpHandle& handle, uint16_t flag, std::string& body) {
-    FilterProcessParam param(FilterProcessParam::FILTER_SEND, handle, flag, std::move(body));
+bool CFilterProcessWithThread::PushSendMsg(const HudpHandle& handle, uint16_t flag, std::string& body, uint32_t upper_id) {
+    FilterProcessParam param(FilterProcessParam::FILTER_SEND, handle, flag, std::move(body), upper_id);
     Push(std::move(param));
     return true;
 }
@@ -57,7 +57,7 @@ void CFilterProcessWithThread::Run() {
             _filter_end->RelieveFilterProcess(filter_param._handle, filter_param._flag, filter_param._body);
 
         } else if (filter_param._filter_type == FilterProcessParam::FILTER_SEND) {
-            _filter_head->FilterProcess(filter_param._handle, filter_param._flag, filter_param._body);
+            _filter_head->FilterProcess(filter_param._handle, filter_param._flag, filter_param._body, filter_param._upper_id);
 
         } else {
             base::LOG_WARN("unknow filer param type.");

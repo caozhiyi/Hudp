@@ -11,7 +11,7 @@ static bool SliceBagComparer(const SliceBag& bag1, const SliceBag& bag2) {
     return bag1._head._index < bag2._head._index;
 }
 
-bool CFlowSlicingFilter::FilterProcess(const HudpHandle& handle, uint16_t flag, std::string& body) {
+bool CFlowSlicingFilter::FilterProcess(const HudpHandle& handle, uint16_t flag, std::string& body, uint32_t upper_id) {
     _cur_flag.fetch_add(1);
 
     uint32_t total_size = (uint32_t)body.length();
@@ -39,7 +39,7 @@ bool CFlowSlicingFilter::FilterProcess(const HudpHandle& handle, uint16_t flag, 
         }
         // send to next filter
         std::string send_slice =  SliceBagRefToString(bag);
-        if (!_next_filter->FilterProcess(handle, flag, send_slice)) {
+        if (!_next_filter->FilterProcess(handle, flag, send_slice, upper_id)) {
             return false;
         }
     }

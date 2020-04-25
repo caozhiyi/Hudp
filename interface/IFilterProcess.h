@@ -21,7 +21,7 @@ namespace hudp {
         // add a filter
         virtual void AddFilter(std::shared_ptr<CFilter> filter) = 0;
         // push message to send process
-        virtual bool PushSendMsg(const HudpHandle& handle, uint16_t flag, std::string& body) = 0;
+        virtual bool PushSendMsg(const HudpHandle& handle, uint16_t flag, std::string& body, uint32_t upper_id = 0) = 0;
         // push message to recv process
         virtual bool PushRecvMsg(const HudpHandle& handle, uint16_t flag, std::string& body) = 0;
     };

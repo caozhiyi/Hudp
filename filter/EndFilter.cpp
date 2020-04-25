@@ -3,9 +3,9 @@
 
 using namespace hudp;
 
-bool CEndFilter::FilterProcess(const HudpHandle& handle, uint16_t flag, std::string& body) {
+bool CEndFilter::FilterProcess(const HudpHandle& handle, uint16_t flag, std::string& body, uint32_t upper_id) {
     // send to hudp
-    return CHudpImpl::Instance().SendTo(handle, flag, body);
+    return CHudpImpl::Instance().SendTo(handle, flag, body, upper_id);
 }
 
 bool CEndFilter::RelieveFilterProcess(const HudpHandle& handle, uint16_t flag, std::string& body) {

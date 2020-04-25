@@ -33,7 +33,7 @@ hudp::hudp_error_code hudp::SendTo(const HudpHandle& handle, uint16_t flag, std:
         return ret;
     }
     
-    CHudpImpl::Instance().SendMsgToFilter(handle, flag, msg);
+    CHudpImpl::Instance().SendMsgToFilter(handle, flag, msg, upper_id);
     return HEC_SUCCESS;
 }
 
@@ -44,7 +44,7 @@ hudp::hudp_error_code hudp::SendTo(const HudpHandle& handle, uint16_t flag, cons
     }
     
     std::string send_msg(msg, len);
-    CHudpImpl::Instance().SendMsgToFilter(handle, flag, send_msg);
+    CHudpImpl::Instance().SendMsgToFilter(handle, flag, send_msg, upper_id);
     return HEC_SUCCESS;
 }
 
