@@ -30,12 +30,12 @@ namespace hudp {
     };
 
     enum hudp_error_code {
-        HEC_SUCCESS          = 1,
-        HEC_CLOSED           = 2,
-        HEC_INVALID_HANDLE   = 3,
-        HEC_FAILED           = 4,
-        HEC_BREAK            = 5,
-        HEC_INVALID_PARAM    = 6
+        HEC_SUCCESS          = 0,
+        HEC_CLOSED           = 1,
+        HEC_INVALID_HANDLE   = 2,
+        HEC_FAILED           = 3,
+        HEC_BREAK            = 4,
+        HEC_INVALID_PARAM    = 5
     };
 
     typedef std::string HudpHandle; /*ip:port*/

@@ -15,11 +15,11 @@ hudp::hudp_error_code hudp::Start(const std::string& ip, uint16_t port, const re
 }
 
 void hudp::SetConnectCallBack(const connect_back& conn_func) {
-
+    CHudpImpl::Instance().SetConnectCallBack(conn_func);
 }
 
 void hudp::SetResendCallBack(const resend_back& resend_func) {
-
+    CHudpImpl::Instance().SetResendCallBack(resend_func);
 }
 
 hudp::hudp_error_code hudp::Join() {

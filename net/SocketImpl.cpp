@@ -77,17 +77,16 @@ void CSocketImpl::SendMessage(std::shared_ptr<CMsg> msg) {
 }
 
 void CSocketImpl::RecvMessage(std::shared_ptr<CMsg> msg) {
+    // first time recv ack msg
+    if (_sk_status == SS_CLOSE) {
+        StatusChange(SS_READY);
+        CHudpImpl::Instance().NewConnectToUpper(_handle, HEC_SUCCESS);
+    }
     // get ack info
     GetAckToSendWnd(msg);
     // recv msg to orderlist
     bool done = false;
     uint16_t ret = 0;
-
-    // first time recv msg
-    if (_sk_status == SS_CLOSE) {
-        CHudpImpl::Instance().NewConnectToUpper(_handle, HEC_SUCCESS);
-        StatusChange(SS_READY);
-    }
 
     // time wait status send rst to remote.
     if (_sk_status == SS_TIME_WAIT) {
@@ -301,11 +300,6 @@ bool CSocketImpl::AddAckToMsg(std::shared_ptr<CMsg> msg) {
 }
 
 void CSocketImpl::GetAckToSendWnd(std::shared_ptr<CMsg> msg) {
-    // first time recv ack msg
-    if (_sk_status == SS_CLOSE) {
-        StatusChange(SS_READY);
-    }
-
     uint64_t rtt_time = 0;
     uint32_t ack_msg_size = 0;
     if (msg->GetHeaderFlag() & HPF_WITH_RELIABLE_ORDERLY_ACK) {
