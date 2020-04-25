@@ -29,7 +29,7 @@ struct Content {
 std::map<HudpHandle, Content> _recv_map;
 static const uint16_t __send_flag = HPF_NROMAL_PRI | HTF_RELIABLE;
 
-void ReadFunc(const HudpHandle& handle, const char* msg, uint32_t len) {
+void ReadFunc(const HudpHandle& handle, const char* msg, uint32_t len, hudp_error_code err) {
     if (_recv_map.count(handle) < 1) {
         _recv_map[handle] = Content();
     }
@@ -87,11 +87,18 @@ void ReadFunc(const HudpHandle& handle, const char* msg, uint32_t len) {
     }
 }
 
+void SendCallBack(const HudpHandle& handle, uint32_t upper_id, hudp_error_code err) {
+    if (err == hudp::HEC_SUCCESS) {
+        std::cout << "send success to :" << handle << " upper_id : " << upper_id << std::endl;
+    }
+}
+
+
 int main() {
 
     hudp::Init();
 
-    hudp::Start("0.0.0.0", 8921, ReadFunc);
+    hudp::Start("0.0.0.0", 8921, ReadFunc, SendCallBack);
 
     hudp::Join();
 }

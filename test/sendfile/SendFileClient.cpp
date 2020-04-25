@@ -22,7 +22,7 @@ public:
 
     }
 
-    void OnRecv(const HudpHandle& handle, const char* data, uint32_t len) {
+    void OnRecv(const HudpHandle& handle, const char* data, uint32_t len, hudp_error_code err) {
         if (len < 2) {
             return;
         }
@@ -63,6 +63,12 @@ public:
         SendTo(handle, __send_flag, (char*)&_header, sizeof(_header));
     }
 
+    void SendCallBack(const HudpHandle& handle, uint32_t upper_id, hudp_error_code err) {
+        if (err == hudp::HEC_SUCCESS) {
+            std::cout << "send success to :" << handle << " upper_id : " << upper_id << std::endl;
+        }
+    }
+
 private:
     bool GetFileHeader() {
         _file.open(_file_name, std::ios::binary | std::ios::in);
@@ -91,6 +97,7 @@ private:
         _file.close();
     }
 
+
 private:
     std::fstream _file;
     FileHeader   _header;
@@ -111,6 +118,8 @@ int main(int argc, char *argv[]) {
     hudp::Init();
 
     hudp::Start("0.0.0.0", 8922, std::bind(&CSendFile::OnRecv, &file, std::placeholders::_1, std::placeholders::_2,
+        std::placeholders::_3, std::placeholders::_4), 
+        std::bind(&CSendFile::SendCallBack, &file, std::placeholders::_1, std::placeholders::_2,
         std::placeholders::_3));
 
     file.StartSendFile("127.0.0.1:8921");
