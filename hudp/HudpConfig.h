@@ -20,9 +20,6 @@ namespace hudp {
     // msx length of send wnd
     static const uint16_t __max_send_wnd_size = 65535;
 
-    // bitstream pool expand size every times.
-    static const uint16_t _stream_pool_expand_size = 100;
-
     // if id trans boundary, still think bigger in 0 ~ __max_compare_num.
     static const uint16_t __max_compare_num = 100;
 

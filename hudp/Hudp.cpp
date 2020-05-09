@@ -2,8 +2,7 @@
 #include "HudpImpl.h"
 
 hudp::hudp_error_code hudp::Init() {
-    CHudpImpl::Instance().Init();
-    return HEC_SUCCESS;
+    return CHudpImpl::Instance().Init();
 }
 
 hudp::hudp_error_code hudp::Start(const std::string& ip, uint16_t port, const recv_back& recv_func, 

@@ -199,7 +199,7 @@ hudp_error_code CHudpImpl::CheckCanSend(const HudpHandle& handle) {
     //get a socket. 
     std::shared_ptr<CSocket> sock = _socket_mananger->GetSocket(handle);
     if (!sock->CanSendMessage()) {
-        base::LOG_ERROR("the socket is not ready.");
+        base::LOG_WARN("the socket is not ready.");
         return HEC_FAILED;
     }
     return HEC_SUCCESS;
