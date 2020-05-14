@@ -22,8 +22,14 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sendfile", "sendfile", "{4FB02BE7-C9E1-45EC-886D-196D7AEB6940}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SendFileSer", "test\sendfile\SendFileSer.vcxproj", "{F928B653-25D0-48E3-AB29-A543EA40A220}"
+	ProjectSection(ProjectDependencies) = postProject
+		{DE0D19A0-D775-4B5F-B0E3-E2ED9046E41A} = {DE0D19A0-D775-4B5F-B0E3-E2ED9046E41A}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SendFileCli", "test\sendfile\SendFileCli.vcxproj", "{E9054DA0-B761-4FD9-98BF-9D5E37B4FE49}"
+	ProjectSection(ProjectDependencies) = postProject
+		{DE0D19A0-D775-4B5F-B0E3-E2ED9046E41A} = {DE0D19A0-D775-4B5F-B0E3-E2ED9046E41A}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

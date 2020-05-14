@@ -39,7 +39,7 @@ bool CFlowSlicingFilter::FilterProcess(const HudpHandle& handle, uint16_t flag, 
         }
         // send to next filter
         std::string send_slice =  SliceBagRefToString(bag);
-        if (!_next_filter->FilterProcess(handle, flag, send_slice, upper_id)) {
+        if (_next_filter->FilterProcess(handle, flag, send_slice, upper_id) != HEC_SUCCESS) {
             return false;
         }
     }

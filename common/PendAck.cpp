@@ -95,7 +95,9 @@ bool CPendAck::GetAck(std::vector<uint16_t>& ack_vec, std::vector<uint64_t>& tim
     if (continuity && ack_vec.size() == 1) {
         continuity = false;
     }
-    base::LOG_DEBUG("[ACK] : attach ack msg. id : %d, size : %d", ack_vec[0], ack_vec.size());
+    if (!ack_vec.empty()) {
+        base::LOG_DEBUG("[ACK] : attach ack msg. id : %d, size : %d", ack_vec[0], ack_vec.size());
+    }
     _cur_size -= cur_szie;
     return true;
 }
