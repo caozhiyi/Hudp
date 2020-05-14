@@ -30,15 +30,15 @@ bool CConfig::LoadFile(const std::string& path) {
             continue;
         }
         line = buf;
-        _Trim(line);
+        Trim(line);
         if (line[0] == '#') {
             continue;
         }
 
         key = line.substr(0, line.find_first_of("="));
         value = line.substr(line.find_first_of("=") + 1);
-        _Trim(key);
-        _Trim(value);
+        Trim(key);
+        Trim(value);
         LOG_INFO("load config key : %s, value : %s", key.c_str(), value.c_str());
         temp_map[key] = value;
     }
@@ -108,7 +108,7 @@ bool CConfig::GetBoolValue(const std::string& key) {
     }
 }
 
-void CConfig::_Trim(std::string& line) {
+void CConfig::Trim(std::string& line) {
     if (line.empty()) {
         return;
     }
