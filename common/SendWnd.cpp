@@ -34,21 +34,22 @@ void CSendWndImpl::PushBack(std::shared_ptr<CMsg> msg) {
         base::LOG_WARN("send a repeat mag to send wnd. id : %d", msg->GetId());
         return;
     }
-    // can send now, push to priority queue.
+    // push to priority queue.
     if (_cur_send_size >= _send_wnd_size) {
         _priority_queue->PushBack(msg);
 
     } else {
+        // send to remote directly.
         PushBackToSendWnd(msg);
     }
 }
 // receive a ack
 uint32_t CSendWndImpl::AcceptAck(uint16_t id) {
-
     base::LOG_DEBUG("send wnd recv a ack. id : %d", id);
     std::unique_lock<std::mutex> lock(_mutex);
     auto iter = _id_msg_map.find(id);
     if (iter == _id_msg_map.end()) {
+        // a repeat ack.
         return 0;
     }
 
@@ -62,7 +63,7 @@ uint32_t CSendWndImpl::AcceptAck(uint16_t id) {
     _ack_queue.push(iter->second);
     _cur_send_size--;
 
-    uint32_t ret = iter->second->GetEstimateSize();
+    uint32_t size = iter->second->GetEstimateSize();
     _id_msg_map.erase(iter);
 
     if (!_id_msg_map.empty()) {
@@ -80,7 +81,7 @@ uint32_t CSendWndImpl::AcceptAck(uint16_t id) {
     // send next bag
     SendNext();
     SendAndAck();
-    return ret;
+    return size;
 }
 
 uint32_t CSendWndImpl::AcceptAck(uint16_t start_id, uint16_t len) {

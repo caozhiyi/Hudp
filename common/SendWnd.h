@@ -21,7 +21,8 @@ namespace hudp {
         ~CSendWndImpl();
 
         void PushBack(std::shared_ptr<CMsg> msg);
-        // receive a ack
+        // receive a ack.
+        // return the msg size.
         uint32_t AcceptAck(uint16_t id);
         uint32_t AcceptAck(uint16_t start_id, uint16_t len);
         uint32_t AcceptAck(std::vector<uint16_t>& vec_id, uint16_t start_index, uint16_t len);

@@ -14,6 +14,7 @@ CRtoImpl::CRtoImpl() : _srtt(0),
 }
 
 CRtoImpl::~CRtoImpl() {
+
 }
 
 void CRtoImpl::SetRttTime(uint64_t rtt) {
