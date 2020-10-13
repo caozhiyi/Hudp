@@ -1,6 +1,7 @@
 #ifndef HEADER_INCLUDE_HUDPFLAG
 #define HEADER_INCLUDE_HUDPFLAG
 
+#include <string>
 #include <functional>
 
 namespace hudp {
